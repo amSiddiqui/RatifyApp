@@ -1,0 +1,73 @@
+import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import jwtDecode from 'jwt-decode';
+import { AuthInitialStateType, TokenType } from '../types/AuthTypes'
+
+const initialState = {isAuthenticated: false, user: null, error: false, loading: true, message: ''} as AuthInitialStateType;
+
+const authSlice = createSlice({
+    name: 'auth',
+    initialState,
+    reducers: {
+        login: (state, action:PayloadAction<TokenType>) => {
+            const { access, refresh } = action.payload as TokenType;
+            
+            localStorage.setItem('tokens', JSON.stringify({
+                access,
+                refresh,
+            }));
+            state.isAuthenticated = true;
+            state.user = jwtDecode(access);
+            state.error = false;
+            state.loading = false;
+            state.message = '';
+        },
+
+        logout: (state) => {
+            localStorage.removeItem('tokens');
+            state.isAuthenticated = false;
+            state.user = null;
+            state.error = false;
+            state.loading = false;
+            state.message = '';
+        },
+
+        accessTokenRefreshed: (state, action:PayloadAction<string>) => {
+            const accessToken = action.payload;
+            let tokensStr = localStorage.getItem('tokens');
+            if (tokensStr) {
+                let tokens = JSON.parse(tokensStr) as TokenType;
+                tokens.access = accessToken;
+                localStorage.setItem('tokens', JSON.stringify(tokens));
+                state.user = jwtDecode(accessToken);
+            } else {
+                state.isAuthenticated = false;
+                state.user = null;
+            }
+            state.isAuthenticated = true;
+            state.user = jwtDecode(accessToken);
+            state.error = false;
+            state.loading = false;
+            state.message = '';
+        },
+        
+        setLoading: (state) => {
+            state.error = false;
+            state.loading = true;
+            state.message = '';
+        },
+
+        setError: (state, action:PayloadAction<string>) => {
+            state.isAuthenticated = false;
+            state.error = true;
+            state.loading = false;
+            state.message = action.payload;
+            localStorage.removeItem('tokens');
+        }
+    }
+});
+
+
+
+export const authActions = authSlice.actions;
+
+export default authSlice;
