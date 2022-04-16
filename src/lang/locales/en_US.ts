@@ -10,7 +10,7 @@ Table of Contents
 
 export const enMessages = {
   /* 01.General */
-  'general.copyright': 'Gogo React © 2018 All Rights Reserved.',
+  'general.copyright': 'Ratify © 2022 All Rights Reserved.',
 
   'unauthorized.title': 'Unauthorized Access Attempt',
   'unauthorized.detail':
@@ -22,6 +22,7 @@ export const enMessages = {
   'user.forgot-password': 'Forgot Password',
   'user.email': 'E-mail',
   'user.password': 'Password',
+  'user.confirm-password': 'Confirm Password',
   'user.forgot-password-question': 'Forget password?',
   'user.fullname': 'Full Name',
   'user.login-button': 'LOGIN',

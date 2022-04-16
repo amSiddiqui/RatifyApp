@@ -2,21 +2,28 @@ import './App.css';
 import React from 'react';
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
-import {
-    isMultiColorActive,
-    adminRoot,
-    UserRole,
-} from './constants/defaultValues';
-
 import { IntlProvider } from 'react-intl';
 import AppLocale from './lang/';
 import { getDirection } from './helpers/Utils';
 // @ts-ignore
-import { NotificationContainer } from './theme/components/common/react-notifications';
-import ColorSwitcher from './theme/components/common/ColorSwitcher';
-import { authActions } from './redux/auth-slice';
 import { AppDispatch, RootState } from './redux/';
-import { AuthHelper } from "./helpers/AuthHelper";
+import { AuthHelper } from './helpers/AuthHelper';
+
+const ViewError = React.lazy(() =>
+  import(/* webpackChunkName: "views-error" */ './theme/views/error')
+);
+const ViewUnauthorized = React.lazy(() =>
+  import(/* webpackChunkName: "views-error" */ './theme/views/unauthorized')
+);
+const ViewUser = React.lazy(() =>
+  import(/* webpackChunkName: "views-user" */ './theme/views/user')
+);
+const Login = React.lazy(() =>
+  import(/* webpackChunkName: "user-login" */ './theme/views/user/login')
+);
+const Register = React.lazy(() =>
+  import(/* webpackChunkName: "user-register" */ './theme/views/user/register')
+);
 
 type ProtectedRouteProps = {
     isAuthenticated: boolean;
@@ -46,7 +53,7 @@ function App() {
 
     const defaultProtectedRouteProps: Omit<ProtectedRouteProps, 'outlet'> = {
         isAuthenticated: auth.isAuthenticated || auth.loading,
-        authenticationPath: '/login',
+        authenticationPath: '/user',
     };
 
     React.useEffect(() => {
@@ -72,14 +79,18 @@ function App() {
                 messages={currentAppLocale.messages}
             >
                 <>
-                    <NotificationContainer />
                     <React.Suspense fallback={<div className="loading" />}>
                         <BrowserRouter>
                             <Routes>
-                                <Route path="/" element={<ProtectedRoute {...defaultProtectedRouteProps} outlet={<div>Home</div>} />} />
-                                <Route path="/error" element={<div>Error</div>} />
-                                <Route path="/unauthorized" element={<div>Unauthorized</div>} />
-                                <Route path="/login" element={<div>Login</div>} />
+                                <Route path='/' element={<ProtectedRoute {...defaultProtectedRouteProps} outlet={<div className='flex h-screen justify-center items-center text-3xl'>Home</div>} />} />
+                                <Route path='error' element={<ViewError></ViewError>} />
+                                <Route path='unauthorized' element={<ViewUnauthorized></ViewUnauthorized>} />
+                                <Route path='user' element={<ViewUser />} >
+                                    <Route index element={<Navigate to='/user/login' />} />
+                                    <Route path='login' element={<Login />} />
+                                    <Route path='register' element={<Register />} />
+                                </Route>
+                                <Route path="*" element={<Navigate to='/error' />} />
                             </Routes>
                         </BrowserRouter>
                     </React.Suspense>

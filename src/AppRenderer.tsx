@@ -3,6 +3,9 @@ import ReactDOM from 'react-dom';
 import reportWebVitals from './reportWebVitals';
 import store from './redux/index';
 import { Provider } from 'react-redux';
+import { ToastContainer } from "react-toastify";
+import 'react-toastify/dist/ReactToastify.css';
+
 
 const App = React.lazy(() => import(/* webpackChunkName: "App" */ './App'));
 
@@ -14,6 +17,7 @@ const Main = () => {
           <App />
         </Suspense>
       </Provider>
+      <ToastContainer />
     </React.StrictMode>
   );
 };

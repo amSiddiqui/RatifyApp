@@ -24,7 +24,7 @@ export const currentUser = {
     role: UserRole.Admin,
 };
 
-export const adminRoot = "/app";
+export const adminRoot = "/";
 export const buyUrl = "https://1.envato.market/k4z0";
 export const searchPath = `${adminRoot}/#`;
 export const servicePath = "https://api.coloredstrategies.com";
