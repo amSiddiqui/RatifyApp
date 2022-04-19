@@ -10,7 +10,7 @@ const initialState = {
   subHiddenBreakpoint: subHiddenBreakpoint,
   menuHiddenBreakpoint: menuHiddenBreakpoint,
   menuClickCount: 0,
-  selectedMenuHasSubItems: defaultMenuType === 'menu-default',
+  selectedMenuHasSubItems: false,
 };
 
 const menuSlice = createSlice({

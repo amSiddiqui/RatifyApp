@@ -21,19 +21,17 @@ export const localeOptions = [
 export const currentUser:UserType = {
     id: 1,
     title: "Sarah Kortney",
-    img: "/assets/img/profiles/l-1.jpg",
+    img: "/static/img/profiles/l-1.jpg",
     date: "Last seen today 15:24",
     role: UserRole.Admin,
 };
 
 export const adminRoot = "/";
-export const buyUrl = "https://1.envato.market/k4z0";
 export const searchPath = `${adminRoot}/#`;
-export const servicePath = "https://api.coloredstrategies.com";
 
 export const themeColorStorageKey = "__theme_selected_color";
 export const isMultiColorActive = true;
-export const defaultColor = "light.purplemonster";
+export const defaultColor = "light.blueyale";
 export const isDarkSwitchActive = true;
 export const defaultDirection = "ltr";
 export const themeRadiusStorageKey = "__theme_radius";

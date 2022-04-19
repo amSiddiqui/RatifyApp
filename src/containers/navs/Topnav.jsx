@@ -14,14 +14,11 @@ import {
 
 import { NavLink, useNavigate } from 'react-router-dom';
 
-import IntlMessages from '../../helpers/IntlMessages';
-
 import {
   menuHiddenBreakpoint,
   searchPath,
   localeOptions,
   isDarkSwitchActive,
-  buyUrl,
   adminRoot,
 } from '../../constants/defaultValues';
 
@@ -181,9 +178,11 @@ const TopNav = ({ intl }) => {
       window.dispatchEvent(event);
     }, 350);
     dispatch(menuActions.setContainerClassnames(
-      _clickCount + 1,
-      _conClassnames,
-      selectedMenuHasSubItems
+      {
+      clickIndex: _clickCount + 1,
+      strCurrentClasses: _conClassnames,
+      selectedMenuHasSubItems: selectedMenuHasSubItems
+      }
     ));
   };
 
@@ -256,15 +255,6 @@ const TopNav = ({ intl }) => {
             </DropdownMenu>
           </UncontrolledDropdown>
         </div>
-        <div className="position-relative d-none d-none d-lg-inline-block">
-          <a
-            className="btn btn-outline-primary btn-sm ml-2"
-            target="_top"
-            href={buyUrl}
-          >
-            <IntlMessages id="user.buy" />
-          </a>
-        </div>
       </div>
       <NavLink className="navbar-logo" to={adminRoot}>
         <span className="logo d-none d-xs-block" />
@@ -294,7 +284,7 @@ const TopNav = ({ intl }) => {
             <DropdownToggle className="p-0" color="empty">
               <span className="name mr-1">Sarah Kortney</span>
               <span>
-                <img alt="Profile" src="/assets/img/profiles/l-1.jpg" />
+                <img alt="Profile" src="/static/img/profiles/l-1.jpg" />
               </span>
             </DropdownToggle>
             <DropdownMenu className="mt-3" right>

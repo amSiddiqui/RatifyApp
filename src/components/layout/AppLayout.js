@@ -16,7 +16,7 @@ const AppLayout = ({ children }) => {
   const location = useLocation();
   
   const setContainerClassnames = (a, b, c) => {
-    dispatchFn(menuActions.setContainerClassnames(a, b, c));
+    dispatchFn(menuActions.setContainerClassnames({clickIndex:a, strCurrentClasses: b, selectedMenuHasSubItems: c}));
   }
 
   const changeSelectedMenuHasSubItems = (value) => {

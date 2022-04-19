@@ -29,6 +29,10 @@ const ViewApp = React.lazy(() =>
   import(/* webpackChunkName: "views-app" */ './views/app')
 );
 
+const BlankPage = React.lazy(() =>
+  import(/* webpackChunkName: "viwes-blank-page" */ './views/app/blank-page')
+);
+
 type ProtectedRouteProps = {
     isAuthenticated: boolean;
     authenticationPath: string;
@@ -84,7 +88,9 @@ function App() {
                     <React.Suspense fallback={<div className="loading" />}>
                         <BrowserRouter>
                             <Routes>
-                                <Route path='/' element={<ProtectedRoute {...defaultProtectedRouteProps} outlet={<ViewApp />} />} />
+                                <Route path='/' element={<ProtectedRoute {...defaultProtectedRouteProps} outlet={<ViewApp />} />}>
+                                    <Route index element={<BlankPage />} />
+                                </Route>
                                 <Route path='error' element={<ViewError></ViewError>} />
                                 <Route path='unauthorized' element={<ViewUnauthorized></ViewUnauthorized>} />
                                 <Route path='user' element={<ViewUser />} >

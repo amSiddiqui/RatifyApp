@@ -52,7 +52,6 @@ const Login = () => {
     const [password] = React.useState('');
 
     const onUserLogin = (data:LoginDataType) => {
-        console.log(data);
         authHelper
             .loginRequest(data)
             .then(() => {

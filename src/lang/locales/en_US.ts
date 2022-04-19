@@ -34,8 +34,8 @@ export const enMessages = {
   /* 03.Menu */
   'menu.home': 'Home',
   'menu.app': 'Home',
-  'menu.dashboards': 'Dashboards',
-  'menu.gogo': 'Gogo',
+  'menu.dashboards': 'Dashboard',
+  'menu.ratify': 'Ratify',
   'menu.start': 'Start',
   'menu.second-menu': 'Second Menu',
   'menu.second': 'Second',
