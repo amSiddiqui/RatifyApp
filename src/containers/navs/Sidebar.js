@@ -1,6 +1,5 @@
 /* eslint-disable react/no-array-index-key */
 import React, { Component } from 'react';
-import ReactDOM from 'react-dom';
 import { Nav, NavItem, Collapse } from 'reactstrap';
 import { NavLink } from 'react-router-dom';
 import classnames from 'classnames';
@@ -13,6 +12,7 @@ import menuItems from '../../constants/menu';
 class Sidebar extends Component {
   constructor(props) {
     super(props);
+    this.gRef = React.createRef();
     this.state = {
       selectedParentMenu: '',
       viewingParentMenu: '',
@@ -101,7 +101,7 @@ class Sidebar extends Component {
 
   getContainer = () => {
     // eslint-disable-next-line react/no-find-dom-node
-    return ReactDOM.findDOMNode(this);
+    return this.gRef.current;
   };
 
   toggle = () => {
@@ -346,7 +346,7 @@ class Sidebar extends Component {
     const { selectedParentMenu, viewingParentMenu, collapsedMenus } =
       this.state;
     return (
-      <div className="sidebar">
+      <div ref={this.gRef} className="sidebar">
         <div className="main-menu">
           <div className="scroll">
             <PerfectScrollbar
