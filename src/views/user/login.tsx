@@ -10,8 +10,10 @@ import IntlMessages from '../../helpers/IntlMessages';
 import { AuthHelper } from '../../helpers/AuthHelper';
 import { useDispatch, useSelector } from 'react-redux';
 import { toast } from 'react-toastify';
+import { RootState } from '../../redux';
+import { LoginDataType } from '../../types/AuthTypes';
 
-const validatePassword = (value) => {
+const validatePassword = (value:string) => {
     let error;
     // check if password is at least 8 characters long containing at least one number and one letter
     if (value.length < 8) {
@@ -26,7 +28,7 @@ const validatePassword = (value) => {
     return error;
 };
 
-const validateEmail = (value) => {
+const validateEmail = (value:string) => {
     let error;
     if (!value) {
         error = 'Please enter your email address';
@@ -37,7 +39,7 @@ const validateEmail = (value) => {
 };
 
 const Login = () => {
-    const loading = useSelector((root) => root.auth.loading);
+    const loading = useSelector<RootState>((root) => root.auth.loading);
     const navigate = useNavigate();
     const dispatch = useDispatch();
     const authHelper = React.useMemo(
@@ -49,7 +51,7 @@ const Login = () => {
     const [email] = React.useState('');
     const [password] = React.useState('');
 
-    const onUserLogin = (data) => {
+    const onUserLogin = (data:LoginDataType) => {
         console.log(data);
         authHelper
             .loginRequest(data)

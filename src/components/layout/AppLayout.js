@@ -41,7 +41,6 @@ const AppLayout = ({ children }) => {
     return <div className='loading'></div>
   }
 
-  console.log({menu});
   return (
     <div id="app-container" className={menu.containerClassName}>
       <TopNav />

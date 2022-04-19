@@ -5,7 +5,7 @@ import { Colxx } from '../components/common/CustomBootstrap';
 import IntlMessages from '../helpers/IntlMessages';
 import { adminRoot } from '../constants/defaultValues';
 
-const Unauthorized = () => {
+const Unauthorized:React.FC = () => {
   useEffect(() => {
     document.body.classList.add('background');
     document.body.classList.add('no-footer');

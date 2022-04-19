@@ -16,9 +16,10 @@ import { Colxx } from '../../components/common/CustomBootstrap';
 import { AuthHelper } from '../../helpers/AuthHelper';
 import { useDispatch } from 'react-redux';
 import * as Yup from 'yup';
-import { useFormik } from 'formik';
+import { FormikHelpers, useFormik } from 'formik';
+import { SignUpDataType } from '../../types/AuthTypes';
 
-const passwordValidation = (value) => {
+const passwordValidation = (value:string | undefined) => {
     if (typeof value !== 'string') {
         return false;
     }
@@ -41,7 +42,7 @@ const Register = () => {
         [dispatchFn]
     );
 
-    const onUserRegister = (data, actions) => {
+    const onUserRegister = (data:SignUpDataType, actions:FormikHelpers<SignUpDataType>) => {
         console.log({ data });
         setTimeout(() => {
             actions.setSubmitting(false);
