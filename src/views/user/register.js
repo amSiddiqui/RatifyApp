@@ -11,9 +11,9 @@ import {
 } from 'reactstrap';
 import { NavLink } from 'react-router-dom';
 
-import IntlMessages from '../../../helpers/IntlMessages';
+import IntlMessages from '../../helpers/IntlMessages';
 import { Colxx } from '../../components/common/CustomBootstrap';
-import { AuthHelper } from '../../../helpers/AuthHelper';
+import { AuthHelper } from '../../helpers/AuthHelper';
 import { useDispatch } from 'react-redux';
 import * as Yup from 'yup';
 import { useFormik } from 'formik';

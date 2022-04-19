@@ -2,8 +2,8 @@
 import React from 'react';
 import { Breadcrumb, BreadcrumbItem } from 'reactstrap';
 import { NavLink } from 'react-router-dom';
-import IntlMessages from '../../../helpers/IntlMessages';
-import { adminRoot } from '../../../constants/defaultValues';
+import IntlMessages from '../../helpers/IntlMessages';
+import { adminRoot } from '../../constants/defaultValues';
 
 const getMenuTitle = (sub) => {
   if (`/${sub}` === adminRoot) return <IntlMessages id="menu.home" />;

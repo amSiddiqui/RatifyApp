@@ -6,9 +6,9 @@ import { NavLink } from 'react-router-dom';
 import classnames from 'classnames';
 import PerfectScrollbar from 'react-perfect-scrollbar';
 
-import IntlMessages from '../../../helpers/IntlMessages';
+import IntlMessages from '../../helpers/IntlMessages';
 
-import menuItems from '../../../constants/menu';
+import menuItems from '../../constants/menu';
 
 class Sidebar extends Component {
   constructor(props) {

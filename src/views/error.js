@@ -2,10 +2,10 @@ import React, { useEffect } from 'react';
 import { Row, Card, CardTitle } from 'reactstrap';
 import { NavLink } from 'react-router-dom';
 import { Colxx } from '../components/common/CustomBootstrap';
-import IntlMessages from '../../helpers/IntlMessages';
-import { adminRoot } from '../../constants/defaultValues';
+import IntlMessages from '../helpers/IntlMessages';
+import { adminRoot } from '../constants/defaultValues';
 
-const Unauthorized = () => {
+const Error = () => {
   useEffect(() => {
     document.body.classList.add('background');
     document.body.classList.add('no-footer');
@@ -33,12 +33,12 @@ const Unauthorized = () => {
                     <span className="logo-single" />
                   </NavLink>
                   <CardTitle className="mb-4">
-                    <IntlMessages id="unauthorized.title" />
+                    <IntlMessages id="pages.error-title" />
                   </CardTitle>
                   <p className="text-muted text-small mb-0">
-                    <IntlMessages id="unauthorized.detail" />
+                    <IntlMessages id="pages.error-code" />
                   </p>
-                  <p className="display-1 font-weight-bold mb-5">503</p>
+                  <p className="display-1 font-weight-bold mb-5">404</p>
                   <NavLink
                     to={adminRoot}
                     className="btn btn-primary btn-shadow btn-lg"
@@ -55,4 +55,4 @@ const Unauthorized = () => {
   );
 };
 
-export default Unauthorized;
+export default Error;

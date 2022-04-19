@@ -10,23 +10,23 @@ import { AppDispatch, RootState } from './redux/';
 import { AuthHelper } from './helpers/AuthHelper';
 
 const ViewError = React.lazy(() =>
-  import(/* webpackChunkName: "views-error" */ './theme/views/error')
+  import(/* webpackChunkName: "views-error" */ './views/error')
 );
 const ViewUnauthorized = React.lazy(() =>
-  import(/* webpackChunkName: "views-error" */ './theme/views/unauthorized')
+  import(/* webpackChunkName: "views-error" */ './views/unauthorized')
 );
 const ViewUser = React.lazy(() =>
-  import(/* webpackChunkName: "views-user" */ './theme/views/user')
+  import(/* webpackChunkName: "views-user" */ './views/user')
 );
 const Login = React.lazy(() =>
-  import(/* webpackChunkName: "user-login" */ './theme/views/user/login')
+  import(/* webpackChunkName: "user-login" */ './views/user/login')
 );
 const Register = React.lazy(() =>
-  import(/* webpackChunkName: "user-register" */ './theme/views/user/register')
+  import(/* webpackChunkName: "user-register" */ './views/user/register')
 );
 
 const ViewApp = React.lazy(() =>
-  import(/* webpackChunkName: "views-app" */ './theme/views/app')
+  import(/* webpackChunkName: "views-app" */ './views/app')
 );
 
 type ProtectedRouteProps = {

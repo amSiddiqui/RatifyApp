@@ -14,7 +14,7 @@ import {
 
 import { NavLink, useNavigate } from 'react-router-dom';
 
-import IntlMessages from '../../../helpers/IntlMessages';
+import IntlMessages from '../../helpers/IntlMessages';
 
 import {
   menuHiddenBreakpoint,
@@ -23,17 +23,17 @@ import {
   isDarkSwitchActive,
   buyUrl,
   adminRoot,
-} from '../../../constants/defaultValues';
+} from '../../constants/defaultValues';
 
 import { MobileMenuIcon, MenuIcon } from '../../components/svg';
-import { getDirection, setDirection } from '../../../helpers/Utils';
+import { getDirection, setDirection } from '../../helpers/Utils';
 import TopnavEasyAccess from './Topnav.EasyAccess';
 import TopnavNotifications from './Topnav.Notifications';
 import TopnavDarkSwitch from './Topnav.DarkSwitch';
 import { useDispatch, useSelector } from 'react-redux';
-import { settingsActions } from '../../../redux/settings-slice';
-import { menuActions } from '../../../redux/menu-slice';
-import { authActions } from '../../../redux/auth-slice';
+import { settingsActions } from '../../redux/settings-slice';
+import { menuActions } from '../../redux/menu-slice';
+import { authActions } from '../../redux/auth-slice';
 
 const TopNav = ({ intl }) => {
 

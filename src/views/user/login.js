@@ -6,8 +6,8 @@ import { Formik, Form, Field } from 'formik';
 import { useNavigate } from 'react-router-dom';
 
 import { Colxx } from '../../components/common/CustomBootstrap';
-import IntlMessages from '../../../helpers/IntlMessages';
-import { AuthHelper } from '../../../helpers/AuthHelper';
+import IntlMessages from '../../helpers/IntlMessages';
+import { AuthHelper } from '../../helpers/AuthHelper';
 import { useDispatch, useSelector } from 'react-redux';
 import { toast } from 'react-toastify';
 

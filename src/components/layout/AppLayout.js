@@ -4,8 +4,8 @@ import TopNav from '../../containers/navs/Topnav';
 import Sidebar from '../../containers/navs/Sidebar';
 import Footer from '../../containers/navs/Footer';
 import { useSelector, useDispatch } from 'react-redux';
-import { menuActions } from '../../../redux/menu-slice';
-import { AuthHelper } from '../../../helpers/AuthHelper';
+import { menuActions } from '../../redux/menu-slice';
+import { AuthHelper } from '../../helpers/AuthHelper';
 import { useLocation } from 'react-router-dom';
 
 const AppLayout = ({ children }) => {

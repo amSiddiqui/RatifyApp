@@ -1,8 +1,8 @@
 import React from 'react';
 import { UncontrolledDropdown, DropdownToggle, DropdownMenu } from 'reactstrap';
 import { NavLink } from 'react-router-dom';
-import IntlMessages from '../../../helpers/IntlMessages';
-import { adminRoot } from '../../../constants/defaultValues';
+import IntlMessages from '../../helpers/IntlMessages';
+import { adminRoot } from '../../constants/defaultValues';
 
 const TopnavEasyAccess = () => {
   return (
