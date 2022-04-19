@@ -12,36 +12,14 @@ import { useDispatch, useSelector } from 'react-redux';
 import { toast } from 'react-toastify';
 import { RootState } from '../../redux';
 import { LoginDataType } from '../../types/AuthTypes';
+import { useIntl } from 'react-intl';
 
-const validatePassword = (value:string) => {
-    let error;
-    // check if password is at least 8 characters long containing at least one number and one letter
-    if (value.length < 8) {
-        error = 'Password must be at least 8 characters long';
-    }
-    if (!/[A-Z]/.test(value)) {
-        error = 'Password must contain at least one capital letter';
-    }
-    if (!/[0-9]/.test(value)) {
-        error = 'Password must contain at least one number';
-    }
-    return error;
-};
-
-const validateEmail = (value:string) => {
-    let error;
-    if (!value) {
-        error = 'Please enter your email address';
-    } else if (!/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,10}$/i.test(value)) {
-        error = 'Invalid email address';
-    }
-    return error;
-};
 
 const Login = () => {
     const loading = useSelector<RootState>((root) => root.auth.loading);
     const navigate = useNavigate();
     const dispatch = useDispatch();
+    const intl = useIntl();
     const authHelper = React.useMemo(
         () => new AuthHelper(dispatch),
         [dispatch]
@@ -50,6 +28,28 @@ const Login = () => {
 
     const [email] = React.useState('');
     const [password] = React.useState('');
+    
+    const validatePassword = (value:string) => {
+        let validError;
+        if (typeof value !== 'string') {
+            return intl.messages['auth.password.required'];
+        }
+        if (value.length < 8) {
+            return intl.messages['auth.password.min'];
+        }
+        return validError;
+    };
+
+    const validateEmail = (value:string) => {
+        let validError;
+        if (!value) {
+            validError = intl.messages['auth.email.required'];
+        } else if (!/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,10}$/i.test(value)) {
+            validError = intl.messages['auth.email.invalid'];
+        }
+        return validError;
+    };
+
 
     const onUserLogin = (data:LoginDataType) => {
         authHelper

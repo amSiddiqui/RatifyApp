@@ -18,6 +18,7 @@ import { useDispatch } from 'react-redux';
 import * as Yup from 'yup';
 import { FormikHelpers, useFormik } from 'formik';
 import { SignUpDataType } from '../../types/AuthTypes';
+import { useIntl } from 'react-intl';
 
 const passwordValidation = (value:string | undefined) => {
     if (typeof value !== 'string') {
@@ -36,6 +37,7 @@ const passwordValidation = (value:string | undefined) => {
 };
 
 const Register = () => {
+    const intl = useIntl();
     const dispatchFn = useDispatch();
     const authHelper = React.useMemo(
         () => new AuthHelper(dispatchFn),
@@ -57,19 +59,19 @@ const Register = () => {
         },
         validationSchema: Yup.object({
             email: Yup.string()
-                .email('Please enter a valid email')
-                .required('Please enter your email'),
+                .email(intl.formatMessage({ id: 'auth.email.invalid' }))
+                .required(intl.formatMessage({ id: 'auth.email.required' })),
             password: Yup.string()
-                .min(8, 'Password must be at least 8 characters long')
-                .required('Please enter a password')
+                .min(8, intl.formatMessage({ id: 'auth.password.min' }))
+                .required(intl.formatMessage({ id: 'auth.password.required' }))
                 .test(
                     'password-validation',
-                    'Password must contain at least one capital letter and one number',
+                    intl.formatMessage({ id: 'auth.password.invalid' }),
                     passwordValidation
                 ),
             confirm_password: Yup.string()
-                .oneOf([Yup.ref('password')], 'Password does not match')
-                .required('Please confirm your password'),
+                .oneOf([Yup.ref('password')], intl.formatMessage({ id: 'auth.password.mismatch' }))
+                .required(intl.formatMessage({ id: 'auth.password.confirm' })),
         }),
         onSubmit: onUserRegister,
     });

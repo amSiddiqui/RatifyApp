@@ -52,4 +52,15 @@ export const enMessages = {
   'pages.error-title': 'Ooops... looks like an error occurred!',
   'pages.error-code': 'Error code',
   'pages.go-back-home': 'GO BACK HOME',
+
+  // 05. Auth Messages
+  'auth.password.min': 'Password must be at least 8 characters long',
+  'auth.password.required': 'Please enter a password',
+  'auth.password.invalid': 'Password must contain at least one capital letter and one number',
+  'auth.password.mismatch': 'Passwords do not match',
+  'auth.password.confirm': 'Please confirm your password',
+  'auth.email.required': 'Please enter an email',
+  'auth.email.invalid': 'Please enter a valid email',
+
+  'auth.login.notify': 'Invalid email or password',
 };
