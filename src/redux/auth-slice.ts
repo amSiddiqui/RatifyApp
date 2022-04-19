@@ -1,6 +1,6 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import jwtDecode from 'jwt-decode';
-import { AuthInitialStateType, TokenType } from '../types/AuthTypes'
+import { AuthInitialStateType, TokenType, UserType } from '../types/AuthTypes'
 
 const initialState = {isAuthenticated: false, user: null, error: false, loading: true, message: ''} as AuthInitialStateType;
 
@@ -16,7 +16,6 @@ const authSlice = createSlice({
                 refresh,
             }));
             state.isAuthenticated = true;
-            state.user = jwtDecode(access);
             state.error = false;
             state.loading = false;
             state.message = '';
@@ -44,7 +43,6 @@ const authSlice = createSlice({
                 state.user = null;
             }
             state.isAuthenticated = true;
-            state.user = jwtDecode(accessToken);
             state.error = false;
             state.loading = false;
             state.message = '';
@@ -62,6 +60,10 @@ const authSlice = createSlice({
             state.loading = false;
             state.message = action.payload;
             localStorage.removeItem('tokens');
+        },
+
+        setUser: (state, action:PayloadAction<UserType>) => {
+            state.user = action.payload;
         }
     }
 });

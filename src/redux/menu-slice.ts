@@ -29,8 +29,8 @@ const menuSlice = createSlice({
           ? state.containerClassName + ' ' + action.payload
           : state.containerClassName;
     },
-    clickOnMobileMenu: (state) => {
-      const strCurrentClasses = state.containerClassName;
+    clickOnMobileMenu: (state, action:PayloadAction<string>) => {
+      const strCurrentClasses = action.payload;
       const currentClasses = strCurrentClasses
         ? strCurrentClasses
             .split(' ')
@@ -53,10 +53,10 @@ const menuSlice = createSlice({
       state.containerClassName = nextClasses;
       state.menuClickCount = 0;
     },
-    setContainerClassnames: (state) => {
-      let clickIndex = state.menuClickCount;
-      let strCurrentClasses = state.containerClassName;
-      let selectedMenuHasSubItems = state.selectedMenuHasSubItems;
+    setContainerClassnames: (state, action:PayloadAction<{clickIndex: number, strCurrentClasses: string, selectedMenuHasSubItems: boolean}>) => {
+      let clickIndex = action.payload.clickIndex;
+      let strCurrentClasses = action.payload.strCurrentClasses;
+      let selectedMenuHasSubItems = action.payload.selectedMenuHasSubItems;
       const currentClasses = strCurrentClasses
         ? strCurrentClasses.split(' ').filter((x) => x !== '')
         : '';

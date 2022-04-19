@@ -1,3 +1,5 @@
+import { UserType } from "../types/AuthTypes";
+
 export const UserRole = {
     Admin: 0,
     Editor: 1,
@@ -16,7 +18,7 @@ export const localeOptions = [
     { id: "es", name: "Español", direction: "ltr" },
     { id: "enrtl", name: "English - RTL", direction: "rtl" },
 ];
-export const currentUser = {
+export const currentUser:UserType = {
     id: 1,
     title: "Sarah Kortney",
     img: "/assets/img/profiles/l-1.jpg",

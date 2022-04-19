@@ -1,10 +1,11 @@
 import axios from './axiosInstance';
 import { AxiosResponse } from 'axios';
-import { TokenType, UserDataType, SignUpDataType } from '../types/AuthTypes';
+import { TokenType, SignUpDataType, UserType } from '../types/AuthTypes';
 import { authActions } from '../redux/auth-slice';
 import { LoginDataType } from '../types/AuthTypes';
 import { ApiHelper } from './ApiHelper';
 import { NoTokenError } from '../types/ErrorTypes';
+import { currentUser } from '../constants/defaultValues';
 
 export class AuthHelper extends ApiHelper {
 
@@ -37,21 +38,22 @@ export class AuthHelper extends ApiHelper {
         }
     }
     
-
-    async getUserInfo(): Promise<UserDataType> {
+    async getUser(): Promise<UserType> {
         let token = await this.getToken();
         if (token === null) {
             throw new NoTokenError('No token');
         }
-
-        let response: AxiosResponse<UserDataType> = await axios.get('/auth/user/', {headers: {Authorization: `Bearer ${token}`}});
-        return response.data;
+        // TODO: change to axios request
+        // let response: AxiosResponse<UserType> = await axios.get('/auth/user/', {headers: {Authorization: `Bearer ${token}`}});
+        let data = currentUser as UserType;
+        this.dispatchFn(authActions.setUser(data));
+        return data;
     }
 
-    async updateUser(userData: UserDataType) {
+    async updateUser(userData: UserType) {
         let token = this.getToken();
         if (token !== null) {
-            let response: AxiosResponse<UserDataType> = await axios.put('/auth/user/', userData, {headers: {Authorization: `Bearer ${token}`}});
+            let response: AxiosResponse<UserType> = await axios.put('/auth/user/', userData, {headers: {Authorization: `Bearer ${token}`}});
             return response.data;
         }
         throw new NoTokenError('No token');

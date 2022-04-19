@@ -1,6 +1,14 @@
+export type UserType = {
+    id: number;
+    title: string;
+    img: string;
+    date: string;
+    role: number;
+}
+
 export type AuthInitialStateType = {
     isAuthenticated: boolean;
-    user: JWTType | null;
+    user: UserType | null;
     error: boolean;
     loading: boolean;
     message: string;
@@ -22,13 +30,6 @@ export type SignUpDataType = {
 export type TokenType = {
     access: string;
     refresh: string;
-}
-
-export type UserDataType = {
-    id: number;
-    first_name: string;
-    last_name: string;
-    email: string;
 }
 
 export type JWTType = {

@@ -25,6 +25,10 @@ const Register = React.lazy(() =>
   import(/* webpackChunkName: "user-register" */ './theme/views/user/register')
 );
 
+const ViewApp = React.lazy(() =>
+  import(/* webpackChunkName: "views-app" */ './theme/views/app')
+);
+
 type ProtectedRouteProps = {
     isAuthenticated: boolean;
     authenticationPath: string;
@@ -67,9 +71,7 @@ function App() {
     }, [direction]);
 
     React.useEffect(() => {
-        authHelper.refreshTokenRequest().then(() => {
-            authHelper.getUserInfo().then().catch(err => {});
-        });
+        authHelper.refreshTokenRequest();
     }, [authHelper]);
 
     return (
@@ -82,7 +84,7 @@ function App() {
                     <React.Suspense fallback={<div className="loading" />}>
                         <BrowserRouter>
                             <Routes>
-                                <Route path='/' element={<ProtectedRoute {...defaultProtectedRouteProps} outlet={<div className='flex h-screen justify-center items-center text-3xl'>Home</div>} />} />
+                                <Route path='/' element={<ProtectedRoute {...defaultProtectedRouteProps} outlet={<ViewApp />} />} />
                                 <Route path='error' element={<ViewError></ViewError>} />
                                 <Route path='unauthorized' element={<ViewUnauthorized></ViewUnauthorized>} />
                                 <Route path='user' element={<ViewUser />} >
