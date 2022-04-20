@@ -30,6 +30,8 @@ export const enMessages = {
   'user.reset-password-button': 'RESET',
   'user.buy': 'BUY',
   'user.username': 'Username',
+  'user.verify-email-title': 'Verify Your Email Address',
+  'user.verify-email-message': 'Check your email and confirm your account.',
 
   /* 03.Menu */
   'menu.home': 'Home',
@@ -52,6 +54,7 @@ export const enMessages = {
   'pages.error-title': 'Ooops... looks like an error occurred!',
   'pages.error-code': 'Error code',
   'pages.go-back-home': 'GO BACK HOME',
+  'pages.go-home': 'HOME',
 
   // 05. Auth Messages
   'auth.password.min': 'Password must be at least 8 characters long',

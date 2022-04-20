@@ -12,17 +12,25 @@ import { AuthHelper } from './helpers/AuthHelper';
 const ViewError = React.lazy(() =>
   import(/* webpackChunkName: "views-error" */ './views/error')
 );
+
 const ViewUnauthorized = React.lazy(() =>
   import(/* webpackChunkName: "views-error" */ './views/unauthorized')
 );
+
 const ViewUser = React.lazy(() =>
   import(/* webpackChunkName: "views-user" */ './views/user')
 );
+
 const Login = React.lazy(() =>
   import(/* webpackChunkName: "user-login" */ './views/user/login')
 );
+
 const Register = React.lazy(() =>
   import(/* webpackChunkName: "user-register" */ './views/user/register')
+);
+
+const VerifyEmail = React.lazy(() =>
+  import(/* webpackChunkName: "user-register" */ './views/user/verify-email')
 );
 
 const ViewApp = React.lazy(() =>
@@ -110,6 +118,7 @@ function App() {
                                     <Route index element={<Navigate to='/user/login' />} />
                                     <Route path='login' element={<Login />} />
                                     <Route path='register' element={<Register />} />
+                                    <Route path='verify-email' element={<VerifyEmail />} />
                                 </Route>
                                 <Route path="*" element={<Navigate to='/error' />} />
                             </Routes>
