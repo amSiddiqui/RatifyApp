@@ -1,6 +1,6 @@
 import './App.css';
 import React from 'react';
-import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
+import { BrowserRouter, Navigate, Route, Routes, Outlet } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import { IntlProvider } from 'react-intl';
 import AppLocale from './lang/';
@@ -31,6 +31,14 @@ const ViewApp = React.lazy(() =>
 
 const BlankPage = React.lazy(() =>
   import(/* webpackChunkName: "viwes-blank-page" */ './views/app/blank-page')
+);
+
+const ProfileSettings = React.lazy(() =>
+  import(/* webpackChunkName: "viwes-blank-page" */ './views/accounts/profile-settings')
+);
+
+const UiSettings = React.lazy(() =>
+  import(/* webpackChunkName: "viwes-blank-page" */ './views/accounts/ui-settings')
 );
 
 type ProtectedRouteProps = {
@@ -90,6 +98,11 @@ function App() {
                             <Routes>
                                 <Route path='/' element={<ProtectedRoute {...defaultProtectedRouteProps} outlet={<ViewApp />} />}>
                                     <Route index element={<BlankPage />} />
+                                    <Route path='account' element={<><Outlet /></>}>
+                                        <Route index element={<Navigate to='/account/profile-settings' />} />
+                                        <Route path='profile-settings' element={<ProfileSettings />} />
+                                        <Route path='ui-settings' element={<UiSettings />} />
+                                    </Route>
                                 </Route>
                                 <Route path='error' element={<ViewError></ViewError>} />
                                 <Route path='unauthorized' element={<ViewUnauthorized></ViewUnauthorized>} />

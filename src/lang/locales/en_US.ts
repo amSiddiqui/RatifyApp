@@ -61,6 +61,10 @@ export const enMessages = {
   'auth.password.confirm': 'Please confirm your password',
   'auth.email.required': 'Please enter an email',
   'auth.email.invalid': 'Please enter a valid email',
-
   'auth.login.notify': 'Invalid email or password',
+
+  // 06. Account
+  'account.account': 'Account',
+  'account.settings.profile': 'Profile Settings',
+  'account.settings.ui': 'UI Settings',
 };

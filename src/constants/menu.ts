@@ -1,26 +1,30 @@
-import { adminRoot } from "./defaultValues";
-// import { UserRole } from "helpers/authHelper"
+import { adminRoot } from './defaultValues';
+// import { UserRole } from 'helpers/authHelper'
 
 const data = [
-    // {
-    //     id: "gogo",
-    //     icon: "iconsminds-air-balloon-1",
-    //     label: "menu.gogo",
-    //     to: `${adminRoot}/gogo`,
-    //     // roles: [UserRole.Admin, UserRole.Editor],
-    //     subs: [
-    //         {
-    //             icon: "simple-icon-paper-plane",
-    //             label: "menu.start",
-    //             to: `${adminRoot}/gogo/start`,
-    //         },
-    //     ],
-    // },
     {
-        id: "dashboard",
-        icon: "iconsminds-dashboard",
-        label: "menu.dashboards",
+        id: 'dashboard',
+        icon: 'iconsminds-dashboard',
+        label: 'menu.dashboards',
         to: `${adminRoot}`,
     },
+    {
+        id: 'account',
+        icon: 'iconsminds-user',
+        label: 'account.account',
+        to: `/account`,
+        subs: [
+            {
+                icon: 'simple-icon-user',
+                label: 'account.settings.profile',
+                to: '/account/profile-settings',
+            },
+            {
+                icon: 'simple-icon-puzzle',
+                label: 'account.settings.ui',
+                to: '/account/ui-settings',
+            },
+        ]
+    }
 ];
 export default data;
