@@ -49,12 +49,16 @@ export const enMessages = {
   'menu.search': 'Search',
   'menu.docs': 'Docs',
   'menu.blank-page': 'Blank Page',
+  'menu.account': 'Account',
+  'menu.profile-settings': 'Profile Settings',
+  'menu.ui-settings': 'UI Settings',
 
   /* 04.Error Page */
   'pages.error-title': 'Ooops... looks like an error occurred!',
   'pages.error-code': 'Error code',
   'pages.go-back-home': 'GO BACK HOME',
   'pages.go-home': 'HOME',
+  'server-error': 'Something went wrong. Try again later!',
 
   // 05. Auth Messages
   'auth.password.min': 'Password must be at least 8 characters long',
@@ -70,4 +74,9 @@ export const enMessages = {
   'account.account': 'Account',
   'account.settings.profile': 'Profile Settings',
   'account.settings.ui': 'UI Settings',
+
+  'profile-settings.last-name': 'Last Name',
+  'profile-settings.first-name': 'First Name',
+  'profile-settings.email': 'Email',
+  'profile-settings.save': 'Save',
 };

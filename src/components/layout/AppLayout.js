@@ -9,59 +9,71 @@ import { AuthHelper } from '../../helpers/AuthHelper';
 import { useLocation } from 'react-router-dom';
 
 const AppLayout = ({ children }) => {
-  const dispatchFn = useDispatch();
-  const [user, setUser] = React.useState(null);
-  const authHelper = React.useMemo(() => new AuthHelper(dispatchFn), [dispatchFn]);
-  const [loading, setLoading] = React.useState(true);
-  const location = useLocation();
-  
-  const setContainerClassnames = (a, b, c) => {
-    dispatchFn(menuActions.setContainerClassnames({clickIndex:a, strCurrentClasses: b, selectedMenuHasSubItems: c}));
-  }
+    const dispatchFn = useDispatch();
+    const [user, setUser] = React.useState(null);
+    const authHelper = React.useMemo(
+        () => new AuthHelper(dispatchFn),
+        [dispatchFn]
+    );
+    const [loading, setLoading] = React.useState(true);
+    const location = useLocation();
 
-  const changeSelectedMenuHasSubItems = (value) => {
-    dispatchFn(menuActions.changeSelectedMenuHasSubItems(value));
-  }
+    const setContainerClassnames = (a, b, c) => {
+        dispatchFn(
+            menuActions.setContainerClassnames({
+                clickIndex: a,
+                strCurrentClasses: b,
+                selectedMenuHasSubItems: c,
+            })
+        );
+    };
 
-  const addContainerClassname = (classname, strCurrentClasses) => {
-    dispatchFn(menuActions.addContainerClassname(classname));
-  }
+    const changeSelectedMenuHasSubItems = (value) => {
+        dispatchFn(menuActions.changeSelectedMenuHasSubItems(value));
+    };
 
-  const menu = useSelector(root => root.menu);
+    const addContainerClassname = (classname, strCurrentClasses) => {
+        dispatchFn(menuActions.addContainerClassname(classname));
+    };
 
-  React.useEffect(() => {
-    authHelper.getUser().then(user => {
-      setUser(user);
-    }).finally(() => {
-      setLoading(false);
-    });
-  }, [authHelper]);
+    const menu = useSelector((root) => root.menu);
 
-  if (loading) {
-    return <div className='loading'></div>
-  }
+    React.useEffect(() => {
+        authHelper
+            .getUser()
+            .then((user) => {
+                setUser(user);
+            })
+            .finally(() => {
+                setLoading(false);
+            });
+    }, [authHelper]);
 
-  return (
-    <div id="app-container" className={menu.containerClassName}>
-      <TopNav />
-      <Sidebar 
-      containerClassnames={menu.containerClassName} 
-      subHiddenBreakpoint={menu.subHiddenBreakpoint}
-      menuHiddenBreakpoint={menu.menuHiddenBreakpoint}
-      menuClickCount={menu.menuClickCount}
-      selectedMenuHasSubItems={menu.selectedMenuHasSubItems}
-      currentUser={user}
-      setContainerClassnames={setContainerClassnames}
-      addContainerClassname={addContainerClassname}
-      changeSelectedMenuHasSubItems={changeSelectedMenuHasSubItems}
-      location={location}
-      />
-      <main>
-        <div className="container-fluid">{children}</div>
-      </main>
-      <Footer />
-    </div>
-  );
+    if (loading) {
+        return <div className="loading"></div>;
+    }
+
+    return (
+        <div id="app-container" className={menu.containerClassName}>
+            <TopNav />
+            <Sidebar
+                containerClassnames={menu.containerClassName}
+                subHiddenBreakpoint={menu.subHiddenBreakpoint}
+                menuHiddenBreakpoint={menu.menuHiddenBreakpoint}
+                menuClickCount={menu.menuClickCount}
+                selectedMenuHasSubItems={menu.selectedMenuHasSubItems}
+                currentUser={user}
+                setContainerClassnames={setContainerClassnames}
+                addContainerClassname={addContainerClassname}
+                changeSelectedMenuHasSubItems={changeSelectedMenuHasSubItems}
+                location={location}
+            />
+            <main>
+                <div className="container-fluid">{children}</div>
+            </main>
+            <Footer />
+        </div>
+    );
 };
 
 export default AppLayout;

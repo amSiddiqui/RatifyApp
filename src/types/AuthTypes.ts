@@ -1,8 +1,10 @@
 export type UserType = {
     id: number;
-    title: string;
+    first_name: string;
+    last_name: string;
+    verified: boolean;
     img: string;
-    date: string;
+    last_seen: string;
     role: number;
 }
 
@@ -12,6 +14,7 @@ export type AuthInitialStateType = {
     error: boolean;
     loading: boolean;
     message: string;
+    image: string | null;
 }
 
 export type LoginDataType = {

@@ -1,19 +1,38 @@
 import React, { Suspense } from 'react';
-import { Outlet } from 'react-router-dom';
+import { Outlet, useSearchParams } from 'react-router-dom';
+import { toast } from 'react-toastify';
 
 import AppLayout from '../../components/layout/AppLayout';
 
-
 const App = () => {
-  return (
-    <AppLayout>
-      <div className="dashboard-wrapper">
-        <Suspense fallback={<div className="loading" />}>
-          <Outlet />
-        </Suspense>
-      </div>
-    </AppLayout>
-  );
+    const [searchParams, setSearchParam] = useSearchParams();
+
+    React.useEffect(() => {
+        // check if params has expired and verified
+        const expired = searchParams.get('expired');
+        if (expired) {
+            toast.error(
+                'Verification link expired. Go to settings and send a new verification link.'
+            );
+        }
+        const verified = searchParams.get('verified');
+        if (verified === 'true') {
+            toast.success('Email verified.');
+        } else if (verified === 'false') {
+            toast.error('Email verification failed. Try again.');
+        }
+        setSearchParam({});
+    }, [searchParams, setSearchParam]);
+
+    return (
+        <AppLayout>
+            <div className="dashboard-wrapper">
+                <Suspense fallback={<div className="loading" />}>
+                    <Outlet />
+                </Suspense>
+            </div>
+        </AppLayout>
+    );
 };
 
 export default App;

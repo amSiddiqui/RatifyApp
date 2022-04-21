@@ -1,8 +1,9 @@
 import { UserType } from "../types/AuthTypes";
 
 export const UserRole = {
-    Admin: 0,
+    Admin: 99,
     Editor: 1,
+    User: 0,
 };
 /*
   Menu Types:
@@ -20,10 +21,12 @@ export const localeOptions = [
 ];
 export const currentUser:UserType = {
     id: 1,
-    title: "Sarah Kortney",
+    first_name: "Sarah",
+    last_name: 'Courtney',
     img: "/static/img/profiles/l-1.jpg",
-    date: "Last seen today 15:24",
+    last_seen: "Last seen today 15:24",
     role: UserRole.Admin,
+    verified: true,
 };
 
 export const adminRoot = "/";

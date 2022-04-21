@@ -9,7 +9,7 @@ import {
     Input,
     Button,
 } from 'reactstrap';
-import { NavLink } from 'react-router-dom';
+import { NavLink, useNavigate } from 'react-router-dom';
 
 import IntlMessages from '../../helpers/IntlMessages';
 import { Colxx } from '../../components/common/CustomBootstrap';
@@ -19,6 +19,8 @@ import * as Yup from 'yup';
 import { FormikHelpers, useFormik } from 'formik';
 import { SignUpDataType } from '../../types/AuthTypes';
 import { useIntl } from 'react-intl';
+import { AxiosError } from 'axios';
+import { toast } from 'react-toastify';
 
 const passwordValidation = (value:string | undefined) => {
     if (typeof value !== 'string') {
@@ -37,6 +39,8 @@ const passwordValidation = (value:string | undefined) => {
 };
 
 const Register = () => {
+    const navigate = useNavigate();
+
     const intl = useIntl();
     const dispatchFn = useDispatch();
     const authHelper = React.useMemo(
@@ -45,10 +49,17 @@ const Register = () => {
     );
 
     const onUserRegister = (data:SignUpDataType, actions:FormikHelpers<SignUpDataType>) => {
-        console.log({ data });
-        setTimeout(() => {
+        authHelper.registerRequest(data).then(() => {
+            navigate('/user/verify-email');
+        }).catch((err:AxiosError) => {
+            if (err.response?.status === 400) {
+                toast.error(err.response?.data.message);
+            } else {
+                toast.error(intl.formatMessage({ id: 'server-error' }));
+            }
+        }).finally(() => {
             actions.setSubmitting(false);
-        }, 3000);
+        });
     };
 
     const formik = useFormik({

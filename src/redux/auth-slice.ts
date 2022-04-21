@@ -2,7 +2,7 @@ import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import jwtDecode from 'jwt-decode';
 import { AuthInitialStateType, TokenType, UserType } from '../types/AuthTypes'
 
-const initialState = {isAuthenticated: false, user: null, error: false, loading: true, message: ''} as AuthInitialStateType;
+const initialState = {isAuthenticated: false, user: null, error: false, loading: true, message: '', image: null} as AuthInitialStateType;
 
 const authSlice = createSlice({
     name: 'auth',
@@ -64,6 +64,10 @@ const authSlice = createSlice({
 
         setUser: (state, action:PayloadAction<UserType>) => {
             state.user = action.payload;
+        },
+
+        setImage: (state, action:PayloadAction<string>) => {
+            state.image = action.payload;
         }
     }
 });

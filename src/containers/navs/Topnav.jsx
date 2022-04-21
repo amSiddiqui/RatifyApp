@@ -38,7 +38,7 @@ const TopNav = ({ intl }) => {
   const [searchKeyword, setSearchKeyword] = useState('');
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const { menu, settings } = useSelector(root => root);
+  const { menu, settings, auth } = useSelector(root => root);
   const selectedMenuHasSubItems = menu.selectedMenuHasSubItems;
 
   const search = () => {
@@ -282,9 +282,9 @@ const TopNav = ({ intl }) => {
         <div className="user d-inline-block">
           <UncontrolledDropdown className="dropdown-menu-right">
             <DropdownToggle className="p-0" color="empty">
-              <span className="name mr-1">Sarah Kortney</span>
+              <span className="name mr-1">{auth.user.first_name + ' ' + auth.user.last_name}</span>
               <span>
-                <img alt="Profile" src="/static/img/profiles/l-1.jpg" />
+                <img alt="Profile" src="/static/img/default.jpg" />
               </span>
             </DropdownToggle>
             <DropdownMenu className="mt-3" right>
