@@ -53,6 +53,9 @@ export const enMessages = {
     'menu.profile-settings': 'Profile Settings',
     'menu.ui-settings': 'UI Settings',
     'menu.analytics': 'Analytics',
+    'menu.contracts-agreements': 'Contracts & Agreements',
+    'menu.agreements': 'Agreements',
+    'menu.reports': 'Reports',
 
     /* 04.Error Page */
     'pages.error-title': 'Ooops... looks like an error occurred!',
@@ -73,7 +76,7 @@ export const enMessages = {
     'auth.login.notify': 'Invalid email or password',
 
     // 06. Account
-    'account.account': 'Account',
+    'account.account': 'Business Profile',
     'account.settings.profile': 'Profile Settings',
     'account.settings.ui': 'UI Settings',
 
@@ -81,6 +84,10 @@ export const enMessages = {
     'profile-settings.first-name': 'First Name',
     'profile-settings.email': 'Email',
     'profile-settings.save': 'Save',
+
+    'contract-agreement.upload': 'Upload',
+    'contract-agreement.drop-file': 'Drop file here',
+    'contract-agreement.create-new': 'Create New',
 
     /* 04.Dashboards */
     'dashboards.pending-orders': 'Pending Orders',

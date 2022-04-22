@@ -37,6 +37,13 @@ const ViewApp = React.lazy(() =>
   import(/* webpackChunkName: "views-app" */ './views/app')
 );
 
+const ContractsAgreements = React.lazy(() =>
+  import(/* webpackChunkName: "views-app" */ './views/app/contract-agreements')
+);
+
+const Reports = React.lazy(() =>
+  import(/* webpackChunkName: "views-app" */ './views/app/reports')
+);
 
 const DashboardAnalytics = React.lazy(() =>
   import(/* webpackChunkName: "viwes-blank-page" */ './views/app/dashboards/analytics')
@@ -106,6 +113,8 @@ function App() {
                             <Routes>
                                 <Route path='/' element={<ProtectedRoute {...defaultProtectedRouteProps} outlet={<ViewApp />} />}>
                                     <Route index element={<DashboardAnalytics />} />
+                                    <Route path='agreements' element={<ContractsAgreements></ContractsAgreements>}></Route>
+                                    <Route path='reports' element={<Reports></Reports>}></Route>
                                     <Route path='account' element={<><Outlet /></>}>
                                         <Route index element={<Navigate to='/account/profile-settings' />} />
                                         <Route path='profile-settings' element={<ProfileSettings />} />

@@ -106,7 +106,7 @@ export const setDirection = (localValue: 'rtl' | 'ltr') => {
 };
 
 export const getCurrentRadius = () => {
-    let currentRadius = 'rounded';
+    let currentRadius = 'flat';
     try {
         if (localStorage.getItem(themeRadiusStorageKey)) {
             currentRadius = localStorage.getItem(themeRadiusStorageKey)!;
@@ -116,7 +116,7 @@ export const getCurrentRadius = () => {
             '>>>>: src/helpers/Utils.js : getCurrentRadius -> error',
             error
         );
-        currentRadius = 'rounded';
+        currentRadius = 'flat';
     }
     return currentRadius;
 };

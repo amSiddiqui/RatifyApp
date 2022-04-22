@@ -2,7 +2,7 @@ import React from 'react';
 
 const ThumbListIcon = () => {
   return (
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 19 19">
+    <svg className='inline' xmlns="http://www.w3.org/2000/svg" viewBox="0 0 19 19">
       <path
         className="view-icon-svg"
         d="M17.5,3H6.5a.5.5,0,0,1,0-1h11a.5.5,0,0,1,0,1Z"

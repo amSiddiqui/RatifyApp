@@ -1,0 +1,21 @@
+.contract-agreement-header-main{
+    /* grow */
+    flex-grow: 1;
+    text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+
+.contract-agreements-create-new i {
+    font-size: 1rem;
+}
+
+.file-drop-zone {
+    width: 200px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 10px;
+}

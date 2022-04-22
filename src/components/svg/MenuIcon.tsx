@@ -4,7 +4,7 @@ const MenuIcon = () => {
   return (
     <>
       <svg
-        className="main"
+        className="main inline"
         xmlns="http://www.w3.org/2000/svg"
         viewBox="0 0 9 17"
       >
@@ -13,7 +13,7 @@ const MenuIcon = () => {
         <rect x="0.48" y="15.5" width="7" height="1" />
       </svg>
       <svg
-        className="sub"
+        className="sub inline"
         xmlns="http://www.w3.org/2000/svg"
         viewBox="0 0 18 17"
       >

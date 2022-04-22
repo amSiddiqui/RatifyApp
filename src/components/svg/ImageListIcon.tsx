@@ -2,7 +2,7 @@ import React from 'react';
 
 const ImageListIcon = () => {
   return (
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 19 19">
+    <svg xmlns="http://www.w3.org/2000/svg" className='inline' viewBox="0 0 19 19">
       <path
         className="view-icon-svg"
         d="M7,2V8H1V2H7m.12-1H.88A.87.87,0,0,0,0,1.88V8.12A.87.87,0,0,0,.88,9H7.12A.87.87,0,0,0,8,8.12V1.88A.87.87,0,0,0,7.12,1Z"

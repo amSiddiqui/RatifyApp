@@ -1,12 +1,15 @@
-import { adminRoot } from './defaultValues';
-// import { UserRole } from 'helpers/authHelper'
-
 const data = [
     {
         id: 'dashboard',
         icon: 'iconsminds-dashboard',
         label: 'menu.dashboards',
-        to: `${adminRoot}`,
+        to: `/`,
+    },
+    {
+        id: 'agreements',
+        icon: 'iconsminds-notepad',
+        label: 'menu.agreements',
+        to: `/agreements`,
     },
     {
         id: 'account',
@@ -25,6 +28,12 @@ const data = [
                 to: '/account/ui-settings',
             },
         ]
-    }
+    },
+    {
+        id: 'reports',
+        icon: 'iconsminds-monitor-analytics',
+        label: 'menu.reports',
+        to: `/reports`,
+    },
 ];
 export default data;
