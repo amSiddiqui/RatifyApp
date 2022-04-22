@@ -4,8 +4,6 @@ import { Chart } from 'chart.js';
 
 import { areaChartOptions } from './config';
 
-console.log(Chart.defaults);
-
 const Area = ({ data, shadow = false }) => {
   const chartContainer = useRef(null);
   const [, setChartInstance] = useState(null);

@@ -23,12 +23,8 @@ export class AuthHelper extends ApiHelper {
     
     async registerRequest(data: SignUpDataType) {
         this.dispatchFn(authActions.setLoading());
-        let token = await this.getToken();
-        if (token === null) {
-            throw new NoTokenError('No token');
-        }
         try {
-            let response: AxiosResponse<TokenType> = await axios.post('/auth/register/', data, {headers: {Authorization: `Bearer ${token}`}}); 
+            let response: AxiosResponse<TokenType> = await axios.post('/auth/register/', data); 
             this.dispatchFn(authActions.login(response.data));
             this.updateToken();
         } catch (err) {

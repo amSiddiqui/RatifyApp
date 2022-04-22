@@ -15,10 +15,10 @@ const App = () => {
                 'Verification link expired. Go to settings and send a new verification link.'
             );
         }
-        const verified = searchParams.get('verified');
-        if (verified === 'true') {
-            toast.success('Email verified.');
-        } else if (verified === 'false') {
+        const validate = searchParams.get('validate');
+        if (validate === 'true') {
+            toast.success('Email Verified.');
+        } else if (validate === 'false') {
             toast.error('Email verification failed. Try again.');
         }
         setSearchParam({});
