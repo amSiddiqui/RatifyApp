@@ -4,42 +4,69 @@ import { GoPlus } from 'react-icons/go';
 import { Colxx } from '../../../components/common/CustomBootstrap';
 import { IntlShape } from 'react-intl';
 import { Dropzone, PDF_MIME_TYPE } from '@mantine/dropzone';
+import { RiUploadCloud2Fill } from 'react-icons/ri';
+import { MdFileUpload } from 'react-icons/md';
 
-const CATopBar: React.FC<{intl: IntlShape}> = ( { intl }) => {
+const CATopBar: React.FC<{
+    intl: IntlShape;
+    onDocSelect: (files: File[]) => void;
+}> = ({ intl, onDocSelect }) => {
     return (
         <Row>
-            <Colxx xxs="12" className="mb-4">
+            <Colxx xxs="12">
                 <div className="d-flex align-items-stretch">
                     <div className="contract-agreement-header-main">
-                        <Card className="upload-contract-card">
-                            <CardBody className='p-3'>
-                                <Dropzone
-                                    onDrop={(files) => console.log('Accepted: ',{files})}
-                                    onReject={(files) => console.log('Rejected: ', {files})}
-                                    accept={PDF_MIME_TYPE}
-                                >
-                                    {(status) => (
-                                    <div className='flex px-5 h-12 items-center justify-center'>
-                                        <i className='iconsminds-upload text-3xl mr-2' />
-                                        <div className='mt-3'>
-                                            <p>Drag Files here or Click to select Files</p>
-                                        </div>
-                                    </div>)}
-                                </Dropzone>
+                        <div>
+                            <Button
+                                className="contract-agreements-create-new flex h-14 items-center justify-between"
+                                size="lg"
+                                color="secondary"
+                            >
+                                <i className='mr-2'>
+                                    <MdFileUpload />
+                                </i>
+                                <span>Upload File</span>
+                            </Button>
+                        </div>
+                        <Card style={{ width: '50%', height: '8rem'}}>
+                            <CardBody className="p-1">
+                                <div className="w-full h-full">
+                                    <Dropzone
+                                        className='w-full h-full'
+                                        onDrop={onDocSelect}
+                                        onReject={(files) =>
+                                            console.log('Rejected: ', {
+                                                files,
+                                            })
+                                        }
+                                        accept={PDF_MIME_TYPE}
+                                    >
+                                        {(status) => (
+                                            <div className="flex px-5 h-full items-center justify-center">
+                                                <span className="text-5xl">
+                                                    <RiUploadCloud2Fill />
+                                                </span>
+                                                <p className='mt-3 ml-3'>
+                                                    Drag and Drop Files here
+                                                </p>
+                                            </div>
+                                        )}
+                                    </Dropzone>
+                                </div>
                             </CardBody>
                         </Card>
-                    </div>
-                    <div className="d-flex align-items-center">
-                        <Button
-                            className="contract-agreements-create-new flex h-14 items-center justify-between"
-                            size="lg"
-                            color="secondary"
-                        >
-                            <i className="mr-2">
-                                <GoPlus />
-                            </i>
-                            <span>Create New</span>
-                        </Button>
+                        <div className='flex justify-center items-center'>
+                            <Button
+                                className="contract-agreements-create-new flex h-14 items-center justify-between"
+                                size="lg"
+                                color="secondary"
+                            >
+                                <i className="mr-2">
+                                    <GoPlus />
+                                </i>
+                                <span>Create New</span>
+                            </Button>
+                        </div>
                     </div>
                 </div>
             </Colxx>

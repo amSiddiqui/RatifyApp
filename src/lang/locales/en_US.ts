@@ -22,7 +22,7 @@ export const enMessages = {
     'user.forgot-password': 'Forgot Password',
     'user.email': 'E-mail',
     'user.password': 'Password',
-    'user.confirm-password': 'Confirm Password',
+    'user.confirm-password': 'Confirm password',
     'user.forgot-password-question': 'Forget password?',
     'user.fullname': 'Full Name',
     'user.login-button': 'LOGIN',
@@ -56,6 +56,7 @@ export const enMessages = {
     'menu.contracts-agreements': 'Contracts & Agreements',
     'menu.agreements': 'Agreements',
     'menu.reports': 'Reports',
+    'menu.create': 'Create',
 
     /* 04.Error Page */
     'pages.error-title': 'Ooops... looks like an error occurred!',
@@ -88,6 +89,9 @@ export const enMessages = {
     'contract-agreement.upload': 'Upload',
     'contract-agreement.drop-file': 'Drop file here',
     'contract-agreement.create-new': 'Create New',
+    'contract-agreement.agreement-creator': 'Agreement Creator',
+
+    'agreement-creator.title-placeholder': 'Agreement Title',
 
     /* 04.Dashboards */
     'dashboards.pending-orders': 'Pending Orders',

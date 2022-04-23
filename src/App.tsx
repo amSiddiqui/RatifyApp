@@ -41,6 +41,10 @@ const ContractsAgreements = React.lazy(() =>
   import(/* webpackChunkName: "views-app" */ './views/app/contract-agreements')
 );
 
+const AgreementCreator = React.lazy(() => 
+    import(/* webpackChunkName: "views-app" */ './views/app/contract-agreements/agreement-creator')
+);
+
 const Reports = React.lazy(() =>
   import(/* webpackChunkName: "views-app" */ './views/app/reports')
 );
@@ -113,7 +117,10 @@ function App() {
                             <Routes>
                                 <Route path='/' element={<ProtectedRoute {...defaultProtectedRouteProps} outlet={<ViewApp />} />}>
                                     <Route index element={<DashboardAnalytics />} />
-                                    <Route path='agreements' element={<ContractsAgreements></ContractsAgreements>}></Route>
+                                    <Route path='agreements' element={<><Outlet /></>}>
+                                        <Route index element={<ContractsAgreements></ContractsAgreements>} />
+                                        <Route path='create/:contractId' element={<AgreementCreator />} />
+                                    </Route>
                                     <Route path='reports' element={<Reports></Reports>}></Route>
                                     <Route path='account' element={<><Outlet /></>}>
                                         <Route index element={<Navigate to='/account/profile-settings' />} />

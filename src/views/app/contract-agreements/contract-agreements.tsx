@@ -7,10 +7,20 @@ import { useLocation } from 'react-router-dom';
 import './contract-agreements.css';
 import CATopBar from './topbar';
 import CATemplates from './templates';
+import { Modal, Divider } from '@mantine/core';
 
-const ContractAgreements = () => {
+const ContractAgreements:React.FC = () => {
     const match = useLocation();
     const intl = useIntl();
+
+    const [, setSelectedDoc] = React.useState<File|null>();
+    const [showPdfConfirm, setShowPdfConfirm] = React.useState(false);
+
+    const onDocSelect = (files:File[]) => {
+        setSelectedDoc(files[0]);
+        setShowPdfConfirm(true);
+    }
+
     return (
         <>
             <Row>
@@ -19,12 +29,25 @@ const ContractAgreements = () => {
                         heading="menu.contracts-agreements"
                         match={match}
                     />
-                    <Separator className="mb-5" />
+                    <Separator className="mb-14" />
                 </Colxx>
             </Row>
-            <CATopBar intl={intl} />
-            <h1 className='text-2xl mt-4'>Select From Templates</h1>
+            <CATopBar intl={intl} onDocSelect={onDocSelect} />
+            <Divider className="mb-10 mt-10" label={
+                <p className='text-2xl relative top-2'>OR</p>
+            } labelPosition='center'/>
+            <div className='flex justify-between items-center'>
+                <h1 className='text-2xl'>Select from saved templates</h1>
+                <p>Currently there are no saved templates</p>
+            </div>
             <CATemplates intl={intl} />
+            <Modal
+                opened={showPdfConfirm}
+                onClose={() => setShowPdfConfirm(false)}
+                title='Uploading'
+            >
+                
+            </Modal>
         </>
     );
 };
