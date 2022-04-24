@@ -28,7 +28,7 @@ const CATopBar: React.FC<{
                                 <span>Upload File</span>
                             </Button>
                         </div>
-                        <Card style={{ width: '50%', height: '8rem'}}>
+                        <Card style={{ width: '30%', height: '10rem'}} className='mx-16'>
                             <CardBody className="p-1">
                                 <div className="w-full h-full">
                                     <Dropzone

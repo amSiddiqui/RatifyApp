@@ -89,9 +89,9 @@ export const enMessages = {
     'contract-agreement.upload': 'Upload',
     'contract-agreement.drop-file': 'Drop file here',
     'contract-agreement.create-new': 'Create New',
-    'contract-agreement.agreement-creator': 'Agreement Creator',
+    'contract-agreement.agreement-creator': 'Contracts & Agreements',
 
-    'agreement-creator.title-placeholder': 'Agreement Title',
+    'agreement-creator.title-placeholder': 'Type document title here',
 
     /* 04.Dashboards */
     'dashboards.pending-orders': 'Pending Orders',

@@ -297,14 +297,7 @@ const TopNav = ({ intl }) => {
                     <UncontrolledDropdown className="dropdown-menu-right">
                         <DropdownToggle className="p-0 topnav-account-dropdown justify-center items-center" color="empty">
                             <span className="name mr-1 inline">
-                                {auth.user.first_name === null
-                                    ? ''
-                                    : auth.user.first_name +
-                                          ' ' +
-                                          auth.user.last_name ===
-                                      null
-                                    ? ''
-                                    : auth.user.last_name}
+                                {auth.user.first_name} {auth.user.last_name}
                             </span>
                             <span className='inline'>
                                 <img

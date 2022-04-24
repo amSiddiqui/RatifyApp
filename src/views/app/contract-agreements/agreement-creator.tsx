@@ -15,6 +15,7 @@ import {
     Select,
     Switch,
     Group,
+    ScrollArea
 } from '@mantine/core';
 import { DatePicker } from '@mantine/dates';
 import { Card, CardBody } from 'reactstrap';
@@ -24,8 +25,11 @@ import { AppDispatch } from '../../../redux';
 import { ContractHelper } from '../../../helpers/ContractHelper';
 import { toast } from 'react-toastify';
 import classNames from 'classnames';
-import { MdChevronLeft, MdChevronRight, MdCalendarToday} from 'react-icons/md';
+import { MdCalendarToday} from 'react-icons/md';
+import { HiChevronLeft, HiChevronRight, HiChevronDoubleLeft, HiChevronDoubleRight } from 'react-icons/hi';
 import { DateTime } from 'luxon';
+import { Button } from 'reactstrap'; 
+import { GoPlus } from 'react-icons/go';
 
 // luxon today date
 const today = DateTime.local();
@@ -61,6 +65,42 @@ const AgreementCreator: React.FC = () => {
 
     function onDocumentLoadSuccess({ numPages }: any) {
         setNumPages(numPages);
+    }
+
+    const onPreviousPage = () => {
+        setPageNumber((prev) => {
+            if (numPages === null) {
+                return 1;
+            }
+            if (prev === 1) {
+                return 1;
+            }
+            return prev - 1;
+        });
+    }
+
+    const onNextPage = () => {
+        setPageNumber((prev) => {
+            if (numPages === null) {
+                return 1;
+            }
+            if (prev === numPages) {
+                return numPages;
+            }
+            return prev + 1;
+        });
+    }
+
+    const onFirstPage = () => {
+        setPageNumber(1);
+    }
+
+    const onLastPage = () => {
+        if (numPages === null) {
+            setPageNumber(1);   
+        } else {
+            setPageNumber(numPages);
+        }
     }
 
     React.useEffect(() => {
@@ -123,19 +163,52 @@ const AgreementCreator: React.FC = () => {
                     })}
                 />
             </Center>
-            <Grid columns={12}>
-                <Grid.Col span={3}>
-                    <Card style={{ height: '850px' }}>
-                        <CardBody>
-                            <p className="text-center text-lg">
+            <Grid columns={20}>
+                <Grid.Col span={4}>
+                    <div className='flex items-center justify-center mb-2'>
+                        <Button
+                            className="contract-agreements-create-new flex h-14 items-center justify-center"
+                            color="primary"
+                            style={{width: '170px'}}
+                        >
+                            <i className='mr-2'>
+                                <GoPlus />
+                            </i>
+                            <span>Add Signers</span>
+                        </Button>
+                    </div>
+                </Grid.Col>
+                <Grid.Col span={12}>
+                </Grid.Col>
+                <Grid.Col span={4}>
+                    <div className='flex items-center justify-center mb-2'>
+                        <Button
+                            className="contract-agreements-create-new flex h-14 items-center justify-center"
+                            color="secondary"
+                            style={{width: '170px'}}
+                        >
+                            <i className='mr-2'>
+                                <GoPlus />
+                            </i>
+                            <span>Save As Template</span>
+                        </Button>
+                    </div>
+                </Grid.Col>
+            </Grid>
+
+            <Grid columns={20}>
+                <Grid.Col span={4}>
+                    <Card style={{ height: '900px' }}>
+                        <CardBody className='p-0'>
+                            <div className="text-center text-lg py-4">
                                 Signing Workflow
-                            </p>
-                            <Divider className="my-7" />
+                            </div>
+                            <Divider className="mb-3" />
                         </CardBody>
                     </Card>
                 </Grid.Col>
-                <Grid.Col span={6}>
-                    <Card style={{ height: '850px' }}>
+                <Grid.Col span={12}>
+                    <Card style={{ height: '900px' }}>
                         <CardBody>
                             <Center>
                                 {pdfLoading && <Skeleton height={750} />}
@@ -157,51 +230,41 @@ const AgreementCreator: React.FC = () => {
                         </CardBody>
                     </Card>
                 </Grid.Col>
-                <Grid.Col span={3}>
-                    <Card style={{ height: '850px' }}>
-                        <CardBody>
-                            <p className="text-center text-lg">
+                <Grid.Col span={4}>
+                    <Card style={{ height: '900px' }}>
+                        <CardBody className='p-0'>
+                            <div className="text-center text-lg py-4">
                                 Page Navigation
-                            </p>
-                            <Divider className="my-7" />
-                            <Center>
-                                <p className="text-3xl">
-                                    {' '}
-                                    <MdChevronLeft
-                                        onClick={() => {
-                                            setPageNumber((prev) => {
-                                                if (numPages === null) {
-                                                    return 1;
-                                                }
-                                                if (prev === 1) {
-                                                    return 1;
-                                                }
-                                                return prev - 1;
-                                            });
-                                        }}
+                            </div>
+                            <Divider className='mb-4' />
+                            <Center className='mb-4'>
+                                <div className='text-2xl'>
+                                    <HiChevronDoubleLeft 
+                                        onClick={onFirstPage}
+                                        className='cursor-pointer'
+                                    />
+                                </div>
+                                <div className="text-2xl">
+                                    <HiChevronLeft
+                                        onClick={onPreviousPage}
                                         className="cursor-pointer"
-                                    />{' '}
-                                </p>
-                                <p className="px-3">
+                                    />
+                                </div>
+                                <div className="px-1">
                                     Page: {pageNumber} / {numPages}
-                                </p>
-                                <p className="text-3xl">
-                                    {' '}
-                                    <MdChevronRight
-                                        onClick={() => {
-                                            setPageNumber((prev) => {
-                                                if (numPages === null) {
-                                                    return 1;
-                                                }
-                                                if (prev === numPages) {
-                                                    return numPages;
-                                                }
-                                                return prev + 1;
-                                            });
-                                        }}
+                                </div>
+                                <div className="text-2xl">
+                                    <HiChevronRight
+                                        onClick={onNextPage}
                                         className="cursor-pointer"
-                                    />{' '}
-                                </p>
+                                    />
+                                </div>
+                                <div className='text-2xl'>
+                                    <HiChevronDoubleRight
+                                        onClick={onLastPage}
+                                        className='cursor-pointer'
+                                    />
+                                </div>
                             </Center>
                             <Center>
                                 {thumbnailsLoading && (
@@ -211,13 +274,13 @@ const AgreementCreator: React.FC = () => {
                                     </Stack>
                                 )}
                                 {!thumbnailsLoading && (
-                                    <div
+                                    <ScrollArea
                                         style={{
                                             height: 290,
                                             overflowY: 'scroll',
                                             width: '70%',
                                         }}
-                                        className="border-2 py-3 rounded-md"
+                                        className="rounded-md"
                                     >
                                         <Stack spacing={2}>
                                             {Object.keys(pdfThumbnails).map(
@@ -228,60 +291,38 @@ const AgreementCreator: React.FC = () => {
                                                             className="flex flex-col justify-center items-center"
                                                         >
                                                             <span
-                                                                className={classNames(
-                                                                    {
-                                                                        'border-4 border-sky-500':
-                                                                            pageNumber ===
-                                                                            parseInt(
-                                                                                key
-                                                                            ) +
-                                                                                1,
-                                                                    },
+                                                                className={classNames('border-4',
+                                                                    {'border-sky-500': pageNumber === parseInt(key) +1,},
+                                                                    {'border-gray-300': pageNumber !== parseInt(key) +1,},
                                                                     'cursor-pointer'
                                                                 )}
                                                             >
                                                                 <img
-                                                                    src={
-                                                                        'data:image/jpeg;base64,' +
-                                                                        pdfThumbnails[
-                                                                            key
-                                                                        ]
-                                                                    }
-                                                                    style={{
-                                                                        height: 100,
-                                                                    }}
-                                                                    alt="Page"
-                                                                    onClick={() => {
-                                                                        setPageNumber(
-                                                                            parseInt(
-                                                                                key
-                                                                            ) +
-                                                                                1
-                                                                        );
-                                                                    }}
+                                                                    src={'data:image/jpeg;base64,' +pdfThumbnails[key]}
+                                                                    style={{ height: 100, }} alt="Page" onClick={() => {setPageNumber(parseInt(key) + 1);}}
                                                                 />
                                                             </span>
                                                             <p className="text-center text-sm">
-                                                                {parseInt(key) +
-                                                                    1}
+                                                                {parseInt(key) +1}
                                                             </p>
                                                         </div>
                                                     );
                                                 }
                                             )}
                                         </Stack>
-                                    </div>
+                                    </ScrollArea>
                                 )}
                             </Center>
-                            <Divider className="mt-10 mb-5" />
-                            <p className="text-center text-lg mb-5">Settings</p>
-                            <Stack spacing={'lg'}>
+                            <Divider className="my-4" />
+                            <div className="text-center text-lg mb-5">Settings</div>
+                            <Divider className="my-4" />
+                            <Stack spacing={'lg'} className='px-4'>
                                 <Group position="apart">
                                     <div>Has end date?</div>
                                     <Switch checked={showEndDate} onChange={(checked) => { setShowEndDate(checked.target.checked) }} size="md"></Switch>
                                 </Group>
-                                {showEndDate && <div>End Date: <span className='text-lg'>{ endDate.toLocaleString(DateTime.DATE_HUGE) }</span></div>}
-                                {showEndDate && <Group position="apart">
+                                {showEndDate && <div>End Date<br /><span>{ endDate.toLocaleString(DateTime.DATE_HUGE) }</span></div>}
+                                {showEndDate && <Stack spacing={1}>
                                     <Select
                                         style={{width: 120}}
                                         placeholder="Select End Date"
@@ -302,6 +343,7 @@ const AgreementCreator: React.FC = () => {
                                             { value: '36', label: '3 years' },
                                         ]}
                                     />
+                                    <div>OR</div>
                                     <DatePicker 
                                         onChange={(value) => {
                                             if (value !== null) {
@@ -317,11 +359,11 @@ const AgreementCreator: React.FC = () => {
                                         style={{width: 150}} 
                                         placeholder='Select Date' 
                                     />
-                                </Group>}
+                                </Stack>}
                             </Stack>
-                            <div className='mt-4'>
+                            <div className='mt-4 px-4'>
                                 <DatePicker
-                                    label="Must be signed by"
+                                    label="Document must be signed by"
                                     onChange={(value) => {
                                         setSignedBefore(value);
                                     }}
