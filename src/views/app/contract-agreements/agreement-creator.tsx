@@ -54,7 +54,7 @@ const AgreementCreator: React.FC = () => {
         return endDate;
     });
     const [templateDate, setTemplateDate] = React.useState<string>('6');
-    const [signedBefore, setSignedBefore] = React.useState<Date | null>();
+    const [, setSignedBefore] = React.useState<Date | null>();
 
     const dispatchFn = useDispatch<AppDispatch>();
     const contractHelper = React.useMemo(
@@ -211,7 +211,7 @@ const AgreementCreator: React.FC = () => {
                     <Card style={{ height: '900px' }}>
                         <CardBody>
                             <Center>
-                                {pdfLoading && <Skeleton height={750} />}
+                                {pdfLoading && <Skeleton height={750} width={613} />}
                                 {!pdfLoading && (
                                     <Document
                                         loading={<Skeleton height={750} />}

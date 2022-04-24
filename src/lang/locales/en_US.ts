@@ -57,6 +57,8 @@ export const enMessages = {
     'menu.agreements': 'Agreements',
     'menu.reports': 'Reports',
     'menu.create': 'Create',
+    'menu.documents': 'Documents',
+    'menu.add-signers': 'Add Signers',
 
     /* 04.Error Page */
     'pages.error-title': 'Ooops... looks like an error occurred!',

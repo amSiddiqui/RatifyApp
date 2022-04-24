@@ -117,9 +117,9 @@ function App() {
                             <Routes>
                                 <Route path='/' element={<ProtectedRoute {...defaultProtectedRouteProps} outlet={<ViewApp />} />}>
                                     <Route index element={<DashboardAnalytics />} />
-                                    <Route path='agreements' element={<><Outlet /></>}>
+                                    <Route path='documents' element={<><Outlet /></>}>
                                         <Route index element={<ContractsAgreements></ContractsAgreements>} />
-                                        <Route path='create/:contractId' element={<AgreementCreator />} />
+                                        <Route path='add-signers/:contractId' element={<AgreementCreator />} />
                                     </Route>
                                     <Route path='reports' element={<Reports></Reports>}></Route>
                                     <Route path='account' element={<><Outlet /></>}>

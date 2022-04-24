@@ -18,7 +18,6 @@ import {
     menuHiddenBreakpoint,
     searchPath,
     localeOptions,
-    isDarkSwitchActive,
     adminRoot,
 } from '../../constants/defaultValues';
 
@@ -26,7 +25,6 @@ import { MobileMenuIcon, MenuIcon } from '../../components/svg';
 import { getDirection, setDirection } from '../../helpers/Utils';
 import TopnavEasyAccess from './Topnav.EasyAccess';
 import TopnavNotifications from './Topnav.Notifications';
-import TopnavDarkSwitch from './Topnav.DarkSwitch';
 import { useDispatch, useSelector } from 'react-redux';
 import { settingsActions } from '../../redux/settings-slice';
 import { menuActions } from '../../redux/menu-slice';
@@ -276,7 +274,6 @@ const TopNav = ({ intl }) => {
             </NavLink>
 
             <div className="navbar-right">
-                {isDarkSwitchActive && <TopnavDarkSwitch />}
                 <div className="header-icons d-inline-block align-middle">
                     <TopnavEasyAccess />
                     <TopnavNotifications />

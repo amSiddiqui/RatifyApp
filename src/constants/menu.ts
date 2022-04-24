@@ -6,10 +6,10 @@ const data = [
         to: `/`,
     },
     {
-        id: 'agreements',
+        id: 'documents',
         icon: 'iconsminds-notepad',
         label: 'menu.agreements',
-        to: `/agreements`,
+        to: `/documents`,
     },
     {
         id: 'account',
