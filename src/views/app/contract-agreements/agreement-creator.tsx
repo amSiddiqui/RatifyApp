@@ -166,7 +166,7 @@ const AgreementCreator: React.FC = () => {
                 />
             </Center>
             <Grid columns={20}>
-                <Grid.Col span={4}>
+                <Grid.Col span={3}>
                     <div className='flex items-center justify-center mb-2'>
                         <Button
                             className="contract-agreements-create-new flex h-14 items-center justify-center"
@@ -183,9 +183,9 @@ const AgreementCreator: React.FC = () => {
                         </Button>
                     </div>
                 </Grid.Col>
-                <Grid.Col span={12}>
+                <Grid.Col span={14}>
                 </Grid.Col>
-                <Grid.Col span={4}>
+                <Grid.Col span={3}>
                     <div className='flex items-center justify-center mb-2'>
                         <Button
                             className="contract-agreements-create-new flex h-14 items-center justify-center"

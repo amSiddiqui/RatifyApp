@@ -292,7 +292,7 @@ const TopNav = ({ intl }) => {
                 </div>
                 <div className="user d-inline-block">
                     <UncontrolledDropdown className="dropdown-menu-right">
-                        <DropdownToggle className="p-0 topnav-account-dropdown justify-center items-center" color="empty">
+                        <DropdownToggle className="p-0 flex items-center justify-center" color="empty">
                             <span className="name mr-1 inline">
                                 {auth.user.first_name} {auth.user.last_name}
                             </span>
