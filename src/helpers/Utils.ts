@@ -132,3 +132,18 @@ export const setCurrentRadius = (radius: string) => {
         );
     }
 };
+
+
+export const swap = (arr: any[], i: number, j: number) => {
+    if (i === j) {
+        return [...arr];
+    }
+    if (i < 0 || i >= arr.length || j < 0 || j >= arr.length) {
+        return [...arr];
+    }
+    const new_arr = [...arr];
+    const temp = new_arr[i];
+    new_arr[i] = new_arr[j];
+    new_arr[j] = temp;
+    return new_arr;
+}

@@ -15,7 +15,8 @@ import {
     Select,
     Switch,
     Group,
-    ScrollArea
+    ScrollArea,
+    Modal,
 } from '@mantine/core';
 import { DatePicker } from '@mantine/dates';
 import { Card, CardBody } from 'reactstrap';
@@ -30,6 +31,7 @@ import { HiChevronLeft, HiChevronRight, HiChevronDoubleLeft, HiChevronDoubleRigh
 import { DateTime } from 'luxon';
 import { Button } from 'reactstrap'; 
 import { GoPlus } from 'react-icons/go';
+import AddSigner, { SignerElement } from './add-signer';
 
 // luxon today date
 const today = DateTime.local();
@@ -43,18 +45,13 @@ const AgreementCreator: React.FC = () => {
     const { contractId } = useParams();
     const [pdf, setPdf] = React.useState('');
     const [pdfLoading, setPdfLoading] = React.useState(true);
-    const [pdfThumbnails, setPdfThumbnails] = React.useState<{
-        [id: string]: string;
-    }>({});
+    const [pdfThumbnails, setPdfThumbnails] = React.useState<{[id: string]: string;}>({});
     const [thumbnailsLoading, setThumbnailsLoading] = React.useState(true);
     const [showEndDate, setShowEndDate] = React.useState(false);
-    const [endDate, setEndDate] = React.useState<DateTime>(() => {
-        // datetime get 1 month from today
-        const endDate = today.plus({ months: 6 });
-        return endDate;
-    });
+    const [endDate, setEndDate] = React.useState<DateTime>(() => {const endDate = today.plus({ months: 6 }); return endDate;});
     const [templateDate, setTemplateDate] = React.useState<string>('6');
     const [, setSignedBefore] = React.useState<Date | null>();
+    const [showSignerModal, setShowSignerModal] = React.useState(false);
 
     const dispatchFn = useDispatch<AppDispatch>();
     const contractHelper = React.useMemo(
@@ -62,6 +59,11 @@ const AgreementCreator: React.FC = () => {
         [dispatchFn]
     );
     const navigate = useNavigate();
+
+    const onAddSigner = (signers:SignerElement[]) => {
+        console.log({signers});
+        setShowSignerModal(false);
+    }
 
     function onDocumentLoadSuccess({ numPages }: any) {
         setNumPages(numPages);
@@ -169,6 +171,9 @@ const AgreementCreator: React.FC = () => {
                         <Button
                             className="contract-agreements-create-new flex h-14 items-center justify-center"
                             color="primary"
+                            onClick={() => {
+                                setShowSignerModal(true);
+                            }}
                             style={{width: '170px'}}
                         >
                             <i className='mr-2'>
@@ -376,6 +381,9 @@ const AgreementCreator: React.FC = () => {
                     </Card>
                 </Grid.Col>
             </Grid>
+            <Modal size='90%' centered title='Add Signers' opened={showSignerModal} onClose={() => setShowSignerModal(false)}>
+                {showSignerModal && <AddSigner onConfirmAddSigner={onAddSigner} onCancelAddSigner={() => {setShowSignerModal(false)}} />}
+            </Modal>
         </>
     );
 };

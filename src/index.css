@@ -47,3 +47,7 @@
 .center-input input {
     text-align: center;
 }
+
+label {
+    margin-bottom: 0;
+}

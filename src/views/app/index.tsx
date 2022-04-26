@@ -21,7 +21,9 @@ const App = () => {
         } else if (validate === 'false') {
             toast.error('Email verification failed. Try again.');
         }
-        setSearchParam({});
+        if (expired || validate) {
+            setSearchParam({});
+        }
     }, [searchParams, setSearchParam]);
 
     return (

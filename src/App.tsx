@@ -33,6 +33,10 @@ const VerifyEmail = React.lazy(() =>
   import(/* webpackChunkName: "user-register" */ './views/user/verify-email')
 );
 
+const BlankPage = React.lazy(() =>
+  import(/* webpackChunkName: "user-register" */ './views/app/blank-page')
+);
+
 const ViewApp = React.lazy(() =>
   import(/* webpackChunkName: "views-app" */ './views/app')
 );
@@ -127,6 +131,7 @@ function App() {
                                         <Route path='profile-settings' element={<ProfileSettings />} />
                                         <Route path='ui-settings' element={<UiSettings />} />
                                     </Route>
+                                    <Route path='blank' element={<BlankPage />} />
                                 </Route>
                                 <Route path='error' element={<ViewError></ViewError>} />
                                 <Route path='unauthorized' element={<ViewUnauthorized></ViewUnauthorized>} />

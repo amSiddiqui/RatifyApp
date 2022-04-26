@@ -59,6 +59,7 @@ export const enMessages = {
     'menu.create': 'Create',
     'menu.documents': 'Documents',
     'menu.add-signers': 'Add Signers',
+    'menu.blank': 'Blank Page',
 
     /* 04.Error Page */
     'pages.error-title': 'Ooops... looks like an error occurred!',
