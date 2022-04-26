@@ -202,8 +202,8 @@ const AgreementCreator: React.FC = () => {
             </Grid>
 
             <Grid columns={20}>
-                <Grid.Col span={4}>
-                    <Card style={{ height: '900px' }}>
+                <Grid.Col span={3}>
+                    <Card style={{ height: '1080px' }}>
                         <CardBody className='p-0'>
                             <div className="text-center text-lg py-4">
                                 Signing Workflow
@@ -212,8 +212,8 @@ const AgreementCreator: React.FC = () => {
                         </CardBody>
                     </Card>
                 </Grid.Col>
-                <Grid.Col span={12}>
-                    <Card style={{ height: '900px' }}>
+                <Grid.Col span={14}>
+                    <Card style={{ height: '1080px' }}>
                         <CardBody>
                             <Center>
                                 {pdfLoading && <Skeleton height={750} width={613} />}
@@ -228,6 +228,7 @@ const AgreementCreator: React.FC = () => {
                                         <Page
                                             loading={<Skeleton height={750} />}
                                             pageNumber={pageNumber}
+                                            height={1024}
                                         />
                                     </Document>
                                 )}
@@ -235,8 +236,8 @@ const AgreementCreator: React.FC = () => {
                         </CardBody>
                     </Card>
                 </Grid.Col>
-                <Grid.Col span={4}>
-                    <Card style={{ height: '900px' }}>
+                <Grid.Col span={3}>
+                    <Card style={{ height: '1080px' }}>
                         <CardBody className='p-0'>
                             <div className="text-center text-lg py-4">
                                 Page Navigation
