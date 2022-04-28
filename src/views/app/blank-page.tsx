@@ -4,65 +4,100 @@ import IntlMessages from '../../helpers/IntlMessages';
 import { Colxx, Separator } from '../../components/common/CustomBootstrap';
 import Breadcrumb from '../../containers/navs/Breadcrumb';
 import { useLocation } from 'react-router-dom';
-import { clamp } from 'lodash-es';
+import { Center, Grid, Stack } from '@mantine/core';
+import { Card, CardBody } from 'reactstrap';
 
-import { useSprings, animated } from 'react-spring';
-import { useDrag } from '@use-gesture/react';
-import { Center, Grid } from '@mantine/core';
-import { Card, CardBody } from 'reactstrap'; 
-import { Button } from 'reactstrap'
+const INPUT_WIDTH = 150;
+const INPUT_HEIGHT = 20;
 
-const swap = (arr: number[], i: number, j:number)  => {
-    if (i === j) return arr;
-    if (i < 0 || i >= arr.length || j < 0 || j >= arr.length) return arr;
-    // remove ith element
-    let new_arr = [...arr];
-    let ith = new_arr.splice(i, 1)[0];
-    // insert at jth position
-    new_arr.splice(j, 0, ith); 
-    return new_arr;
-}
+const POSITION_OFFSET_X = INPUT_WIDTH / 2;
+const POSITION_OFFSET_Y = INPUT_HEIGHT / 2;
 
-const fn = (order: number[], active = false, originalIndex = 0, curIndex = 0, y = 0) => (index:number) =>
-    active && index === originalIndex
-        ? {
-            y: curIndex * 100 + y,
-            scale: 1.1,
-            zIndex: 1,
-            shadow: 15,
-            immediate: (key: string) => key === 'y' || key === 'zIndex',
-        }
-        : {
-            y: order.indexOf(index) * 100,
-            scale: 1,
-            zIndex: 0,
-            shadow: 1,
-            immediate: false,
-        }
+type PositionType = {
+    x: number;
+    y: number;
+};
+
+const DraggableInput: React.FC<{ pos: PositionType }> = ({ pos }) => {
+
+    return (
+        <div
+            style={{
+                position: 'fixed',
+                top: pos.y - POSITION_OFFSET_Y,
+                left: pos.x - POSITION_OFFSET_X,
+                zIndex: 100,
+                userSelect: 'none',
+            }}
+        >
+            <div
+                style={{
+                    width: INPUT_WIDTH,
+                    height: INPUT_HEIGHT,
+                    backgroundColor: 'rgba(50,160,216, 0.9)',
+                }}
+                className="z-10 text-white flex justify-center items-center cursor-pointer"
+            >
+                Name
+            </div>
+        </div>
+    );
+};
 
 const BlankPage = () => {
     const match = useLocation();
 
-    const [items, setItems] = React.useState<string[]>([]);
-    const [order, setOrder] = React.useState(items.map((_, index) => index));
-    const [springs, api] = useSprings(items.length, fn(order));
-    const [shouldDrag, setShouldDrag] = React.useState(false);
+    const canvasRef = React.useRef<HTMLDivElement>(null);
 
-    const bind = useDrag(({ args: [originalIndex], active, movement: [, y] }) => {
-        const curIndex = order.indexOf(originalIndex);
-        const curRow = clamp(Math.round((curIndex * 100 + y) / 100), 0, items.length - 1);
-        const newOrder = swap(order, curIndex, curRow);
-        api.start(fn(newOrder, active && shouldDrag, originalIndex, curIndex, y));
-        if (!active) {
-            setOrder(newOrder);
-        }
+    const [inputElements, setInputElements] = React.useState<PositionType[]>(
+        [{ x: 300, y: 170}],
+    );
+    const [isDragging, setIsDragging] = React.useState<boolean | null>(null);
+    const [mousePosition, setMousePosition] = React.useState<PositionType>({
+        x: 0,
+        y: 0,
     });
+    
+    const spawnInput = () => {
+        setIsDragging(true);
+    };
 
-    const onRowAdd = () => {
-        setItems(prev => [...prev, 'G']);
-        setOrder(prev => [...prev, prev.length]);
-    }
+    React.useEffect(() => {
+        const canvas = canvasRef.current;
+        if (!canvas || isDragging === null) {
+            return;
+        }
+        if (!isDragging) {
+            // check if mousePosition inside canvas
+            const bounds = canvas.getBoundingClientRect();
+            const x = mousePosition.x - bounds.left;
+            const y = mousePosition.y - bounds.top;
+            if (x < 0 || x > bounds.width || y < 0 || y > bounds.height) {
+            } else {
+                setInputElements(prev => [...prev, {x, y}]);
+            }
+        }
+    }, [isDragging, mousePosition]);
 
+    React.useLayoutEffect(() => {
+        const onmouseup = () => {
+            setIsDragging(false);
+        };
+
+        const onmousemove = (event: MouseEvent) => {
+            if (isDragging) {
+                setMousePosition({ x: event.clientX, y: event.clientY });
+            }
+        };
+
+        window.addEventListener('mouseup', onmouseup);
+        window.addEventListener('mousemove', onmousemove);
+
+        return () => {
+            window.removeEventListener('mouseup', onmouseup);
+            window.removeEventListener('mousemove', onmousemove);
+        };
+    }, [isDragging]);
 
     return (
         <>
@@ -79,64 +114,94 @@ const BlankPage = () => {
                     </p>
                 </Colxx>
             </Row>
-            <Center className='mb-10'>
-                <Button onClick={onRowAdd}>Add Items</Button>
-            </Center>
-            <Center>
-                <div style={{
-                    position: 'relative',
-                    width: '500px',
-                    height: '800px',
-                }}>
-                    {springs.map(({zIndex, shadow, y, scale}, i) => (
-                        <animated.div
-                            {...bind(i)}
-                            key={i}
+
+            <Grid columns={20}>
+                <Grid.Col span={3}>
+                    <Card>
+                        <CardBody
                             style={{
-                                zIndex,
-                                boxShadow: shadow.to(s => `rgba(0, 0, 0, 0.15) 0px ${s}px ${2 * s} px 0px`),
-                                y,
-                                scale,
-                                position: 'absolute',
-                                width: '500px',
-                                height: '70px',
-                                transformOrigin: '50% 50% 0px',
-                                borderRadius: '5px',
-                                paddingLeft: '32px',
-                                fontSize: '14.5px',
-                                textTransform: 'uppercase',
-                                letterSpacing: '2px',
-                                touchAction: 'none',
+                                height: '800px',
                             }}
                         >
-                            <Grid columns={12}>
-                                <Grid.Col span={8}>
-                                    <Card>
-                                        <CardBody style={{height: '70px'}}>
-                                            {items[i]}
-                                        </CardBody>
-                                    </Card>
-                                </Grid.Col>
-                                <Grid.Col span={4}>
-                                    <Card>
-                                        <CardBody onMouseDown={() => {
-                                            setShouldDrag(true);
-                                        }} 
-                                        onMouseUp={() => {
-                                            setShouldDrag(false);
+                            <Stack>
+                                <Center>
+                                    <div
+                                        onMouseDown={spawnInput}
+                                        style={{
+                                            height: '65px',
+                                            width: '65px',
                                         }}
-                                        style={{height: '70px'}}
-                                        className='cursor-pointer'
+                                        className="rounded-md shadow-md bg-blue-100"
+                                    >
+                                        <Center
+                                            className="cursor-pointer"
+                                            style={{
+                                                height: '65px',
+                                                color: 'black',
+                                                fontSize: '2rem',
+                                                userSelect: 'none',
+                                            }}
                                         >
-
-                                        </CardBody>
-                                    </Card>
-                                </Grid.Col>
-                            </Grid>
-                        </animated.div>
-                    ))}
-                </div>
-            </Center>
+                                            T
+                                        </Center>
+                                    </div>
+                                </Center>
+                            </Stack>
+                        </CardBody>
+                    </Card>
+                </Grid.Col>
+                <Grid.Col span={17}>
+                    <Center>
+                        <div
+                            style={{ height: '1080px', width: '825px' }}
+                            className="relative"
+                        >
+                            <div
+                                ref={canvasRef}
+                                style={{
+                                    position: 'absolute',
+                                    top: 0,
+                                    left: 0,
+                                    height: '1080px',
+                                    width: '825px',
+                                }}
+                            >
+                                {inputElements.map((element, index) => {
+                                    return (
+                                        <input
+                                            className='pdf-input-element'
+                                            key={index}
+                                            style={{                                           
+                                                zIndex: 2,
+                                                position: 'absolute',
+                                                top:
+                                                    element.y -
+                                                    POSITION_OFFSET_Y,
+                                                left:
+                                                    element.x -
+                                                    POSITION_OFFSET_X,
+                                            }}
+                                            placeholder="First Name"
+                                        />
+                                    );
+                                })}
+                            </div>
+                            <img
+                                src="/static/img/sample_pdf.jpg"
+                                alt="PDF"
+                                style={{
+                                    height: '1080px',
+                                    width: '825px',
+                                    position: 'absolute',
+                                    top: 0,
+                                    left: 0,
+                                }}
+                            />
+                        </div>
+                    </Center>
+                </Grid.Col>
+            </Grid>    
+            {isDragging && <DraggableInput pos={mousePosition} />}
         </>
     );
 };

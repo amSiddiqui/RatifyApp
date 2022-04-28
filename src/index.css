@@ -48,3 +48,26 @@
 label {
     margin-bottom: 0;
 }
+
+.pdf-input-element {
+    width: 150px;
+    background-color: rgba(50, 160, 216, 0.9);
+}
+
+.pdf-input-element::placeholder {
+    color: #fff;
+}
+
+.pdf-input-element::-webkit-input-placeholder {
+    color: #fff;
+}
+
+.pdf-input-element.pdf-input-element-filled {
+    background-color: #fff;
+    color: #000;
+}
+
+.pdf-input-element:focus {
+    background-color: #fff;
+    color: #000;
+}

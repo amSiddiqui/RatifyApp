@@ -17,6 +17,7 @@ import {
     Group,
     ScrollArea,
     Modal,
+    Tooltip
 } from '@mantine/core';
 import { DatePicker } from '@mantine/dates';
 import { Card, CardBody } from 'reactstrap';
@@ -32,6 +33,45 @@ import { DateTime } from 'luxon';
 import { Button } from 'reactstrap'; 
 import { GoPlus } from 'react-icons/go';
 import AddSigner, { SignerElement } from './add-signer';
+import { AiOutlineDrag } from 'react-icons/ai';
+
+const INPUT_WIDTH = 150;
+const INPUT_HEIGHT = 20;
+
+const POSITION_OFFSET_X = INPUT_WIDTH / 2;
+const POSITION_OFFSET_Y = INPUT_HEIGHT / 2;
+
+type PositionType = {
+    x: number;
+    y: number;
+};
+
+const DraggableInput: React.FC<{ pos: PositionType }> = ({ pos }) => {
+
+    return (
+        <div
+            style={{
+                position: 'fixed',
+                top: pos.y - POSITION_OFFSET_Y,
+                left: pos.x - POSITION_OFFSET_X,
+                zIndex: 100,
+                userSelect: 'none',
+            }}
+        >
+            <div
+                style={{
+                    width: INPUT_WIDTH,
+                    height: INPUT_HEIGHT,
+                    backgroundColor: 'rgba(50,160,216, 0.9)',
+                }}
+                className="z-10 text-white flex justify-center items-center cursor-pointer"
+            >
+                Name
+            </div>
+        </div>
+    );
+};
+
 
 // luxon today date
 const today = DateTime.local();
@@ -53,12 +93,27 @@ const AgreementCreator: React.FC = () => {
     const [, setSignedBefore] = React.useState<Date | null>();
     const [showSignerModal, setShowSignerModal] = React.useState(false);
 
+    const canvasRef = React.useRef<HTMLDivElement>(null);
+
+    const [inputElements, setInputElements] = React.useState<PositionType[]>(
+        [{ x: 300, y: 170}],
+    );
+    const [isDragging, setIsDragging] = React.useState<boolean | null>(null);
+    const [mousePosition, setMousePosition] = React.useState<PositionType>({
+        x: 0,
+        y: 0,
+    });
+
     const dispatchFn = useDispatch<AppDispatch>();
     const contractHelper = React.useMemo(
         () => new ContractHelper(dispatchFn),
         [dispatchFn]
     );
     const navigate = useNavigate();
+
+    const spawnInput = () => {
+        setIsDragging(true);
+    };
 
     const onAddSigner = (signers:SignerElement[]) => {
         console.log({signers});
@@ -140,6 +195,44 @@ const AgreementCreator: React.FC = () => {
         }
     }, [contractHelper, contractId, navigate]);
 
+    React.useEffect(() => {
+        const canvas = canvasRef.current;
+        if (!canvas || isDragging === null) {
+            return;
+        }
+        if (!isDragging) {
+            // check if mousePosition inside canvas
+            const bounds = canvas.getBoundingClientRect();
+            const x = mousePosition.x - bounds.left;
+            const y = mousePosition.y - bounds.top;
+            if (x < 0 || x > bounds.width || y < 0 || y > bounds.height) {
+            } else {
+                setInputElements(prev => [...prev, {x, y}]);
+            }
+        }
+    }, [isDragging, mousePosition]);
+
+    React.useLayoutEffect(() => {
+        const onmouseup = () => {
+            setIsDragging(false);
+        };
+
+        const onmousemove = (event: MouseEvent) => {
+            if (isDragging) {
+                setMousePosition({ x: event.clientX, y: event.clientY });
+            }
+        };
+
+        window.addEventListener('mouseup', onmouseup);
+        window.addEventListener('mousemove', onmousemove);
+
+        return () => {
+            window.removeEventListener('mouseup', onmouseup);
+            window.removeEventListener('mousemove', onmousemove);
+        };
+    }, [isDragging]);
+
+
     return (
         <>
             <Row>
@@ -208,7 +301,42 @@ const AgreementCreator: React.FC = () => {
                             <div className="text-center text-lg py-4">
                                 Signing Workflow
                             </div>
-                            <Divider className="mb-3" />
+                            <Divider className="mb-4" />
+                            <p className='text-xs px-3 text-slate-400 italic'>Drag and drop signers on document</p>
+                            <Stack style={{ userSelect: 'none' }} className='px-3 my-4'>
+                                <Tooltip color='red' position='left' placement='start' opened label='Signer 1' withArrow>
+                                    <Stack className='p-3 bg-red-100'>
+                                        <Group onMouseDown={spawnInput} position='apart' className='border-2 cursor-pointer border-slate-300 rounded-sm bg-white p-2 text-slate-400'>
+                                            <span>Name Field</span>
+                                            <i><AiOutlineDrag /></i>
+                                        </Group>
+                                        <Group position='apart' className='border-2 cursor-pointer border-slate-300 rounded-sm bg-white p-2 text-slate-400'>
+                                            <span>Signature</span>
+                                            <i><AiOutlineDrag /></i>
+                                        </Group>
+                                        <Group position='apart' className='border-2 cursor-pointer border-slate-300 rounded-sm bg-white p-2 text-slate-400'>
+                                            <span>Date Field</span>
+                                            <i><AiOutlineDrag /></i>
+                                        </Group>
+                                    </Stack>
+                                </Tooltip>
+                                <Tooltip color='blue' position='left' placement='start' opened label='Signer 2' withArrow>
+                                    <Stack className='p-3 bg-blue-100'>
+                                        <Group position='apart' className='border-2 cursor-pointer border-slate-300 rounded-sm bg-white p-2 text-slate-400'>
+                                            <span>Name Field</span>
+                                            <i><AiOutlineDrag /></i>
+                                        </Group>
+                                        <Group position='apart' className='border-2 cursor-pointer border-slate-300 rounded-sm bg-white p-2 text-slate-400'>
+                                            <span>Signature</span>
+                                            <i><AiOutlineDrag /></i>
+                                        </Group>
+                                        <Group position='apart' className='border-2 cursor-pointer border-slate-300 rounded-sm bg-white p-2 text-slate-400'>
+                                            <span>Date Field</span>
+                                            <i><AiOutlineDrag /></i>
+                                        </Group>
+                                    </Stack>
+                                </Tooltip>
+                            </Stack>
                         </CardBody>
                     </Card>
                 </Grid.Col>
@@ -218,19 +346,23 @@ const AgreementCreator: React.FC = () => {
                             <Center>
                                 {pdfLoading && <Skeleton height={750} width={613} />}
                                 {!pdfLoading && (
-                                    <Document
-                                        loading={<Skeleton height={750} />}
-                                        file={
-                                            'data:application/pdf;base64,' + pdf
-                                        }
-                                        onLoadSuccess={onDocumentLoadSuccess}
-                                    >
-                                        <Page
+                                    <div>
+                                        <Document
                                             loading={<Skeleton height={750} />}
-                                            pageNumber={pageNumber}
-                                            height={1024}
-                                        />
-                                    </Document>
+                                            options={{ workerSrc: "/pdf.worker.js" }}
+                                            file={
+                                                'data:application/pdf;base64,' + pdf
+                                            }
+                                            onLoadSuccess={onDocumentLoadSuccess}
+                                        >
+                                            <Page
+                                                loading={<Skeleton height={750} />}
+                                                pageNumber={pageNumber}
+                                                height={1024}
+                                                
+                                            />
+                                        </Document>
+                                    </div>
                                 )}
                             </Center>
                         </CardBody>
@@ -385,6 +517,7 @@ const AgreementCreator: React.FC = () => {
             <Modal size='90%' centered title='Add Signers' opened={showSignerModal} onClose={() => setShowSignerModal(false)}>
                 {showSignerModal && <AddSigner onConfirmAddSigner={onAddSigner} onCancelAddSigner={() => {setShowSignerModal(false)}} />}
             </Modal>
+            {isDragging && <DraggableInput pos={mousePosition} />}
         </>
     );
 };
