@@ -6,51 +6,17 @@ import Breadcrumb from '../../containers/navs/Breadcrumb';
 import { useLocation } from 'react-router-dom';
 import { Center, Grid, Stack } from '@mantine/core';
 import { Card, CardBody } from 'reactstrap';
-
-const INPUT_WIDTH = 150;
-const INPUT_HEIGHT = 20;
-
-const POSITION_OFFSET_X = INPUT_WIDTH / 2;
-const POSITION_OFFSET_Y = INPUT_HEIGHT / 2;
-
-type PositionType = {
-    x: number;
-    y: number;
-};
-
-const DraggableInput: React.FC<{ pos: PositionType }> = ({ pos }) => {
-
-    return (
-        <div
-            style={{
-                position: 'fixed',
-                top: pos.y - POSITION_OFFSET_Y,
-                left: pos.x - POSITION_OFFSET_X,
-                zIndex: 100,
-                userSelect: 'none',
-            }}
-        >
-            <div
-                style={{
-                    width: INPUT_WIDTH,
-                    height: INPUT_HEIGHT,
-                    backgroundColor: 'rgba(50,160,216, 0.9)',
-                }}
-                className="z-10 text-white flex justify-center items-center cursor-pointer"
-            >
-                Name
-            </div>
-        </div>
-    );
-};
+import DraggableInput from './contract-agreements/form-elements/DraggableInput';
+import { PositionType, POSITION_OFFSET_X, POSITION_OFFSET_Y } from './contract-agreements/types';
+import PdfFormInput, { PdfFormInputType } from './contract-agreements/form-elements/PdfFormInput';
 
 const BlankPage = () => {
     const match = useLocation();
 
     const canvasRef = React.useRef<HTMLDivElement>(null);
 
-    const [inputElements, setInputElements] = React.useState<PositionType[]>(
-        [{ x: 300, y: 170}],
+    const [inputElements, setInputElements] = React.useState<PdfFormInputType[]>(
+        [{ x: 260, y: 180, color: 'blue'}],
     );
     const [isDragging, setIsDragging] = React.useState<boolean | null>(null);
     const [mousePosition, setMousePosition] = React.useState<PositionType>({
@@ -74,7 +40,7 @@ const BlankPage = () => {
             const y = mousePosition.y - bounds.top;
             if (x < 0 || x > bounds.width || y < 0 || y > bounds.height) {
             } else {
-                setInputElements(prev => [...prev, {x, y}]);
+                setInputElements(prev => [...prev, {x, y, color: 'red'}]);
             }
         }
     }, [isDragging, mousePosition]);
@@ -168,21 +134,12 @@ const BlankPage = () => {
                             >
                                 {inputElements.map((element, index) => {
                                     return (
-                                        <input
-                                            className='pdf-input-element'
+                                        <PdfFormInput
                                             key={index}
-                                            style={{                                           
-                                                zIndex: 2,
-                                                position: 'absolute',
-                                                top:
-                                                    element.y -
-                                                    POSITION_OFFSET_Y,
-                                                left:
-                                                    element.x -
-                                                    POSITION_OFFSET_X,
-                                            }}
-                                            placeholder="First Name"
-                                        />
+                                            color={element.color}
+                                            x={element.x - POSITION_OFFSET_X}
+                                            y={element.y - POSITION_OFFSET_Y}                                            
+                                        />   
                                     );
                                 })}
                             </div>
@@ -201,7 +158,7 @@ const BlankPage = () => {
                     </Center>
                 </Grid.Col>
             </Grid>    
-            {isDragging && <DraggableInput pos={mousePosition} />}
+            {isDragging && <DraggableInput color='red' placeholder='Full Name' pos={mousePosition} />}
         </>
     );
 };

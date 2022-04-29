@@ -19,43 +19,7 @@ import { useDrag } from '@use-gesture/react';
 import { clamp } from 'lodash-es';
 import { useMediaQuery } from '@mantine/hooks';
 import { GoPlus } from 'react-icons/go';
-
-const colors = [
-    'blue',
-    'red',
-    'green',
-    'purple',
-    'pink',
-    'yellow',
-    'orange',
-    'cyan',
-    'teal',
-]
-
-const getColor = (color:string) => {
-    switch (color) {
-        case 'red':
-            return 'bg-red-100';
-        case 'green':
-            return 'bg-green-100';
-        case 'blue':
-            return 'bg-blue-100';
-        case 'yellow':
-            return 'bg-yellow-100';
-        case 'orange':
-            return 'bg-orange-100';
-        case 'purple':
-            return 'bg-purple-100';
-        case 'pink':
-            return 'bg-pink-100';
-        case 'cyan':
-            return 'bg-cyan-100';
-        case 'teal':
-            return 'bg-teal-100';
-        default:
-            return 'bg-gray-100';
-    }
-}
+import { colors, getBgColorLight as getColor } from './types';
 
 export type SignerElement = {
     step: number;

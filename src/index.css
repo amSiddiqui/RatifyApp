@@ -50,20 +50,18 @@ label {
 }
 
 .pdf-input-element {
-    width: 150px;
-    z-index: 12;
-    background-color: rgba(50, 160, 216, 0.9);
-    position: absolute;
     padding-left: 3px;
+    width: 100%;
+    height: calc(100% - 17px);
     padding-right: 3px;
 }
 
 .pdf-input-element::placeholder {
-    color: #fff;
+    color: white;
 }
 
 .pdf-input-element::-webkit-input-placeholder {
-    color: #fff;
+    color: white;
 }
 
 .pdf-input-element.pdf-input-element-filled {

@@ -34,44 +34,8 @@ import { Button } from 'reactstrap';
 import { GoPlus } from 'react-icons/go';
 import AddSigner, { SignerElement } from './add-signer';
 import { AiOutlineDrag } from 'react-icons/ai';
-
-const INPUT_WIDTH = 150;
-const INPUT_HEIGHT = 20;
-
-const POSITION_OFFSET_X = INPUT_WIDTH / 2;
-const POSITION_OFFSET_Y = INPUT_HEIGHT / 2;
-
-type PositionType = {
-    x: number;
-    y: number;
-};
-
-const DraggableInput: React.FC<{ pos: PositionType }> = ({ pos }) => {
-
-    return (
-        <div
-            style={{
-                position: 'fixed',
-                top: pos.y - POSITION_OFFSET_Y,
-                left: pos.x - POSITION_OFFSET_X,
-                zIndex: 100,
-                userSelect: 'none',
-            }}
-        >
-            <div
-                style={{
-                    width: INPUT_WIDTH,
-                    height: INPUT_HEIGHT,
-                    backgroundColor: 'rgba(50,160,216, 0.9)',
-                }}
-                className="z-10 text-white flex justify-center items-center cursor-pointer"
-            >
-                Name
-            </div>
-        </div>
-    );
-};
-
+import DraggableInput from './form-elements/DraggableInput';
+import { PositionType, POSITION_OFFSET_X, POSITION_OFFSET_Y } from './types';
 
 // luxon today date
 const today = DateTime.local();
@@ -188,7 +152,7 @@ const AgreementCreator: React.FC = () => {
         } else {
             toast.error('Cannot Find Document. Redirecting to Contract List');
             setTimeout(() => {
-                navigate('/agreements');
+                navigate('/documents');
             }, 4000);
         }
     }, [contractHelper, contractId, navigate]);
@@ -300,13 +264,13 @@ const AgreementCreator: React.FC = () => {
                 <Grid.Col span={3}>
                     <Card style={{ height: '1080px' }}>
                         <CardBody className='p-0'>
-                            <div className="text-center text-lg py-4">
+                            <h5 className="text-center py-4">
                                 Signing Workflow
-                            </div>
+                            </h5>
                             <Divider className="mb-4" />
                             <p className='text-xs px-3 text-slate-400 italic'>Drag and drop signers on document</p>
                             <Stack style={{ userSelect: 'none' }} className='px-3 my-4'>
-                                <Tooltip color='red' position='left' placement='start' opened label='Signer 1' withArrow>
+                                <Tooltip zIndex={1} color='red' position='left' placement='start' opened label='Signer 1' withArrow>
                                     <Stack className='p-3 bg-red-100'>
                                         <Group onMouseDown={spawnInput} position='apart' className='border-2 cursor-pointer border-slate-300 rounded-sm bg-white p-2 text-slate-400'>
                                             <span>Name Field</span>
@@ -322,7 +286,7 @@ const AgreementCreator: React.FC = () => {
                                         </Group>
                                     </Stack>
                                 </Tooltip>
-                                <Tooltip color='blue' position='left' placement='start' opened label='Signer 2' withArrow>
+                                <Tooltip zIndex={1} color='blue' position='left' placement='start' opened label='Signer 2' withArrow>
                                     <Stack className='p-3 bg-blue-100'>
                                         <Group position='apart' className='border-2 cursor-pointer border-slate-300 rounded-sm bg-white p-2 text-slate-400'>
                                             <span>Name Field</span>
@@ -349,7 +313,7 @@ const AgreementCreator: React.FC = () => {
                                 {pdfLoading && <Skeleton height={1080} width={613} />}
                                 {!pdfLoading && (
                                     <div>
-                                        <div ref={canvasRef} style={{height: '1024px', width: '791px', position: 'absolute', top: '28px', zIndex: '2'}} className='bg-transparent'>
+                                        <div ref={canvasRef} style={{height: '1024px', width: '791px', position: 'absolute', top: '28px', zIndex: '1'}} className='bg-transparent'>
                                             {inputElements.map((element, index) => {
                                                 return (
                                                     <input key={index} style={{top: element.y - POSITION_OFFSET_Y, left: element.x - POSITION_OFFSET_X}} placeholder='Full Name' type="text" className='pdf-input-element' />
@@ -380,9 +344,9 @@ const AgreementCreator: React.FC = () => {
                 <Grid.Col span={3}>
                     <Card style={{ height: '1080px' }}>
                         <CardBody className='p-0'>
-                            <div className="text-center text-lg py-4">
+                            <h5 className="text-center py-4">
                                 Page Navigation
-                            </div>
+                            </h5>
                             <Divider className='mb-4' />
                             <Center className='mb-4'>
                                 <div className='text-2xl'>
@@ -461,7 +425,7 @@ const AgreementCreator: React.FC = () => {
                                 )}
                             </Center>
                             <Divider className="my-4" />
-                            <div className="text-center text-lg mb-5">Settings</div>
+                            <h5 className="text-center mb-5">Settings</h5>
                             <Divider className="my-4" />
                             <Stack spacing={'lg'} className='px-4'>
                                 <Group position="apart">
@@ -526,7 +490,7 @@ const AgreementCreator: React.FC = () => {
             <Modal size='90%' centered title='Add Signers' opened={showSignerModal} onClose={() => setShowSignerModal(false)}>
                 {showSignerModal && <AddSigner onConfirmAddSigner={onAddSigner} onCancelAddSigner={() => {setShowSignerModal(false)}} />}
             </Modal>
-            {isDragging && <DraggableInput pos={mousePosition} />}
+            {isDragging && <DraggableInput pos={mousePosition} color='red' placeholder='Full Name' />}
         </>
     );
 };
