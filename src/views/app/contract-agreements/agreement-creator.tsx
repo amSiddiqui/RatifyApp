@@ -95,9 +95,7 @@ const AgreementCreator: React.FC = () => {
 
     const canvasRef = React.useRef<HTMLDivElement>(null);
 
-    const [inputElements, setInputElements] = React.useState<PositionType[]>(
-        [{ x: 300, y: 170}],
-    );
+    const [inputElements, setInputElements] = React.useState<PositionType[]>([]);
     const [isDragging, setIsDragging] = React.useState<boolean | null>(null);
     const [mousePosition, setMousePosition] = React.useState<PositionType>({
         x: 0,
@@ -201,12 +199,16 @@ const AgreementCreator: React.FC = () => {
             return;
         }
         if (!isDragging) {
+            
             // check if mousePosition inside canvas
             const bounds = canvas.getBoundingClientRect();
             const x = mousePosition.x - bounds.left;
             const y = mousePosition.y - bounds.top;
+            console.log('x:', x, 'y:', y);
             if (x < 0 || x > bounds.width || y < 0 || y > bounds.height) {
+                console.log('outside canvas');
             } else {
+                console.log('inside canvas');
                 setInputElements(prev => [...prev, {x, y}]);
             }
         }
@@ -344,11 +346,18 @@ const AgreementCreator: React.FC = () => {
                     <Card style={{ height: '1080px' }}>
                         <CardBody>
                             <Center>
-                                {pdfLoading && <Skeleton height={750} width={613} />}
+                                {pdfLoading && <Skeleton height={1080} width={613} />}
                                 {!pdfLoading && (
                                     <div>
+                                        <div ref={canvasRef} style={{height: '1024px', width: '791px', position: 'absolute', top: '28px', zIndex: '2'}} className='bg-transparent'>
+                                            {inputElements.map((element, index) => {
+                                                return (
+                                                    <input key={index} style={{top: element.y - POSITION_OFFSET_Y, left: element.x - POSITION_OFFSET_X}} placeholder='Full Name' type="text" className='pdf-input-element' />
+                                                );
+                                            })}
+                                        </div>
                                         <Document
-                                            loading={<Skeleton height={750} />}
+                                            loading={<Skeleton height={1080} />}
                                             options={{ workerSrc: "/pdf.worker.js" }}
                                             file={
                                                 'data:application/pdf;base64,' + pdf
@@ -356,12 +365,12 @@ const AgreementCreator: React.FC = () => {
                                             onLoadSuccess={onDocumentLoadSuccess}
                                         >
                                             <Page
-                                                loading={<Skeleton height={750} />}
+                                                loading={<Skeleton height={1080} />}
                                                 pageNumber={pageNumber}
                                                 height={1024}
-                                                
                                             />
                                         </Document>
+                                        
                                     </div>
                                 )}
                             </Center>
