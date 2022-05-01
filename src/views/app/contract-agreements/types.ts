@@ -19,6 +19,8 @@ export const colors = [
     'orange',
     'cyan',
     'teal',
+    'slate',
+    'gray'
 ]
 
 export const getBgColorLight = (color:string) => {
@@ -41,6 +43,8 @@ export const getBgColorLight = (color:string) => {
             return 'bg-cyan-100';
         case 'teal':
             return 'bg-teal-100';
+        case 'slate':
+            return 'bg-slate-100';
         default:
             return 'bg-gray-100';
     }
@@ -67,6 +71,8 @@ export const getBgColorBold = (color:string) => {
             return 'bg-cyan-400';
         case 'teal':
             return 'bg-teal-400';
+        case 'slate':
+            return 'bg-slate-400';
         default:
             return 'bg-gray-400';
     }
@@ -93,6 +99,8 @@ export const getBorderColorBold = (color:string) => {
             return 'border-cyan-400';
         case 'teal':
             return 'border-teal-400';
+        case 'slate':
+            return 'border-slate-400';
         default:
             return 'border-gray-400';
     }

@@ -2,14 +2,14 @@ import React from 'react';
 
 import {
     Center,
-    Input,
-    Grid,
+    TextInput,
     Divider,
     Stack,
     Select,
     Switch,
     Group,
-    Checkbox
+    Checkbox,
+    NumberInput
 } from '@mantine/core';
 import { AiOutlineDrag } from 'react-icons/ai';
 import { Card, CardBody, Button } from 'reactstrap';
@@ -21,58 +21,99 @@ import { useMediaQuery } from '@mantine/hooks';
 import { GoPlus } from 'react-icons/go';
 import { colors, getBgColorLight as getColor } from './types';
 
-export type SignerElement = {
+interface SingerElementStyleProps {
     step: number;
     color: string;
+    type: 'signer' | 'approver' | 'viewer';
 }
 
-type SignerRowProps = {
-    step: number;
-    color: string;
+interface SignerElementFormProps {
+    name: string;
+    email: string;
+    job_title?: string;
+    text_field?: boolean;
+    every?: number;
+    every_unit?: 'days' | 'weeks' | 'months' | 'years' | '0' | string;
+}
+
+export interface SignerElement extends SingerElementStyleProps, SignerElementFormProps {
+    id: string;
+}
+
+interface SignerRowProps extends SingerElementStyleProps {
     onDragStart: () => void;
     onDragEnd: () => void;
+    onDataChange: (index:number,  data: SignerElementFormProps) => void;
+    confirm: boolean;
+    index: number;
 }
 
-const SignerRow:React.FC<SignerRowProps> = ({ color, step, onDragEnd, onDragStart }) => {
+const SignerRow:React.FC<SignerRowProps> = ({ index, color, step, onDragEnd, onDragStart, type, onDataChange, confirm }) => {
+    const [i] = React.useState(index);
+    const [name, setName] = React.useState('');
+    const [email, setEmail] = React.useState('');
+    const [job_title, setJobTitle] = React.useState('');
+    const [text_field, setTextField] = React.useState(false);
+    const [every, setEvery] = React.useState(1);
+    const [every_unit, setEveryUnit] = React.useState<'days' | 'weeks' | 'months' | 'years' | '0' | string>('months');
+
+    React.useEffect(() => {
+        onDataChange(i, {
+            name,
+            email,
+            job_title,
+            text_field,
+            every,
+            every_unit
+        });
+    }, [name, email, job_title, text_field, every, every_unit, onDataChange, i]);
+    
+
     return <>
         <Card>
             <CardBody className='p-3'>
-                <Grid columns={20}>
-                    <Grid.Col span={13}> 
-                        <Group>
-                            <div className={ classNames('p-2 border-2 rounded-sm', getColor(color))}>Signer {step}</div>
-                            <Input placeholder='Name' />
-                            <Input placeholder='Email' />
-                            <Input placeholder='Job Title' style={{width: 100}}/>
-                            <div><Checkbox size='xs' label='Add Text field' /></div>
-                        </Group>
-                    </Grid.Col>
-                    <Grid.Col span={5}>
-                        <Group>
-                            <p>Remind Every</p>
-                            <Input type={'number'} placeholder='0' className='center-input' style={{width: 50}}/>
-                            <Select style={{width: 95}} data={[
-                                { value: 'days', label: 'days' },
-                                { value: 'weeks', label: 'weeks' },
-                                { value: 'months', label: 'months' },
-                                { value: 'years', label: 'years' },
-                                { value: '0', label: 'Never' },
-                            ]} defaultValue={'days'} />
-                        </Group>
-                    </Grid.Col>
-                    <Grid.Col span={2}>
-                        <Center className='h-full'>
-                            <div onMouseDown={onDragStart} onMouseUp={onDragEnd} className='dragger cursor-pointer' style={{width: '70%'}}>
-                                <Stack spacing={2}>
-                                    <p className='mb-0 text-center'>Step {step}</p>
-                                    <Center className='text-2xl'>
-                                        <AiOutlineDrag />
-                                    </Center>
-                                </Stack>
-                            </div>
-                        </Center>
-                    </Grid.Col>
-                </Grid>
+                <Group position='apart'>
+                    <Group>
+                        <div className={ classNames('p-2 border-2 rounded-sm capitalize', getColor(color))}>{type} {step}</div>
+                        <TextInput error={confirm && name.length === 0 ? 'Please enter full name' : ''} placeholder='Name' value={name} onChange={(event) => setName(event.currentTarget.value)}  />
+                        <TextInput error={confirm && email.length === 0 ? 'Please enter email' : ''} placeholder='Email' value={email} onChange={(event) => setEmail(event.currentTarget.value)} />
+                        <TextInput placeholder='Job Title' style={{width: 100}} value={job_title} onChange={(event) => setJobTitle(event.currentTarget.value)} />
+                        { type === 'signer' && <div><Checkbox size='xs' label='Add Text field' defaultChecked={text_field} onChange={(event) => {setTextField(event.currentTarget.checked);}} /></div>}
+                    </Group>
+                    { type !== 'viewer' && <Group>
+                        <p>Remind Every</p>
+                        <NumberInput defaultValue={every} disabled={every_unit === '0'} onChange={val => {
+                            if (val) {
+                                setEvery(val);
+                            } else {
+                                setEvery(0);
+                            }
+                        }} placeholder='0' className='center-input' style={{width: 70}}  />
+                        <Select value={every_unit} onChange={(val) => {
+                            if (val === null) {
+                                setEveryUnit('0');
+                            } else {
+                                setEveryUnit(val);
+                            }
+                        }} style={{width: 95}} data={[
+                            { value: 'days', label: 'days' },
+                            { value: 'weeks', label: 'weeks' },
+                            { value: 'months', label: 'months' },
+                            { value: 'years', label: 'years' },
+                            { value: '0', label: 'Never' },
+                        ]} defaultValue={'days'} />
+                    </Group>}
+                    <Center className='h-full' style={{width: 75}}>
+                        <div onMouseDown={onDragStart} onMouseUp={onDragEnd} className='dragger cursor-pointer' style={{width: '70%'}}>
+                            <Stack spacing={2}>
+                                <p className='mb-0 text-center'>Step {step}</p>
+                                <Center className='text-2xl'>
+                                    <AiOutlineDrag />
+                                </Center>
+                            </Stack>
+                        </div>
+                    </Center>
+                </Group>
             </CardBody>
         </Card>
     </>
@@ -112,13 +153,16 @@ const fn = (order: number[], elementHeight:number, active = false, originalIndex
 type AddSignerProps = {
     onConfirmAddSigner: (singers:SignerElement[]) => void;
     onCancelAddSigner: () => void;
+    onChangeSignerSequence: (val:boolean) => void;
 }
 
-const AddSigner:React.FC<AddSignerProps> = ({ onConfirmAddSigner, onCancelAddSigner }) => {
-    const [items, setItems] = React.useState<Array<SignerElement>>([]);
+const AddSigner:React.FC<AddSignerProps> = ({ onConfirmAddSigner, onCancelAddSigner, onChangeSignerSequence }) => {
+    const [items, setItems] = React.useState<Array<SingerElementStyleProps>>([]);
+    const [signerData, setSignerData] = React.useState<Array<SignerElementFormProps>>([]);
     const matches = useMediaQuery('(min-width: 1400px)');
     const [elementHeight, setElementHeight] = React.useState(() => matches ? 100 : 140);
     const [containerHeight, setContainerHeight] = React.useState( elementHeight * items.length);
+    const [confirming, setConfirming] = React.useState(false);
 
     const [order, setOrder] = React.useState<number[]>(items.map((_, index) => index));
 
@@ -135,17 +179,54 @@ const AddSigner:React.FC<AddSignerProps> = ({ onConfirmAddSigner, onCancelAddSig
         }
     });
 
-    const onAddSigner = () => {
-        setItems(prev => [...prev, { step: prev.length + 1, color: colors[prev.length % colors.length] }]);
+    const onAddSigner = (type: 'signer' | 'approver' | 'viewer') => {
+        let color = 'slate';
+        if (type === 'signer') {
+            color = colors[items.length % colors.length];
+        }
+        if (type === 'approver') {
+            color = 'gray';
+        }
+        setItems(prev => [...prev, { step: prev.length + 1, color, type, name: '', email: '' }]);
+        setSignerData(prev => [...prev, { name: '', email: ''}]);
         setOrder(prev => [...prev, prev.length]);
     }
 
     const onConfirm = () => {
-        const copyOfItems = [...items];
-        // sort copyOfItems according to order
-        copyOfItems.sort((a, b) => order.indexOf(a.step) - order.indexOf(b.step));
-        onConfirmAddSigner(copyOfItems);
+        setConfirming(true);
+        const signers = items.map((item, index) => {
+            const { name, email, job_title, text_field } = signerData[index];
+            return {
+                ...item,
+                name,
+                email,
+                job_title,
+                text_field,
+                // generate random id
+                id: Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15)
+            }
+        });
+        // check if name and email is filled for each items
+        let error = false;
+        signerData.forEach(d => {
+            if (d.name.length === 0 || d.email.length === 0) {
+                error = true;
+            }
+        });
+        if (error) {
+            return;
+        }
+        signers.sort((a, b) => order.indexOf(a.step) - order.indexOf(b.step));
+        onConfirmAddSigner(signers as SignerElement[]);
     }
+
+    const updateItems = React.useCallback((index:number, data:SignerElementFormProps) => {
+        setSignerData(prev => {
+            const d = [...prev];
+            d[index] = data;
+            return d;
+        });
+    }, []);
 
     React.useEffect(() => {
         setContainerHeight( elementHeight * items.length);
@@ -176,26 +257,26 @@ const AddSigner:React.FC<AddSignerProps> = ({ onConfirmAddSigner, onCancelAddSig
                         touchAction: 'none',
                     }}
                 >
-                    <SignerRow onDragStart={() => {setShouldDrag(true)}} onDragEnd={() => {setShouldDrag(false)}} color={items[i].color} step={order.indexOf(i) + 1} />
+                    <SignerRow index={i} confirm={confirming} onDataChange={updateItems} type={items[i].type} onDragStart={() => {setShouldDrag(true)}} onDragEnd={() => {setShouldDrag(false)}} color={items[i].color} step={order.indexOf(i) + 1} />
                 </animated.div>
             ))}
         </div>
         <Divider className='my-3' />
         <p className='text-right text-xs italic'>Drag and drop to change the sequence of workflow steps</p>
         <Group>
-            <Button onClick={onAddSigner} className='flex justify-center items-center' >
+            <Button onClick={() => onAddSigner('signer')} className='flex justify-center items-center' >
                 <i className="mr-2">
                     <GoPlus />
                 </i>
                 Add Signer
             </Button>
-            <Button className='flex justify-center items-center'>
+            <Button onClick={() => onAddSigner('viewer')} className='flex justify-center items-center'>
                 <i className="mr-2">
                     <GoPlus />
                 </i>
                 Add Viewer
             </Button>
-            <Button className='flex justify-center items-center'>
+            <Button onClick={() => onAddSigner('approver')} className='flex justify-center items-center'>
                 <i className="mr-2">
                     <GoPlus />
                 </i>
@@ -206,7 +287,7 @@ const AddSigner:React.FC<AddSignerProps> = ({ onConfirmAddSigner, onCancelAddSig
         <Group position='right'>
             <div className='flex mb-3 justify-center items-center'>
                 <label className='mr-1 mb-0' htmlFor='agreement-creator-sequence-switch'>Signing and approvals must be completed in sequence</label>
-                <Switch id='agreement-creator-sequence-switch' />
+                <Switch onChange={(e) => onChangeSignerSequence(e.currentTarget.checked)} id='agreement-creator-sequence-switch' />
             </div>
         </Group>
         <Group position='right'>

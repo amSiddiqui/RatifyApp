@@ -1,22 +1,29 @@
 import classNames from 'classnames';
 import React from 'react';
 import { getBgColorBold, getBorderColorBold, INPUT_HEIGHT, INPUT_WIDTH } from '../types';
-import { MdEdit, MdDelete, MdSave } from 'react-icons/md';
+import { MdClear, MdDelete, MdSave } from 'react-icons/md';
 import { AiOutlineDrag } from 'react-icons/ai';
 import Draggable from 'react-draggable';
 import { useId } from '@mantine/hooks';
-import { Drawer, Checkbox, Input, Stack, InputWrapper } from '@mantine/core';
+import { Drawer, Checkbox, TextInput, Stack } from '@mantine/core';
 import { Button } from 'reactstrap';
 
 export type PdfFormInputType = {
+    signerId: string;
     x: number;
     y: number;
+    placeholder: string;
     color: string;
 };
 
 const INPUT_TOP_OFFSET = 17;
 
-const PdfFormInput: React.FC<PdfFormInputType> = ({ x, y, color }) => {
+interface Props extends PdfFormInputType {
+    onDelete: () => void;
+}
+
+const PdfFormInput: React.FC<Props> = ({ x, y, color, onDelete, placeholder }) => {
+    const [ph] = React.useState(placeholder);
     const [value, setValue] = React.useState<string>('');
     const [showSettings, setShowSettings] = React.useState<boolean>(false);
     const uuid = useId();
@@ -31,9 +38,7 @@ const PdfFormInput: React.FC<PdfFormInputType> = ({ x, y, color }) => {
             position='right'
             >
                 <Stack>
-                    <InputWrapper label='Placeholder text'>
-                        <Input defaultValue={'Full Name'} placeholder='Placeholder Text' />
-                    </InputWrapper>
+                    <TextInput label='Placeholder Text' defaultValue={'Full Name'} placeholder='Placeholder Text' />
                     <Checkbox label='Required' />
                     <Button className='flex justify-center items-center' color='success'>
                         <i className='mr-1 text-lg'> <MdSave /> </i>
@@ -59,12 +64,12 @@ const PdfFormInput: React.FC<PdfFormInputType> = ({ x, y, color }) => {
                     }}
                     className='flex flex-col'
                 >
-                    <div className='flex items-center justify-center' style={{height: INPUT_TOP_OFFSET + 'px', fontSize: '1rem'}}>
-                        <i id={uuid} className='flex-1 flex justify-center items-center cursor-pointer'><AiOutlineDrag /></i>
-                        <i onClick={() => setShowSettings(true)} className='cursor-pointer'><MdEdit /></i>
+                    <div className='flex items-center justify-between' style={{height: INPUT_TOP_OFFSET + 'px', fontSize: '1rem'}}>
+                        <i id={uuid} className='flex justify-center items-center cursor-pointer'><AiOutlineDrag /></i>
+                        <i onClick={onDelete} className='cursor-pointer text-danger'><MdClear /></i>
                     </div>
                     <input
-                        placeholder="Full Name"
+                        placeholder={ph}
                         type="text"
                         value={value}
                         onChange={(e) => {
