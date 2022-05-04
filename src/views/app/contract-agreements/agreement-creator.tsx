@@ -80,7 +80,9 @@ const AgreementCreator: React.FC = () => {
 
     const [inputElements, setInputElements] = React.useState<
         PdfFormInputType[]
-    >([]);
+    >([
+        {page: 1, signerId: '32', x: 422, y: 96, placeholder: 'Full name', color: 'blue'}
+    ]);
 
     const [isDragging, setIsDragging] = React.useState<boolean | null>(null);
     const [mousePosition, setMousePosition] = React.useState<PositionType>({
@@ -181,20 +183,21 @@ const AgreementCreator: React.FC = () => {
 
     React.useEffect(() => {
         const canvas = canvasRef.current;
-        if (!canvas || isDragging === null) {
+        if (!canvas || isDragging === null || isDragging === true) {
             return;
         }
         if (!isDragging) {
             // check if mousePosition inside canvas
+            setIsDragging(null);
             const bounds = canvas.getBoundingClientRect();
             const x = mousePosition.x - bounds.left;
             const y = mousePosition.y - bounds.top;
             if (x < 0 || x > bounds.width || y < 0 || y > bounds.height) {
             } else {
-                setInputElements((prev) => [...prev, { x, y, color: dragInputColor, placeholder: dragInputText, signerId: dragInputId }]);
+                setInputElements((prev) => [...prev, { x: x - POSITION_OFFSET_X, y: y - POSITION_OFFSET_Y, color: dragInputColor, placeholder: dragInputText, signerId: dragInputId, page: pageNumber }]);
             }
         }
-    }, [isDragging, mousePosition, dragInputColor, dragInputId, dragInputText]);
+    }, [isDragging, mousePosition, dragInputColor, dragInputId, dragInputText, pageNumber]);
 
     React.useLayoutEffect(() => {
         const onmouseup = () => {
@@ -215,6 +218,10 @@ const AgreementCreator: React.FC = () => {
             window.removeEventListener('mousemove', onmousemove);
         };
     }, [isDragging]);
+
+    React.useEffect(() => {
+        console.log({inputElements});
+    }, [inputElements]);
 
     return (
         <>
@@ -382,42 +389,41 @@ const AgreementCreator: React.FC = () => {
                                                 zIndex: '1',
                                             }}
                                             className="bg-transparent"
+                                            id='pdf-form-input-container'
                                         >
                                             {inputElements.map(
                                                 (element, index) => {
-                                                    return (
-                                                        <PdfFormInput
-                                                            placeholder={dragInputText}
-                                                            signerId={dragInputId}
-                                                            key={index}
-                                                            onDelete={() => {
-                                                                setInputElements(
-                                                                    (prev) => {
-                                                                        const newInputElements =
-                                                                            [
-                                                                                ...prev,
-                                                                            ];
-                                                                        newInputElements.splice(
-                                                                            index,
-                                                                            1,
-                                                                        );
+                                                    if (element.page === pageNumber) {
+                                                        return (
+                                                            <PdfFormInput
+                                                                offsetParent={canvasRef.current ? canvasRef.current : undefined}
+                                                                onReposition={(dx, dy) => {
+                                                                    console.log({'reposition': {dx, dy}});
+                                                                    setInputElements(prev => {
+                                                                        const newInputElements = [...prev];
+                                                                        newInputElements[index].x = dx;
+                                                                        newInputElements[index].y = dy;
                                                                         return newInputElements;
-                                                                    },
-                                                                );
-                                                            }}
-                                                            color={
-                                                                element.color
-                                                            }
-                                                            x={
-                                                                element.x -
-                                                                POSITION_OFFSET_X
-                                                            }
-                                                            y={
-                                                                element.y -
-                                                                POSITION_OFFSET_Y
-                                                            }
-                                                        />
-                                                    );
+                                                                    })
+                                                                }}
+                                                                placeholder={element.placeholder}
+                                                                key={index}
+                                                                onDelete={() => {
+                                                                        setInputElements((prev) => {
+                                                                            const newInputElements =[...prev,];
+                                                                            newInputElements.splice(index,1,);
+                                                                            return newInputElements;
+                                                                        },
+                                                                    );
+                                                                }}
+                                                                color={element.color}
+                                                                x={element.x}
+                                                                y={element.y}
+                                                            />
+                                                        );
+                                                    } else {
+                                                        return null;
+                                                    }
                                                 },
                                             )}
                                         </div>

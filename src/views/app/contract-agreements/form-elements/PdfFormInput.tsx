@@ -3,7 +3,7 @@ import React from 'react';
 import { getBgColorBold, getBorderColorBold, INPUT_HEIGHT, INPUT_WIDTH } from '../types';
 import { MdClear, MdDelete, MdSave } from 'react-icons/md';
 import { AiOutlineDrag } from 'react-icons/ai';
-import Draggable from 'react-draggable';
+import { DraggableCore } from 'react-draggable';
 import { useId } from '@mantine/hooks';
 import { Drawer, Checkbox, TextInput, Stack } from '@mantine/core';
 import { Button } from 'reactstrap';
@@ -14,28 +14,61 @@ export type PdfFormInputType = {
     y: number;
     placeholder: string;
     color: string;
+    page: number;
 };
 
 const INPUT_TOP_OFFSET = 17;
 
-interface Props extends PdfFormInputType {
+
+interface Props {
     onDelete: () => void;
+    onReposition: (x:number, y:number) => void;
+    placeholder: string;
+    x: number;
+    y: number;
+    color: string;
+    offsetParent: HTMLElement | undefined,
 }
 
-const PdfFormInput: React.FC<Props> = ({ x, y, color, onDelete, placeholder }) => {
+const PdfFormInput: React.FC<Props> = ({ x: initX, y: initY, color, onDelete, placeholder, onReposition, offsetParent }) => {
+    const [[x, y], setPosition] = React.useState([initX, initY]);
     const [ph] = React.useState(placeholder);
     const [value, setValue] = React.useState<string>('');
     const [showSettings, setShowSettings] = React.useState<boolean>(false);
     const uuid = useId();
+    const nodeRef = React.useRef(null);
+    const [inputStyles, setInputStyles] = React.useState<any>({
+        zIndex: 1,
+        resize: 'horizontal',
+        overflow: 'auto',
+        width: INPUT_WIDTH,
+        height: INPUT_HEIGHT,
+        position: 'absolute',
+        top: y - INPUT_TOP_OFFSET,
+        left: x,
+    });
+
+    React.useEffect(() => {
+        setInputStyles({
+            zIndex: 1,
+            resize: 'horizontal',
+            overflow: 'auto',
+            width: INPUT_WIDTH,
+            height: INPUT_HEIGHT,
+            position: 'absolute',
+            top: y - INPUT_TOP_OFFSET,
+            left: x,
+        });
+    }, [x, y]);
 
     return (
         <>
             <Drawer 
-            opened={showSettings} 
-            onClose={() => setShowSettings(false)}
-            title={'Input Settings'}
-            padding={'xl'}
-            position='right'
+                opened={showSettings} 
+                onClose={() => setShowSettings(false)}
+                title={'Input Settings'}
+                padding={'xl'}
+                position='right'
             >
                 <Stack>
                     <TextInput label='Placeholder Text' defaultValue={'Full Name'} placeholder='Placeholder Text' />
@@ -50,19 +83,24 @@ const PdfFormInput: React.FC<Props> = ({ x, y, color, onDelete, placeholder }) =
                     </Button>
                 </Stack>
             </Drawer>
-            <Draggable handle={`#${uuid}`}>
+            <DraggableCore 
+                handle={`#${uuid}`}
+                onDrag={(e, data) => {
+                    setPosition(prev => {
+                        return [prev[0] + data.deltaX, prev[1] + data.deltaY]
+                    })
+                }}
+                onStop={(e, data) => {
+                    console.log({data});
+                    onReposition(x, y);
+                }}
+                offsetParent={offsetParent}
+                nodeRef={nodeRef}
+            >
                 <div
-                    style={{
-                        zIndex: 1,
-                        position: 'absolute',
-                        top: y - INPUT_TOP_OFFSET,
-                        left: x,
-                        resize: 'horizontal',
-                        overflow: 'auto',
-                        width: INPUT_WIDTH,
-                        height: INPUT_HEIGHT,
-                    }}
-                    className='flex flex-col'
+                    ref={nodeRef}
+                    style={inputStyles}
+                    className='flex flex-col pdf-form-input'
                 >
                     <div className='flex items-center justify-between' style={{height: INPUT_TOP_OFFSET + 'px', fontSize: '1rem'}}>
                         <i id={uuid} className='flex justify-center items-center cursor-pointer'><AiOutlineDrag /></i>
@@ -87,7 +125,7 @@ const PdfFormInput: React.FC<Props> = ({ x, y, color, onDelete, placeholder }) =
                         )}
                     />
                 </div>
-            </Draggable>
+            </DraggableCore>
 
         </>
     );
