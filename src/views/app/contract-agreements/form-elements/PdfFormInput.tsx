@@ -15,6 +15,7 @@ export type PdfFormInputType = {
     placeholder: string;
     color: string;
     page: number;
+    id: string;
 };
 
 const INPUT_TOP_OFFSET = 17;

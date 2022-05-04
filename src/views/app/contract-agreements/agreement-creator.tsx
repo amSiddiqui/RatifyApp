@@ -42,6 +42,7 @@ import { AiOutlineDrag } from 'react-icons/ai';
 import DraggableInput from './form-elements/DraggableInput';
 import { getBgColorLight, PositionType, POSITION_OFFSET_X, POSITION_OFFSET_Y } from './types';
 import PdfFormInput, { PdfFormInputType } from './form-elements/PdfFormInput';
+import { getRandomStringID } from '../../../helpers/Utils';
 
 // luxon today date
 const today = DateTime.local();
@@ -81,7 +82,7 @@ const AgreementCreator: React.FC = () => {
     const [inputElements, setInputElements] = React.useState<
         PdfFormInputType[]
     >([
-        {page: 1, signerId: '32', x: 422, y: 96, placeholder: 'Full name', color: 'blue'}
+        {id: getRandomStringID(), page: 1, signerId: '32', x: 422, y: 96, placeholder: 'Full name', color: 'blue'}
     ]);
 
     const [isDragging, setIsDragging] = React.useState<boolean | null>(null);
@@ -189,12 +190,13 @@ const AgreementCreator: React.FC = () => {
         if (!isDragging) {
             // check if mousePosition inside canvas
             setIsDragging(null);
+            setMousePosition({x: 0, y: 0});
             const bounds = canvas.getBoundingClientRect();
             const x = mousePosition.x - bounds.left;
             const y = mousePosition.y - bounds.top;
             if (x < 0 || x > bounds.width || y < 0 || y > bounds.height) {
             } else {
-                setInputElements((prev) => [...prev, { x: x - POSITION_OFFSET_X, y: y - POSITION_OFFSET_Y, color: dragInputColor, placeholder: dragInputText, signerId: dragInputId, page: pageNumber }]);
+                setInputElements((prev) => [...prev, { x: x - POSITION_OFFSET_X, y: y - POSITION_OFFSET_Y, color: dragInputColor, placeholder: dragInputText, signerId: dragInputId, page: pageNumber, id: getRandomStringID() }]);
             }
         }
     }, [isDragging, mousePosition, dragInputColor, dragInputId, dragInputText, pageNumber]);
@@ -219,9 +221,6 @@ const AgreementCreator: React.FC = () => {
         };
     }, [isDragging]);
 
-    React.useEffect(() => {
-        console.log({inputElements});
-    }, [inputElements]);
 
     return (
         <>
@@ -301,7 +300,7 @@ const AgreementCreator: React.FC = () => {
                                 {signers.map((signer, index) => {
                                     return (
                                         <Tooltip
-                                            key={index}
+                                            key={signer.id}
                                             zIndex={1}
                                             color={signer.color}
                                             position="left"
@@ -398,7 +397,6 @@ const AgreementCreator: React.FC = () => {
                                                             <PdfFormInput
                                                                 offsetParent={canvasRef.current ? canvasRef.current : undefined}
                                                                 onReposition={(dx, dy) => {
-                                                                    console.log({'reposition': {dx, dy}});
                                                                     setInputElements(prev => {
                                                                         const newInputElements = [...prev];
                                                                         newInputElements[index].x = dx;
@@ -407,12 +405,11 @@ const AgreementCreator: React.FC = () => {
                                                                     })
                                                                 }}
                                                                 placeholder={element.placeholder}
-                                                                key={index}
+                                                                key={element.id}
                                                                 onDelete={() => {
                                                                         setInputElements((prev) => {
-                                                                            const newInputElements =[...prev,];
-                                                                            newInputElements.splice(index,1,);
-                                                                            return newInputElements;
+                                                                            const newElements = prev.filter((e, i) => i !== index);
+                                                                            return newElements;
                                                                         },
                                                                     );
                                                                 }}
