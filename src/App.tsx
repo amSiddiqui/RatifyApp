@@ -30,11 +30,11 @@ const Register = React.lazy(() =>
 );
 
 const VerifyEmail = React.lazy(() =>
-  import(/* webpackChunkName: "user-register" */ './views/user/verify-email')
+  import(/* webpackChunkName: "user-verify-email" */ './views/user/verify-email')
 );
 
 const BlankPage = React.lazy(() =>
-  import(/* webpackChunkName: "user-register" */ './views/app/blank-page')
+  import(/* webpackChunkName: "views-blank-page" */ './views/app/blank-page')
 );
 
 const ViewApp = React.lazy(() =>
@@ -42,26 +42,38 @@ const ViewApp = React.lazy(() =>
 );
 
 const ContractsAgreements = React.lazy(() =>
-  import(/* webpackChunkName: "views-app" */ './views/app/contract-agreements')
+  import(/* webpackChunkName: "views-contracts-agreements" */ './views/app/contract-agreements')
 );
 
 const AgreementCreator = React.lazy(() => 
-    import(/* webpackChunkName: "views-app" */ './views/app/contract-agreements/agreement-creator')
+    import(/* webpackChunkName: "views-agreement-creator" */ './views/app/contract-agreements/agreement-creator')
 );
 
 const Reports = React.lazy(() =>
-  import(/* webpackChunkName: "views-app" */ './views/app/reports')
+  import(/* webpackChunkName: "views-reports" */ './views/app/reports')
 );
 
 const DashboardAnalytics = React.lazy(() =>
-  import(/* webpackChunkName: "viwes-blank-page" */ './views/app/dashboards/analytics')
+  import(/* webpackChunkName: "views-analytics-dashboard" */ './views/app/dashboards/analytics')
 );
 const ProfileSettings = React.lazy(() =>
-  import(/* webpackChunkName: "viwes-blank-page" */ './views/accounts/profile-settings')
+  import(/* webpackChunkName: "views-profile-settings" */ './views/accounts/profile-settings')
 );
 
 const UiSettings = React.lazy(() =>
-  import(/* webpackChunkName: "viwes-blank-page" */ './views/accounts/ui-settings')
+  import(/* webpackChunkName: "views-ui-settings" */ './views/accounts/ui-settings')
+);
+
+const BusinessProfile = React.lazy(() =>
+    import(/* webpackChunkName: "views-business-profile" */ './views/accounts/business-profile')
+);
+
+const Billing = React.lazy(() =>
+  import(/* webpackChunkName: "views-billing" */ './views/billing')
+);
+
+const Administration = React.lazy(() =>
+  import(/* webpackChunkName: "views-admin" */ './views/admin')
 );
 
 type ProtectedRouteProps = {
@@ -130,8 +142,12 @@ function App() {
                                         <Route index element={<Navigate to='/account/profile-settings' />} />
                                         <Route path='profile-settings' element={<ProfileSettings />} />
                                         <Route path='ui-settings' element={<UiSettings />} />
+                                        <Route path='business-profile' element={<BusinessProfile />} />
                                     </Route>
                                     <Route path='blank' element={<BlankPage />} />
+                                    <Route path='billing' element={<Billing />}></Route>
+                                    <Route path='administration' element={<Administration />}></Route>
+
                                 </Route>
                                 <Route path='error' element={<ViewError></ViewError>} />
                                 <Route path='unauthorized' element={<ViewUnauthorized></ViewUnauthorized>} />

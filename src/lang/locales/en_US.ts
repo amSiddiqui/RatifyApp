@@ -49,7 +49,7 @@ export const enMessages = {
     'menu.search': 'Search',
     'menu.docs': 'Docs',
     'menu.blank-page': 'Blank Page',
-    'menu.account': 'Account',
+    'menu.account': 'My Account',
     'menu.profile-settings': 'Profile Settings',
     'menu.ui-settings': 'UI Settings',
     'menu.analytics': 'Analytics',
@@ -59,7 +59,12 @@ export const enMessages = {
     'menu.create': 'Create',
     'menu.documents': 'Documents',
     'menu.add-signers': 'Add Signers',
+    'menu.business-profile': 'Business Profile',
     'menu.blank': 'Blank Page',
+    'menu.billing': 'Billing',
+    'menu.administration': 'Administration',
+    'menu.manage-users': 'Manage Users',
+    'menu.notification-settings': 'Notification Settings',
 
     /* 04.Error Page */
     'pages.error-title': 'Ooops... looks like an error occurred!',
@@ -80,7 +85,8 @@ export const enMessages = {
     'auth.login.notify': 'Invalid email or password',
 
     // 06. Account
-    'account.account': 'Business Profile',
+    'account.account': 'My Account',
+    'account.business-profile': 'Business Profile',
     'account.settings.profile': 'Profile Settings',
     'account.settings.ui': 'UI Settings',
 

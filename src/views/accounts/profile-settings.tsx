@@ -26,7 +26,7 @@ const ProfileSettings: React.FC = () => {
                     <div className="profile-picture-container">
                         <img
                             src="/static/img/default.jpg"
-                            className="profile-picture-img shadow "
+                            className="object-cover w-24 h-24 rounded-full shadow"
                             alt="Profile"
                         />
                     </div>

@@ -12,7 +12,7 @@ import {
     Input,
 } from 'reactstrap';
 
-import { NavLink, useNavigate } from 'react-router-dom';
+import { NavLink, useNavigate, Link } from 'react-router-dom';
 
 import {
     menuHiddenBreakpoint,
@@ -304,10 +304,9 @@ const TopNav = ({ intl }) => {
                             </span>
                         </DropdownToggle>
                         <DropdownMenu className="mt-3" right>
-                            <DropdownItem>Account</DropdownItem>
-                            <DropdownItem>Features</DropdownItem>
-                            <DropdownItem>History</DropdownItem>
-                            <DropdownItem>Support</DropdownItem>
+                            <DropdownItem className='active:text-white'>
+                                <Link className='active:text-white w-full' to='/account/profile-settings'>Account</Link>
+                            </DropdownItem>
                             <DropdownItem divider />
                             <DropdownItem onClick={() => handleLogout()}>
                                 Sign out

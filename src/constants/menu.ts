@@ -1,3 +1,5 @@
+import { UserRole } from "./defaultValues";
+
 const data = [
     {
         id: 'dashboard',
@@ -7,33 +9,52 @@ const data = [
     },
     {
         id: 'documents',
-        icon: 'iconsminds-notepad',
+        icon: 'iconsminds-box-with-folders',
         label: 'menu.agreements',
         to: `/documents`,
-    },
-    {
-        id: 'account',
-        icon: 'iconsminds-user',
-        label: 'account.account',
-        to: `/account`,
-        subs: [
-            {
-                icon: 'simple-icon-user',
-                label: 'account.settings.profile',
-                to: '/account/profile-settings',
-            },
-            {
-                icon: 'simple-icon-puzzle',
-                label: 'account.settings.ui',
-                to: '/account/ui-settings',
-            },
-        ]
     },
     {
         id: 'reports',
         icon: 'iconsminds-monitor-analytics',
         label: 'menu.reports',
         to: `/reports`,
+    },
+    {
+        id: 'account',
+        icon: 'iconsminds-profile',
+        label: 'menu.account',
+        to: `/account/profile-settings`,
+    },
+    {
+        id: 'billing',
+        icon: 'iconsminds-billing',
+        label: 'menu.billing',
+        to: `/billing`,
+    },
+    {
+        id: 'business',
+        icon: 'iconsminds-shop-2',
+        label: 'menu.business-profile',
+        to: `/account/business-profile`,
+    },
+    {
+        id: 'administration',
+        icon: 'iconsminds-gear',
+        label: 'menu.administration',
+        roles: [UserRole.Admin],
+        to: `/administration`,
+        subs: [
+            {   
+                icon: 'iconsminds-mens',
+                label: 'menu.manage-users',
+                to: `/administration/users`,
+            },
+            {
+                icon: 'iconsminds-mail-settings',
+                label: 'menu.notification-settings',
+                to: `/administration/notification-settings`,
+            }
+        ]
     },
 ];
 export default data;

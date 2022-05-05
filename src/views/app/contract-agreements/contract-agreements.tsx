@@ -34,7 +34,7 @@ const ContractAgreements:React.FC = () => {
             </Row>
             <CATopBar intl={intl} onDocSelect={onDocSelect} />
             <Divider className="mb-10 mt-10" label={
-                <p className='text-2xl relative top-2'>OR</p>
+                <p className='text-2xl'>OR</p>
             } labelPosition='center'/>
             <div className='flex justify-between items-center'>
                 <h1 className='text-2xl'>Select from saved templates</h1>
