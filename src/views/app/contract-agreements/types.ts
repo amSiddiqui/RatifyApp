@@ -3,6 +3,26 @@ export type PositionType = {
     y: number;
 };
 
+
+export type PdfFormInputType = {
+    signerId: string;
+    x: number;
+    y: number;
+    placeholder: string;
+    color: string;
+    page: number;
+    id: string;
+};
+
+export const INPUT_TOP_OFFSET = 17;
+
+export type BoundType = {
+    left: number;
+    top: number;
+    right: number;
+    bottom: number;
+} | null;
+
 export const INPUT_WIDTH = 180;
 export const INPUT_HEIGHT = 38;
 

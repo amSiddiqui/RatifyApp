@@ -40,12 +40,26 @@ import { GoPlus } from 'react-icons/go';
 import AddSigner, { SignerElement } from './add-signer';
 import { AiOutlineDrag } from 'react-icons/ai';
 import DraggableInput from './form-elements/DraggableInput';
-import { getBgColorLight, PositionType, POSITION_OFFSET_X, POSITION_OFFSET_Y } from './types';
-import PdfFormInput, { PdfFormInputType } from './form-elements/PdfFormInput';
+import { getBgColorLight, PositionType, POSITION_OFFSET_X, POSITION_OFFSET_Y, PdfFormInputType, INPUT_WIDTH, INPUT_HEIGHT } from './types';
+import PdfFormInput from './form-elements/PdfFormInput';
 import { getRandomStringID } from '../../../helpers/Utils';
 
 // luxon today date
 const today = DateTime.local();
+
+const getBounds = (div: HTMLDivElement | null) => {
+    if (div === null) {
+        return null;
+    }
+
+    const rect = div.getBoundingClientRect();
+    return {
+        top: 0,
+        left: 0,
+        right: rect.width - INPUT_WIDTH, 
+        bottom: rect.height - INPUT_HEIGHT,
+    };
+}
 
 const AgreementCreator: React.FC = () => {
     const match = useLocation();
@@ -69,9 +83,7 @@ const AgreementCreator: React.FC = () => {
     const [, setSignedBefore] = React.useState<Date | null>();
     const [showSignerModal, setShowSignerModal] = React.useState(false);
     const [, setSignSequence] = React.useState<boolean>(false);
-    const [{dragInputText, dragInputColor, dragInputId}, setDragInputProps] = React.useState(
-        {dragInputText: 'Full Name', dragInputColor: 'red', dragInputId: '32'},
-    );
+    const [{dragInputText, dragInputColor, dragInputId}, setDragInputProps] = React.useState({dragInputText: 'Full Name', dragInputColor: 'red', dragInputId: '32'},);
     const [signers, setSigners] = React.useState<SignerElement[]>([
         {id: '32', color: 'blue', step: 1, type: 'signer', name: 'Aamir', email: 'email'},
         {id: '33', color: 'red', step: 2, type: 'signer', name: 'Aamir', email: 'email'},
@@ -81,9 +93,7 @@ const AgreementCreator: React.FC = () => {
 
     const [inputElements, setInputElements] = React.useState<
         PdfFormInputType[]
-    >([
-        {id: getRandomStringID(), page: 1, signerId: '32', x: 422, y: 96, placeholder: 'Full name', color: 'blue'}
-    ]);
+    >([]);
 
     const [isDragging, setIsDragging] = React.useState<boolean | null>(null);
     const [mousePosition, setMousePosition] = React.useState<PositionType>({
@@ -196,7 +206,14 @@ const AgreementCreator: React.FC = () => {
             const y = mousePosition.y - bounds.top;
             if (x < 0 || x > bounds.width || y < 0 || y > bounds.height) {
             } else {
-                setInputElements((prev) => [...prev, { x: x - POSITION_OFFSET_X, y: y - POSITION_OFFSET_Y, color: dragInputColor, placeholder: dragInputText, signerId: dragInputId, page: pageNumber, id: getRandomStringID() }]);
+                setInputElements((prev) => [...prev, { 
+                    x: x - POSITION_OFFSET_X, y: y - POSITION_OFFSET_Y, 
+                    color: dragInputColor, 
+                    placeholder: dragInputText, 
+                    signerId: dragInputId, 
+                    page: pageNumber, 
+                    id: getRandomStringID() 
+                }]);
             }
         }
     }, [isDragging, mousePosition, dragInputColor, dragInputId, dragInputText, pageNumber]);
@@ -395,6 +412,7 @@ const AgreementCreator: React.FC = () => {
                                                     if (element.page === pageNumber) {
                                                         return (
                                                             <PdfFormInput
+                                                                bounds={getBounds(canvasRef.current)}
                                                                 offsetParent={canvasRef.current ? canvasRef.current : undefined}
                                                                 onReposition={(dx, dy) => {
                                                                     setInputElements(prev => {

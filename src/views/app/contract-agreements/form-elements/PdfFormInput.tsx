@@ -7,19 +7,8 @@ import { DraggableCore } from 'react-draggable';
 import { useId } from '@mantine/hooks';
 import { Drawer, Checkbox, TextInput, Stack } from '@mantine/core';
 import { Button } from 'reactstrap';
-
-export type PdfFormInputType = {
-    signerId: string;
-    x: number;
-    y: number;
-    placeholder: string;
-    color: string;
-    page: number;
-    id: string;
-};
-
-const INPUT_TOP_OFFSET = 17;
-
+import { BoundType, INPUT_TOP_OFFSET } from '../types';
+ 
 
 interface Props {
     onDelete: () => void;
@@ -28,10 +17,11 @@ interface Props {
     x: number;
     y: number;
     color: string;
-    offsetParent: HTMLElement | undefined,
+    offsetParent: HTMLElement | undefined;
+    bounds?: BoundType;
 }
 
-const PdfFormInput: React.FC<Props> = ({ x: initX, y: initY, color, onDelete, placeholder, onReposition, offsetParent }) => {
+const PdfFormInput: React.FC<Props> = ({ x: initX, y: initY, color, onDelete, placeholder, onReposition, offsetParent, bounds }) => {
     const [[x, y], setPosition] = React.useState([initX, initY]);
     const [ph] = React.useState(placeholder);
     const [value, setValue] = React.useState<string>('');
@@ -88,11 +78,28 @@ const PdfFormInput: React.FC<Props> = ({ x: initX, y: initY, color, onDelete, pl
                 handle={`#${uuid}`}
                 onDrag={(e, data) => {
                     setPosition(prev => {
-                        return [prev[0] + data.deltaX, prev[1] + data.deltaY]
+                        if (bounds) {
+                            let newX = prev[0] + data.deltaX;
+                            let newY = prev[1] + data.deltaY;
+                            if (newX < bounds.left) {
+                                newX = bounds.left;
+                            }
+                            if (newX > bounds.right) {
+                                newX = bounds.right;
+                            }
+                            if (newY < bounds.top) {
+                                newY = bounds.top;
+                            }
+                            if (newY > bounds.bottom) {
+                                newY = bounds.bottom;
+                            }
+                            return [newX, newY];
+                        } else {
+                            return prev;
+                        }
                     })
                 }}
-                onStop={(e, data) => {
-                    console.log({data});
+                onStop={() => {
                     onReposition(x, y);
                 }}
                 offsetParent={offsetParent}
