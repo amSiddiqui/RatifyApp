@@ -73,7 +73,7 @@ export class ApiHelper {
             let response: AxiosResponse<TokenType> = await axios.post('/auth/token/refresh/', {refresh: this.getRefreshToken()});
             this.dispatchFn(authActions.accessTokenRefreshed(response.data.access));
             this.updateToken();
-        } catch (err) {
+        } catch(err) {
             this.dispatchFn(authActions.setError('Token expired'));
         }
     }

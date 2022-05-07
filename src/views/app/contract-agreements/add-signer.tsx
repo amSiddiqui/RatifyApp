@@ -12,6 +12,7 @@ import {
     NumberInput
 } from '@mantine/core';
 import { AiOutlineDrag } from 'react-icons/ai';
+import { MdClear } from 'react-icons/md';
 import { Card, CardBody, Button } from 'reactstrap';
 import classNames from 'classnames';
 import { useSprings, animated } from 'react-spring';
@@ -20,14 +21,17 @@ import { clamp } from 'lodash-es';
 import { useMediaQuery } from '@mantine/hooks';
 import { GoPlus } from 'react-icons/go';
 import { colors, getBgColorLight as getColor } from './types';
+import { getRandomStringID } from '../../../helpers/Utils';
 
 interface SingerElementStyleProps {
     step: number;
     color: string;
     type: 'signer' | 'approver' | 'viewer';
+    id: string;
 }
 
 interface SignerElementFormProps {
+    id: string;
     name: string;
     email: string;
     job_title?: string;
@@ -37,7 +41,6 @@ interface SignerElementFormProps {
 }
 
 export interface SignerElement extends SingerElementStyleProps, SignerElementFormProps {
-    id: string;
 }
 
 interface SignerRowProps extends SingerElementStyleProps {
@@ -46,19 +49,22 @@ interface SignerRowProps extends SingerElementStyleProps {
     onDataChange: (index:number,  data: SignerElementFormProps) => void;
     confirm: boolean;
     index: number;
+    onDelete: () => void;
+    signerData: SignerElementFormProps;
 }
 
-const SignerRow:React.FC<SignerRowProps> = ({ index, color, step, onDragEnd, onDragStart, type, onDataChange, confirm }) => {
+const SignerRow:React.FC<SignerRowProps> = ({ index, color, step, onDragEnd, onDragStart, type, onDataChange, confirm, onDelete, id, signerData }) => {
     const [i] = React.useState(index);
-    const [name, setName] = React.useState('');
-    const [email, setEmail] = React.useState('');
-    const [job_title, setJobTitle] = React.useState('');
-    const [text_field, setTextField] = React.useState(false);
-    const [every, setEvery] = React.useState(1);
-    const [every_unit, setEveryUnit] = React.useState<'days' | 'weeks' | 'months' | 'years' | '0' | string>('months');
+    const [name, setName] = React.useState(signerData.name);
+    const [email, setEmail] = React.useState(signerData.email);
+    const [job_title, setJobTitle] = React.useState(signerData.job_title);
+    const [text_field, setTextField] = React.useState(signerData.text_field ? signerData.text_field : false);
+    const [every, setEvery] = React.useState(signerData.every ? signerData.every : 1);
+    const [every_unit, setEveryUnit] = React.useState<'days' | 'weeks' | 'months' | 'years' | '0' | string>(signerData.every_unit ? signerData.every_unit : 'months');
 
     React.useEffect(() => {
         onDataChange(i, {
+            id,
             name,
             email,
             job_title,
@@ -66,12 +72,15 @@ const SignerRow:React.FC<SignerRowProps> = ({ index, color, step, onDragEnd, onD
             every,
             every_unit
         });
-    }, [name, email, job_title, text_field, every, every_unit, onDataChange, i]);
+    }, [name, id, email, job_title, text_field, every, every_unit, onDataChange, i]);
     
 
     return <>
         <Card>
             <CardBody className='p-3'>
+                <p onClick={onDelete} className='absolute text-danger text-xl hover:scale-110 cursor-pointer' style={{top: '-8px', right: '-8px'}}>
+                    <MdClear />
+                </p>
                 <Group position='apart'>
                     <Group>
                         <div className={ classNames('p-2 border-2 rounded-sm capitalize', getColor(color))}>{type} {step}</div>
@@ -154,11 +163,26 @@ type AddSignerProps = {
     onConfirmAddSigner: (singers:SignerElement[]) => void;
     onCancelAddSigner: () => void;
     onChangeSignerSequence: (val:boolean) => void;
+    signers: SignerElement[];
 }
 
-const AddSigner:React.FC<AddSignerProps> = ({ onConfirmAddSigner, onCancelAddSigner, onChangeSignerSequence }) => {
-    const [items, setItems] = React.useState<Array<SingerElementStyleProps>>([]);
-    const [signerData, setSignerData] = React.useState<Array<SignerElementFormProps>>([]);
+const AddSigner:React.FC<AddSignerProps> = ({ onConfirmAddSigner, onCancelAddSigner, onChangeSignerSequence, signers }) => {
+    const [items, setItems] = React.useState<Array<SingerElementStyleProps>>(() => signers.map(s => ({
+        step: s.step,
+        color: s.color,
+        type: s.type,
+        id: s.id,
+    })));
+    const [lastColorIndex, setLastColorIndex] = React.useState(0);
+    const [signerData, setSignerData] = React.useState<Array<SignerElementFormProps>>(() => signers.map(s => ({
+        id: s.id,
+        name: s.name,
+        email: s.email,
+        job_title: s.job_title,
+        text_field: s.text_field,
+        every: s.every,
+        every_unit: s.every_unit,
+    })));
     const matches = useMediaQuery('(min-width: 1400px)');
     const [elementHeight, setElementHeight] = React.useState(() => matches ? 100 : 140);
     const [containerHeight, setContainerHeight] = React.useState( elementHeight * items.length);
@@ -182,13 +206,15 @@ const AddSigner:React.FC<AddSignerProps> = ({ onConfirmAddSigner, onCancelAddSig
     const onAddSigner = (type: 'signer' | 'approver' | 'viewer') => {
         let color = 'slate';
         if (type === 'signer') {
-            color = colors[items.length % colors.length];
+            color = colors[lastColorIndex % colors.length];
         }
         if (type === 'approver') {
             color = 'gray';
         }
-        setItems(prev => [...prev, { step: prev.length + 1, color, type, name: '', email: '' }]);
-        setSignerData(prev => [...prev, { name: '', email: ''}]);
+        const id = getRandomStringID();
+        setLastColorIndex(prev => prev + 1);
+        setItems(prev => [...prev, { step: prev.length + 1, color, type, name: '', email: '', id }]);
+        setSignerData(prev => [...prev, { name: '', email: '', id}]);
         setOrder(prev => [...prev, prev.length]);
     }
 
@@ -202,8 +228,6 @@ const AddSigner:React.FC<AddSignerProps> = ({ onConfirmAddSigner, onCancelAddSig
                 email,
                 job_title,
                 text_field,
-                // generate random id
-                id: Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15)
             }
         });
         // check if name and email is filled for each items
@@ -216,7 +240,7 @@ const AddSigner:React.FC<AddSignerProps> = ({ onConfirmAddSigner, onCancelAddSig
         if (error) {
             return;
         }
-        signers.sort((a, b) => order.indexOf(a.step) - order.indexOf(b.step));
+        signers.sort((a, b) => order.indexOf(a.step - 1) - order.indexOf(b.step - 1));
         onConfirmAddSigner(signers as SignerElement[]);
     }
 
@@ -245,7 +269,7 @@ const AddSigner:React.FC<AddSignerProps> = ({ onConfirmAddSigner, onCancelAddSig
             {springs.map(({zIndex, shadow, y, scale}, i) => (
                 <animated.div
                     {...bind(i, elementHeight)}
-                    key={i}
+                    key={items[i].id}
                     style={{
                         zIndex,
                         boxShadow: shadow.to(s => `rgba(0, 0, 0, 0.15) 0px ${s}px ${2 * s} px 0px`),
@@ -257,7 +281,55 @@ const AddSigner:React.FC<AddSignerProps> = ({ onConfirmAddSigner, onCancelAddSig
                         touchAction: 'none',
                     }}
                 >
-                    <SignerRow index={i} confirm={confirming} onDataChange={updateItems} type={items[i].type} onDragStart={() => {setShouldDrag(true)}} onDragEnd={() => {setShouldDrag(false)}} color={items[i].color} step={order.indexOf(i) + 1} />
+                    <SignerRow 
+                        id={items[i].id} 
+                        onDelete={() => {
+                            setItems(prev => {
+                                console.log('deleting at index: ', i, ' Item: ', items[i], ' Signer Data: ', signerData[i]);
+                                const dup:SingerElementStyleProps[] = [];
+                                for (let j = 0; j < prev.length; j++) {
+                                    const item = prev[j];
+                                    if (j === i) {
+                                        continue;
+                                    }
+                                    if (j < i) {
+                                        dup.push({...item, step: item.step});
+                                    } 
+                                    if (j > i) {
+                                        dup.push({...item, step: item.step - 1});
+                                    }
+
+                                }
+                                return dup;
+                            });
+                            setSignerData(prev => prev.filter((_, index) => i !== index));
+                            setOrder(prev => {
+                                const newOrder:number[] =  [];
+                                for (let j = 0; j < prev.length; j++) {
+                                    let pos = prev[j];
+                                    if (pos === i) {
+                                        continue;
+                                    }
+                                    if (pos < i) {
+                                        newOrder.push(pos);
+                                    }
+                                    if (pos > i) {
+                                        newOrder.push(pos - 1);
+                                    }
+                                }
+                                return newOrder;
+                            });
+                        }} 
+                        index={i} 
+                        confirm={confirming} 
+                        onDataChange={updateItems} 
+                        type={items[i].type} 
+                        onDragStart={() => {setShouldDrag(true)}} 
+                        onDragEnd={() => {setShouldDrag(false)}} 
+                        color={items[i].color} 
+                        step={order.indexOf(i) + 1}
+                        signerData={signerData[i]}
+                    />
                 </animated.div>
             ))}
         </div>

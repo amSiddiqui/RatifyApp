@@ -1,5 +1,5 @@
 import React from 'react';
-import { PositionType, POSITION_OFFSET_X, POSITION_OFFSET_Y, INPUT_HEIGHT, INPUT_WIDTH, getBgColorBold } from '../types';
+import { PositionType, POSITION_OFFSET_X, POSITION_OFFSET_Y, INPUT_HEIGHT, INPUT_WIDTH, getBgColorLight } from '../types';
 
 
 const DraggableInput: React.FC<{ pos: PositionType, color: string, placeholder: string }> = ({ pos, color, placeholder }) => {
@@ -18,7 +18,7 @@ const DraggableInput: React.FC<{ pos: PositionType, color: string, placeholder: 
                     width: INPUT_WIDTH,
                     height: INPUT_HEIGHT - 17,
                 }}
-                className={"z-10 text-white flex justify-center items-center cursor-pointer " + getBgColorBold(color)}
+                className={"z-10 text-muted flex justify-center items-center cursor-pointer " + getBgColorLight(color)}
             >
                 {placeholder}
             </div>

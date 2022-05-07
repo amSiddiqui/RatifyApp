@@ -38,9 +38,17 @@ export class AuthHelper extends ApiHelper {
         if (token === null) {
             throw new NoTokenError('No token');
         }
-        let response: AxiosResponse<UserType> = await axios.get('/auth/user/', {headers: {Authorization: `Bearer ${token}`}});
-        this.dispatchFn(authActions.setUser(response.data));
-        return response.data;
+        try {
+            let response: AxiosResponse<UserType> = await axios.get('/auth/user/', {headers: {Authorization: `Bearer ${token}`}});
+            this.dispatchFn(authActions.setUser(response.data));
+            return response.data;
+        } catch (err: any) {
+            if (err.response && err.response.status === 401) {
+                this.dispatchFn(authActions.logout());
+                throw new NoTokenError('No token');
+            }
+            throw err;
+        }
     }
 
     async getUserImage(): Promise<string> {

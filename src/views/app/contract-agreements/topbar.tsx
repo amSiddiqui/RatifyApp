@@ -11,6 +11,9 @@ const CATopBar: React.FC<{
     intl: IntlShape;
     onDocSelect: (files: File[]) => void;
 }> = ({ intl, onDocSelect }) => {
+
+    const inputRef = React.useRef<HTMLInputElement>(null);
+
     return (
         <Row>
             <Colxx xxs="12">
@@ -21,12 +24,21 @@ const CATopBar: React.FC<{
                                 className="contract-agreements-create-new flex h-14 items-center justify-between"
                                 size="lg"
                                 color="secondary"
+                                onClick={() => inputRef.current?.click()}
                             >
                                 <i className='mr-2'>
                                     <MdFileUpload />
                                 </i>
                                 <span>Upload File</span>
                             </Button>
+                            <input type="file" ref={inputRef} onChange={(e) => {
+                                if (e.currentTarget.files) {
+                                    const files = Array.from(e.currentTarget.files);
+                                    if (files.length > 0) {
+                                        onDocSelect(files);
+                                    }
+                                }
+                            }} accept='application/pdf' style={{display: 'none'}} />
                         </div>
                         <Card style={{ width: '30%', height: '10rem'}} className='mx-16'>
                             <CardBody className="p-1">

@@ -149,5 +149,5 @@ export const swap = (arr: any[], i: number, j: number) => {
 }
 
 export const getRandomStringID = () => {
-    return Math.random().toString(36).substring(2, 7) + Math.random().toString(36).substring(2, 7);
+    return Math.random().toString(36).substring(2, 11) + Math.random().toString(36).substring(2, 11);
 }

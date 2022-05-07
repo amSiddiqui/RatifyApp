@@ -57,11 +57,11 @@ label {
 }
 
 .pdf-input-element::placeholder {
-    color: white;
+    color: #909090;
 }
 
 .pdf-input-element::-webkit-input-placeholder {
-    color: white;
+    color: #909090;
 }
 
 .pdf-input-element.pdf-input-element-filled {

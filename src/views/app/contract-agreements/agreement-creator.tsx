@@ -70,9 +70,7 @@ const AgreementCreator: React.FC = () => {
     const { contractId } = useParams();
     const [pdf, setPdf] = React.useState('');
     const [pdfLoading, setPdfLoading] = React.useState(true);
-    const [pdfThumbnails, setPdfThumbnails] = React.useState<{
-        [id: string]: string;
-    }>({});
+    const [pdfThumbnails, setPdfThumbnails] = React.useState<{[id: string]: string;}>({});
     const [thumbnailsLoading, setThumbnailsLoading] = React.useState(true);
     const [showEndDate, setShowEndDate] = React.useState(false);
     const [endDate, setEndDate] = React.useState<DateTime>(() => {
@@ -84,16 +82,11 @@ const AgreementCreator: React.FC = () => {
     const [showSignerModal, setShowSignerModal] = React.useState(false);
     const [, setSignSequence] = React.useState<boolean>(false);
     const [{dragInputText, dragInputColor, dragInputId}, setDragInputProps] = React.useState({dragInputText: 'Full Name', dragInputColor: 'red', dragInputId: '32'},);
-    const [signers, setSigners] = React.useState<SignerElement[]>([
-        {id: '32', color: 'blue', step: 1, type: 'signer', name: 'Aamir', email: 'email'},
-        {id: '33', color: 'red', step: 2, type: 'signer', name: 'Aamir', email: 'email'},
-    ]);
+    const [signers, setSigners] = React.useState<SignerElement[]>([]);
 
     const canvasRef = React.useRef<HTMLDivElement>(null);
 
-    const [inputElements, setInputElements] = React.useState<
-        PdfFormInputType[]
-    >([]);
+    const [inputElements, setInputElements] = React.useState<PdfFormInputType[]>([]);
 
     const [isDragging, setIsDragging] = React.useState<boolean | null>(null);
     const [mousePosition, setMousePosition] = React.useState<PositionType>({
@@ -327,6 +320,7 @@ const AgreementCreator: React.FC = () => {
                                             withArrow
                                         >
                                             <Stack className={"p-3 "+getBgColorLight(signer.color)}>
+                                                <p className='mb-0 text-muted text-center'>{signer.name}</p>
                                                 <Group
                                                     onMouseDown={() => {
                                                         setDragInputProps({
@@ -381,7 +375,15 @@ const AgreementCreator: React.FC = () => {
                                             </Stack>
                                         </Tooltip>
                                     )
-                                })};
+                                })}
+                                {signers.length > 0 && (
+                                    <Group position='right'>
+                                        <div className='px-3 py-1 transition cursor-pointer shadow-sm hover:scale-110' onClick={() => {setShowSignerModal(true);}}>
+                                            <span className='relative' style={{top: '1px'}}><i className='simple-icon-pencil text-xs relative mr-1'></i></span>
+                                            <span className='mr-1'>Edit</span>
+                                        </div>
+                                    </Group>
+                                )}
                             </Stack>
                         </CardBody>
                     </Card>
@@ -700,6 +702,7 @@ const AgreementCreator: React.FC = () => {
             >
                 {showSignerModal && (
                     <AddSigner
+                        signers={signers}
                         onChangeSignerSequence={onSetSignerSequence}
                         onConfirmAddSigner={onAddSigner}
                         onCancelAddSigner={() => {

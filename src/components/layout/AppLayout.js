@@ -7,6 +7,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import { menuActions } from '../../redux/menu-slice';
 import { AuthHelper } from '../../helpers/AuthHelper';
 import { useLocation } from 'react-router-dom';
+import { toast } from 'react-toastify';
 
 const AppLayout = ({ children }) => {
     const dispatchFn = useDispatch();
@@ -43,6 +44,13 @@ const AppLayout = ({ children }) => {
             .getUser()
             .then((user) => {
                 setUser(user);
+            })
+            .catch(err => {
+                if (err.response && err.response.status === 401) {
+                    toast.error('Session expired, please login again');
+                } else {
+                    toast.error('Something went wrong, try again later');
+                }
             })
             .finally(() => {
                 setLoading(false);

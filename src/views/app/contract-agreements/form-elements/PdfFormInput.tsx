@@ -1,6 +1,6 @@
 import classNames from 'classnames';
 import React from 'react';
-import { getBgColorBold, getBorderColorBold, INPUT_HEIGHT, INPUT_WIDTH } from '../types';
+import { getBgColorLight, getBorderColorBold, INPUT_HEIGHT, INPUT_WIDTH } from '../types';
 import { MdClear, MdDelete, MdSave } from 'react-icons/md';
 import { AiOutlineDrag } from 'react-icons/ai';
 import { DraggableCore } from 'react-draggable';
@@ -127,7 +127,7 @@ const PdfFormInput: React.FC<Props> = ({ x: initX, y: initY, color, onDelete, pl
                                 'pdf-input-element-filled border-2 ': value.length > 0,
                                 [getBorderColorBold(color)]: true,
                             },
-                            getBgColorBold(color),
+                            getBgColorLight(color),
                             'focus:outline-none',
                             `focus:${getBorderColorBold(color)} focus:border-2`,
                         )}
