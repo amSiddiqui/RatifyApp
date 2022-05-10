@@ -102,6 +102,9 @@ export const enMessages = {
 
     'agreement-creator.title-placeholder': 'Type document title here',
 
+    'contract.error.404': 'Agreement not found',
+    'contract.error.500': 'Something went wrong, try again later!',
+
     /* 04.Dashboards */
     'dashboards.pending-orders': 'Pending Orders',
     'dashboards.completed-orders': 'Completed Orders',

@@ -22,26 +22,7 @@ import { useMediaQuery } from '@mantine/hooks';
 import { GoPlus } from 'react-icons/go';
 import { colors, getBgColorLight as getColor } from './types';
 import { getRandomStringID } from '../../../helpers/Utils';
-
-interface SingerElementStyleProps {
-    step: number;
-    color: string;
-    type: 'signer' | 'approver' | 'viewer';
-    id: string;
-}
-
-interface SignerElementFormProps {
-    id: string;
-    name: string;
-    email: string;
-    job_title?: string;
-    text_field?: boolean;
-    every?: number;
-    every_unit?: 'days' | 'weeks' | 'months' | 'years' | '0' | string;
-}
-
-export interface SignerElement extends SingerElementStyleProps, SignerElementFormProps {
-}
+import { SingerElementStyleProps, SignerElementFormProps, SignerElement } from '../../../types/ContractTypes';
 
 interface SignerRowProps extends SingerElementStyleProps {
     onDragStart: () => void;
@@ -53,7 +34,7 @@ interface SignerRowProps extends SingerElementStyleProps {
     signerData: SignerElementFormProps;
 }
 
-const SignerRow:React.FC<SignerRowProps> = ({ index, color, step, onDragEnd, onDragStart, type, onDataChange, confirm, onDelete, id, signerData }) => {
+const SignerRow:React.FC<SignerRowProps> = ({ index, color, step, onDragEnd, onDragStart, type, onDataChange, confirm, onDelete, uid, signerData }) => {
     const [i] = React.useState(index);
     const [name, setName] = React.useState(signerData.name);
     const [email, setEmail] = React.useState(signerData.email);
@@ -64,7 +45,7 @@ const SignerRow:React.FC<SignerRowProps> = ({ index, color, step, onDragEnd, onD
 
     React.useEffect(() => {
         onDataChange(i, {
-            id,
+            uid,
             name,
             email,
             job_title,
@@ -72,7 +53,7 @@ const SignerRow:React.FC<SignerRowProps> = ({ index, color, step, onDragEnd, onD
             every,
             every_unit
         });
-    }, [name, id, email, job_title, text_field, every, every_unit, onDataChange, i]);
+    }, [name, uid, email, job_title, text_field, every, every_unit, onDataChange, i]);
     
 
     return <>
@@ -164,18 +145,20 @@ type AddSignerProps = {
     onCancelAddSigner: () => void;
     onChangeSignerSequence: (val:boolean) => void;
     signers: SignerElement[];
+    signerSequence: boolean;
 }
 
-const AddSigner:React.FC<AddSignerProps> = ({ onConfirmAddSigner, onCancelAddSigner, onChangeSignerSequence, signers }) => {
+const AddSigner:React.FC<AddSignerProps> = ({ onConfirmAddSigner, onCancelAddSigner, onChangeSignerSequence, signers, signerSequence }) => {
+    const [seq, setSequence] = React.useState<boolean>(signerSequence);
     const [items, setItems] = React.useState<Array<SingerElementStyleProps>>(() => signers.map(s => ({
         step: s.step,
         color: s.color,
         type: s.type,
-        id: s.id,
+        uid: s.uid,
     })));
-    const [lastColorIndex, setLastColorIndex] = React.useState(0);
+    const [lastColorIndex, setLastColorIndex] = React.useState(signers.length);
     const [signerData, setSignerData] = React.useState<Array<SignerElementFormProps>>(() => signers.map(s => ({
-        id: s.id,
+        uid: s.uid,
         name: s.name,
         email: s.email,
         job_title: s.job_title,
@@ -212,22 +195,25 @@ const AddSigner:React.FC<AddSignerProps> = ({ onConfirmAddSigner, onCancelAddSig
             color = 'gray';
         }
         const id = getRandomStringID();
-        setLastColorIndex(prev => prev + 1);
-        setItems(prev => [...prev, { step: prev.length + 1, color, type, name: '', email: '', id }]);
-        setSignerData(prev => [...prev, { name: '', email: '', id}]);
-        setOrder(prev => [...prev, prev.length]);
+        setLastColorIndex((prev) => prev + 1);
+        setItems((prev) => [...prev, { step: prev.length + 1, color, type, name: '', email: '', uid: id }]);
+        setSignerData((prev) => [...prev, { name: '', email: '', uid: id, job_title: '', text_field: false, every: 1, every_unit: 'months' }]);
+        setOrder((prev) => [...prev, prev.length]);
     }
 
     const onConfirm = () => {
         setConfirming(true);
         const signers = items.map((item, index) => {
-            const { name, email, job_title, text_field } = signerData[index];
+            const { name, email, job_title, text_field, every, every_unit } = signerData[index];
             return {
                 ...item,
                 name,
                 email,
                 job_title,
                 text_field,
+                id: -1,
+                every,
+                every_unit
             }
         });
         // check if name and email is filled for each items
@@ -269,7 +255,7 @@ const AddSigner:React.FC<AddSignerProps> = ({ onConfirmAddSigner, onCancelAddSig
             {springs.map(({zIndex, shadow, y, scale}, i) => (
                 <animated.div
                     {...bind(i, elementHeight)}
-                    key={items[i].id}
+                    key={items[i].uid}
                     style={{
                         zIndex,
                         boxShadow: shadow.to(s => `rgba(0, 0, 0, 0.15) 0px ${s}px ${2 * s} px 0px`),
@@ -282,7 +268,7 @@ const AddSigner:React.FC<AddSignerProps> = ({ onConfirmAddSigner, onCancelAddSig
                     }}
                 >
                     <SignerRow 
-                        id={items[i].id} 
+                        uid={items[i].uid} 
                         onDelete={() => {
                             setItems(prev => {
                                 console.log('deleting at index: ', i, ' Item: ', items[i], ' Signer Data: ', signerData[i]);
@@ -359,7 +345,10 @@ const AddSigner:React.FC<AddSignerProps> = ({ onConfirmAddSigner, onCancelAddSig
         <Group position='right'>
             <div className='flex mb-3 justify-center items-center'>
                 <label className='mr-1 mb-0' htmlFor='agreement-creator-sequence-switch'>Signing and approvals must be completed in sequence</label>
-                <Switch onChange={(e) => onChangeSignerSequence(e.currentTarget.checked)} id='agreement-creator-sequence-switch' />
+                <Switch checked={seq} onChange={(e) => {
+                    onChangeSignerSequence(e.currentTarget.checked);
+                    setSequence(e.currentTarget.checked);
+                }} id='agreement-creator-sequence-switch' />
             </div>
         </Group>
         <Group position='right'>

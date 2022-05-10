@@ -12,7 +12,7 @@ const App = () => {
         const expired = searchParams.get('expired');
         if (expired) {
             toast.error(
-                'Verification link expired. Go to settings and send a new verification link.'
+                'Verification link expired. Go to settings and send a new verification link.',
             );
         }
         const validate = searchParams.get('validate');

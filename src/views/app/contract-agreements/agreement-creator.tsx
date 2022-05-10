@@ -37,12 +37,14 @@ import {
 import { DateTime } from 'luxon';
 import { Button } from 'reactstrap';
 import { GoPlus } from 'react-icons/go';
-import AddSigner, { SignerElement } from './add-signer';
+import AddSigner from './add-signer';
+import { SignerElement } from '../../../types/ContractTypes';
 import { AiOutlineDrag } from 'react-icons/ai';
 import DraggableInput from './form-elements/DraggableInput';
 import { getBgColorLight, PositionType, POSITION_OFFSET_X, POSITION_OFFSET_Y, PdfFormInputType, INPUT_WIDTH, INPUT_HEIGHT } from './types';
 import PdfFormInput from './form-elements/PdfFormInput';
 import { getRandomStringID } from '../../../helpers/Utils';
+import { useDebouncedValue } from '@mantine/hooks';
 
 // luxon today date
 const today = DateTime.local();
@@ -65,6 +67,7 @@ const AgreementCreator: React.FC = () => {
     const match = useLocation();
     const intl = useIntl();
     const [agreementName, setAgreementName] = React.useState('');
+    const [dbAgreementName] = useDebouncedValue(agreementName, 1000);
     const [numPages, setNumPages] = React.useState(null);
     const [pageNumber, setPageNumber] = React.useState(1);
     const { contractId } = useParams();
@@ -78,9 +81,9 @@ const AgreementCreator: React.FC = () => {
         return endDate;
     });
     const [templateDate, setTemplateDate] = React.useState<string>('6');
-    const [, setSignedBefore] = React.useState<Date | null>();
+    const [signedBefore, setSignedBefore] = React.useState<Date | null>();
     const [showSignerModal, setShowSignerModal] = React.useState(false);
-    const [, setSignSequence] = React.useState<boolean>(false);
+    const [signSequence, setSignSequence] = React.useState<boolean>(false);
     const [{dragInputText, dragInputColor, dragInputId}, setDragInputProps] = React.useState({dragInputText: 'Full Name', dragInputColor: 'red', dragInputId: '32'},);
     const [signers, setSigners] = React.useState<SignerElement[]>([]);
 
@@ -101,10 +104,22 @@ const AgreementCreator: React.FC = () => {
     );
     const navigate = useNavigate();
 
-    const onAddSigner = React.useCallback((signers: SignerElement[]) => {
-        setSigners(signers);
+    const onAddSigner = React.useCallback((newSigners: SignerElement[]) => {
+        if (contractId) {
+            contractHelper.syncSigners(contractId, newSigners).then((data) => {
+                const ids = data.ids;
+                for (const signer of newSigners) {
+                    signer.id = ids[signer.uid];
+                }
+                setSigners(newSigners);
+            }).catch(err => {
+                console.log(err);
+                toast.error('Error adding signers');
+            });
+        }
+
         setShowSignerModal(false);
-    }, []);
+    }, [contractId, contractHelper]);
 
     const onSetSignerSequence = React.useCallback((signSequence: boolean) => {
         setSignSequence(signSequence);
@@ -152,31 +167,78 @@ const AgreementCreator: React.FC = () => {
 
     React.useEffect(() => {
         if (contractId) {
-            contractHelper
-                .getPdfDocument(contractId)
-                .then((pdf) => {
-                    setPdf(pdf);
-                })
-                .catch((error) => {
-                    console.log(error);
-                    toast.error('Error loading pdf');
-                })
-                .finally(() => {
-                    setPdfLoading(false);
-                });
+            contractHelper.getAgreement(contractId).then((data) => {
+                const agreement = data.agreement;
+                const agreement_signers = data.signers;
+                const agreement_input_fields = data.input_fields;
+                setAgreementName(agreement.title);
+                if (agreement.end_date !== null) {
+                    setShowEndDate(true);
+                    setEndDate(DateTime.fromISO(agreement.end_date));
+                    setTemplateDate('');
+                }
+                if (agreement.signed_before !== null) {
+                    setSignedBefore(new Date(agreement.signed_before));
+                }
+                setSignSequence(agreement.sequence);
 
-            contractHelper
-                .getPdfThumbnails(contractId)
-                .then((thumbnails) => {
-                    setPdfThumbnails(thumbnails);
-                })
-                .catch((error) => {
-                    console.log(error);
-                    toast.error('Error loading pdf thumbnails');
-                })
-                .finally(() => {
-                    setThumbnailsLoading(false);
-                });
+                setSigners(agreement_signers.map((s) => ({
+                    id: s.id,
+                    uid: s.id.toString(),
+                    step: s.step,
+                    color: s.color,
+                    type: s.type,
+                    name: s.name,
+                    email: s.email,
+                    job_title: s.job_title,
+                    text_field: s.text_field,
+                    every: s.every,
+                    every_unit: s.every_unit,
+                } as SignerElement )));
+
+                setInputElements(agreement_input_fields.map((i) => ({
+                    id: i.id.toString(),
+                    signerId: i.signer.toString(),
+                    placeholder: i.placeholder,
+                    color: i.color,
+                    x: i.x,
+                    y: i.y,
+                } as PdfFormInputType)));
+
+                const doc_id = data.agreement.documents[0];
+                contractHelper
+                    .getPdfDocument(doc_id.toString())
+                    .then((pdf) => {
+                        setPdf(pdf);
+                    })
+                    .catch((error) => {
+                        throw error;
+                    })
+                    .finally(() => {
+                        setPdfLoading(false);
+                    });
+    
+                contractHelper
+                    .getPdfThumbnails(doc_id.toString())
+                    .then((thumbnails) => {
+                        setPdfThumbnails(thumbnails);
+                    })
+                    .catch((error) => {
+                        console.log(error);
+                        toast.error('Error loading pdf thumbnails');
+                    })
+                    .finally(() => {
+                        setThumbnailsLoading(false);
+                    });
+            }).catch(err => {
+                console.log(err);
+                if (err.response && err.response.status === 404) {
+                    navigate(`/documents/?error=404`);
+                } else {
+                    navigate(`/documents/?error=500`);
+                }
+            });
+
         } else {
             toast.error('Cannot Find Document. Redirecting to Contract List');
             setTimeout(() => {
@@ -210,6 +272,30 @@ const AgreementCreator: React.FC = () => {
             }
         }
     }, [isDragging, mousePosition, dragInputColor, dragInputId, dragInputText, pageNumber]);
+    
+    React.useEffect(() => {
+        if (contractId) {
+            if (!pdfLoading) {
+                contractHelper.updateAgreementTitle(contractId, dbAgreementName, '').catch(err => {
+                    toast.error('Error updating agreement title');
+                });
+            }
+        }
+    }, [dbAgreementName, contractHelper, contractId, pdfLoading]);
+
+    React.useEffect(() => {
+        if (contractId) {
+            if (!pdfLoading) {
+                let ed:string | null = endDate.toISO();
+                if (!showEndDate) {
+                    ed = null;
+                }
+                contractHelper.updateAgreementDateSequence(contractId, ed, signedBefore ? DateTime.fromJSDate(signedBefore).toISO() : null, signSequence).catch(err => {
+                    toast.error('Error updating agreement');
+                });
+            }
+        }
+    }, [contractId, contractHelper, endDate, signedBefore, showEndDate, signSequence, pdfLoading]);
 
     React.useLayoutEffect(() => {
         const onmouseup = () => {
@@ -325,7 +411,7 @@ const AgreementCreator: React.FC = () => {
                                                     onMouseDown={() => {
                                                         setDragInputProps({
                                                             dragInputColor: signer.color,
-                                                            dragInputId: signer.id,
+                                                            dragInputId: signer.uid,
                                                             dragInputText: 'Full Name'
                                                         });
                                                         setIsDragging(true);
@@ -342,7 +428,7 @@ const AgreementCreator: React.FC = () => {
                                                     onMouseDown={() => {
                                                         setDragInputProps({
                                                             dragInputColor: signer.color,
-                                                            dragInputId: signer.id,
+                                                            dragInputId: signer.uid,
                                                             dragInputText: 'Signature'
                                                         });
                                                         setIsDragging(true);
@@ -359,7 +445,7 @@ const AgreementCreator: React.FC = () => {
                                                     onMouseDown={() => {
                                                         setDragInputProps({
                                                             dragInputColor: signer.color,
-                                                            dragInputId: signer.id,
+                                                            dragInputId: signer.uid,
                                                             dragInputText: 'Date',
                                                         });
                                                         setIsDragging(true);
@@ -393,7 +479,7 @@ const AgreementCreator: React.FC = () => {
                         <CardBody>
                             <Center>
                                 {pdfLoading && (
-                                    <Skeleton height={1080} width={613} />
+                                    <Skeleton height={1024} style={{zIndex: 0}} width={613} />
                                 )}
                                 {!pdfLoading && (
                                     <div>
@@ -678,17 +764,20 @@ const AgreementCreator: React.FC = () => {
                                     </Stack>
                                 )}
                             </Stack>
-                            <div className="mt-4 px-4">
+                            <Stack spacing={'lg'} className="px-4 mt-4">
                                 <DatePicker
+                                    inputFormat='DD/MM/YYYY'
                                     label="Document must be signed by"
+                                    value={signedBefore}
                                     onChange={(value) => {
                                         setSignedBefore(value);
                                     }}
                                     excludeDate={(dt) => dt < today.toJSDate()}
                                     icon={<MdCalendarToday />}
+                                    style={{ width: 150 }}
                                     placeholder="Select Date"
                                 />
-                            </div>
+                            </Stack>
                         </CardBody>
                     </Card>
                 </Grid.Col>
@@ -702,6 +791,7 @@ const AgreementCreator: React.FC = () => {
             >
                 {showSignerModal && (
                     <AddSigner
+                        signerSequence={signSequence}
                         signers={signers}
                         onChangeSignerSequence={onSetSignerSequence}
                         onConfirmAddSigner={onAddSigner}
