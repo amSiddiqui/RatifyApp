@@ -84,10 +84,15 @@ const AgreementCreator: React.FC = () => {
     const [signedBefore, setSignedBefore] = React.useState<Date | null>();
     const [showSignerModal, setShowSignerModal] = React.useState(false);
     const [signSequence, setSignSequence] = React.useState<boolean>(false);
-    const [{dragInputText, dragInputColor, dragInputId}, setDragInputProps] = React.useState({dragInputText: 'Full Name', dragInputColor: 'red', dragInputId: '32'},);
+    const [{dragInputText, dragInputColor, dragInputId, dragInputType}, setDragInputProps] = React.useState({dragInputText: 'Full Name', dragInputColor: 'red', dragInputId: -1, dragInputType: 'name'},);
     const [signers, setSigners] = React.useState<SignerElement[]>([]);
 
     const canvasRef = React.useRef<HTMLDivElement>(null);
+
+    const inputElementsFirstCall = React.useRef(true);
+    const titleFirstCall = React.useRef(true);
+    const dateFirstCall = React.useRef(true);
+    const inputElementsSynchronized = React.useRef(false);
 
     const [inputElements, setInputElements] = React.useState<PdfFormInputType[]>([]);
 
@@ -197,12 +202,15 @@ const AgreementCreator: React.FC = () => {
                 } as SignerElement )));
 
                 setInputElements(agreement_input_fields.map((i) => ({
-                    id: i.id.toString(),
-                    signerId: i.signer.toString(),
+                    id: i.id,
+                    signerId: i.signer,
                     placeholder: i.placeholder,
                     color: i.color,
                     x: i.x,
                     y: i.y,
+                    uid: i.id.toString(),
+                    type: i.type,
+                    page: i.page
                 } as PdfFormInputType)));
 
                 const doc_id = data.agreement.documents[0];
@@ -267,35 +275,68 @@ const AgreementCreator: React.FC = () => {
                     placeholder: dragInputText, 
                     signerId: dragInputId, 
                     page: pageNumber, 
-                    id: getRandomStringID() 
+                    uid: getRandomStringID(),
+                    id: -1,
+                    type: dragInputType
                 }]);
             }
         }
-    }, [isDragging, mousePosition, dragInputColor, dragInputId, dragInputText, pageNumber]);
+    }, [isDragging, mousePosition, dragInputColor, dragInputId, dragInputText, pageNumber, dragInputType]);
     
     React.useEffect(() => {
-        if (contractId) {
-            if (!pdfLoading) {
-                contractHelper.updateAgreementTitle(contractId, dbAgreementName, '').catch(err => {
-                    toast.error('Error updating agreement title');
-                });
-            }
+        if (!contractId || pdfLoading) {
+            return;
+        }
+        if (!titleFirstCall.current) {
+            contractHelper.updateAgreementTitle(contractId, dbAgreementName, '').catch(err => {
+                toast.error('Error updating agreement title');
+            });
+        } else {
+            titleFirstCall.current = false;
         }
     }, [dbAgreementName, contractHelper, contractId, pdfLoading]);
 
     React.useEffect(() => {
-        if (contractId) {
-            if (!pdfLoading) {
-                let ed:string | null = endDate.toISO();
-                if (!showEndDate) {
-                    ed = null;
-                }
-                contractHelper.updateAgreementDateSequence(contractId, ed, signedBefore ? DateTime.fromJSDate(signedBefore).toISO() : null, signSequence).catch(err => {
-                    toast.error('Error updating agreement');
-                });
-            }
+        if (!contractId || pdfLoading) {
+            return;
         }
+        if (dateFirstCall.current) {
+            dateFirstCall.current = false;
+            return;
+        }
+        let ed:string | null = endDate.toISO();
+        if (!showEndDate) {
+            ed = null;
+        }
+        contractHelper.updateAgreementDateSequence(contractId, ed, signedBefore ? DateTime.fromJSDate(signedBefore).toISO() : null, signSequence).catch(err => {
+            toast.error('Error updating agreement');
+        });
     }, [contractId, contractHelper, endDate, signedBefore, showEndDate, signSequence, pdfLoading]);
+
+    React.useEffect(() => {
+        if (pdfLoading || !contractId) {
+            return;
+        }
+        if (inputElementsFirstCall.current) {
+            inputElementsFirstCall.current = false;
+            return;
+        }
+        if (!inputElementsSynchronized.current) {
+            contractHelper.syncInputField(contractId, inputElements).then(data => {
+                const ids = data.ids;
+                setInputElements(prev => {
+                    const newInputElements = [...prev];
+                    for (const inputElement of newInputElements) {
+                        inputElement.id = ids[inputElement.uid];
+                    }
+                    return newInputElements;
+                })
+            });
+            inputElementsSynchronized.current = true;
+        } else {
+            inputElementsSynchronized.current = false;
+        }
+    }, [inputElements, pdfLoading, contractId, contractHelper]);
 
     React.useLayoutEffect(() => {
         const onmouseup = () => {
@@ -411,8 +452,9 @@ const AgreementCreator: React.FC = () => {
                                                     onMouseDown={() => {
                                                         setDragInputProps({
                                                             dragInputColor: signer.color,
-                                                            dragInputId: signer.uid,
-                                                            dragInputText: 'Full Name'
+                                                            dragInputId: signer.id,
+                                                            dragInputText: 'Full Name',
+                                                            dragInputType: 'name'
                                                         });
                                                         setIsDragging(true);
                                                     }}
@@ -428,8 +470,9 @@ const AgreementCreator: React.FC = () => {
                                                     onMouseDown={() => {
                                                         setDragInputProps({
                                                             dragInputColor: signer.color,
-                                                            dragInputId: signer.uid,
-                                                            dragInputText: 'Signature'
+                                                            dragInputId: signer.id,
+                                                            dragInputText: 'Signature',
+                                                            dragInputType: 'signature'
                                                         });
                                                         setIsDragging(true);
                                                     }}
@@ -445,8 +488,9 @@ const AgreementCreator: React.FC = () => {
                                                     onMouseDown={() => {
                                                         setDragInputProps({
                                                             dragInputColor: signer.color,
-                                                            dragInputId: signer.uid,
+                                                            dragInputId: signer.id,
                                                             dragInputText: 'Date',
+                                                            dragInputType: 'date',
                                                         });
                                                         setIsDragging(true);
                                                     }}
@@ -511,7 +555,7 @@ const AgreementCreator: React.FC = () => {
                                                                     })
                                                                 }}
                                                                 placeholder={element.placeholder}
-                                                                key={element.id}
+                                                                key={element.uid}
                                                                 onDelete={() => {
                                                                         setInputElements((prev) => {
                                                                             const newElements = prev.filter((e, i) => i !== index);

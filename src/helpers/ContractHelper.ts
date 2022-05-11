@@ -10,6 +10,7 @@ import {
 } from '../types/ContractTypes';
 import { BaseResponse } from '../types/AuthTypes';
 import { SignerElement } from '../types/ContractTypes';
+import { PdfFormInputType } from '../views/app/contract-agreements/types';
 
 export class ContractHelper extends ApiHelper {
     async getPdfDocument(id: string): Promise<string> {
@@ -150,6 +151,22 @@ export class ContractHelper extends ApiHelper {
         let response = await axios.post<SyncSignerResponse>(
             `/contracts/${contract_id}/signers/`,
             { signers },
+            { headers: { Authorization: `Bearer ${token}` } },
+        );
+        return response.data;
+    }
+
+    async syncInputField(
+        contract_id: string,
+        input_fields: PdfFormInputType[],
+    ): Promise<SyncSignerResponse> {
+        let token = await this.getToken();
+        if (token === null) {
+            throw new NoTokenError('No token');
+        }
+        let response = await axios.post<SyncSignerResponse>(
+            `/contracts/${contract_id}/inputs/`,
+            { input_fields },
             { headers: { Authorization: `Bearer ${token}` } },
         );
         return response.data;

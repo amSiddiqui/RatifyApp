@@ -5,13 +5,15 @@ export type PositionType = {
 
 
 export type PdfFormInputType = {
-    signerId: string;
+    signerId: number;
+    type: string;
     x: number;
     y: number;
     placeholder: string;
     color: string;
     page: number;
-    id: string;
+    id: number;
+    uid: string;
 };
 
 export const INPUT_TOP_OFFSET = 17;
