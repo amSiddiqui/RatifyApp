@@ -1,19 +1,20 @@
 import React from 'react';
-import { Row } from 'reactstrap';
+import { Badge, Row } from 'reactstrap';
 import { useIntl } from 'react-intl';
 import { Colxx, Separator } from '../../../components/common/CustomBootstrap';
 import Breadcrumb from '../../../containers/navs/Breadcrumb';
 import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import './contract-agreements.css';
 import CATopBar from './topbar';
-import CATemplates from './templates';
-import { Modal, Progress, Divider, Group, Center, Stack } from '@mantine/core';
+import DocumentCarousel from './document_carousel';
+import { Modal, Progress, Divider, Group, Center, Stack, Collapse } from '@mantine/core';
 import { ContractHelper } from '../../../helpers/ContractHelper';
 import { AppDispatch } from '../../../redux';
 import { useDispatch } from 'react-redux';
 import { toast } from 'react-toastify';
 import { Button } from 'reactstrap';
-import { DocumentsResponseType } from '../../../types/ContractTypes';
+import { Agreement } from '../../../types/ContractTypes';
+import { useDisclosure } from '@mantine/hooks';
 
 const ContractAgreements: React.FC = () => {
     const match = useLocation();
@@ -32,9 +33,9 @@ const ContractAgreements: React.FC = () => {
     const [uploadError, setUploadError] = React.useState('');
     const [progress, setProgress] = React.useState(0);
     const [newContractId, setNewContractId] = React.useState(-1);
-    const [templateDocuments, setTemplateDocuments] = React.useState<
-        DocumentsResponseType[]
-    >([]);
+    const [drafts, setDrafts] = React.useState<Agreement[]>([]);
+
+    const [openedTemplate, handlersTemplate] = useDisclosure(true);
 
     const uploadProgress = React.useCallback((progressEvent: any) => {
         setProgress(progressEvent.loaded / progressEvent.total);
@@ -73,13 +74,13 @@ const ContractAgreements: React.FC = () => {
 
     React.useEffect(() => {
         contractHelper
-            .getAllDocuments()
+            .getDrafts()
             .then((data) => {
-                setTemplateDocuments(data);
+                setDrafts(data);
             })
             .catch((err) => {
                 console.log(err);
-                toast.error('Cannot fetch templates. Try Again Later!');
+                toast.error('Cannot fetch drafts. Try Again Later!');
             });
     }, [contractHelper]);
 
@@ -110,22 +111,33 @@ const ContractAgreements: React.FC = () => {
                 label={<p className="text-2xl">OR</p>}
                 labelPosition="center"
             />
-            <div className="flex justify-between items-center mb-4">
-                <h1 className="text-2xl">Select from saved templates</h1>
-                {templateDocuments.length === 0 && (
-                    <p>Currently there are no saved templates</p>
+            <div onClick={() => {handlersTemplate.toggle()}} className="flex justify-between items-center mb-2 cursor-pointer">
+                <div>
+                    <span className='relative' style={{top: '-2px'}}> {!openedTemplate && <i className="simple-icon-arrow-right"></i>} {openedTemplate && <i className="simple-icon-arrow-down"></i>} </span>
+                    <h1 className="text-2xl mb-0">Drafts</h1>
+                    <Badge className='ml-2 relative' style={{top: '-4px'}} pill>{drafts.length}</Badge>
+                </div>
+                {drafts.length === 0 && (
+                    <p>No drafts</p>
                 )}
-                {templateDocuments.length > 0 && (
+                {drafts.length > 0 && (
                     <p>
-                        {templateDocuments.length}{' '}
-                        {templateDocuments.length > 1
-                            ? 'templates'
-                            : 'template'}{' '}
+                        {drafts.length}{' '}
+                        {drafts.length > 1
+                            ? 'drafts'
+                            : 'drafts'}{' '}
                         found
                     </p>
                 )}
             </div>
-            <CATemplates templates={templateDocuments} intl={intl} />
+            <Collapse in={openedTemplate}>
+                <DocumentCarousel docs={drafts.map(d => ({
+                    id: d.documents[0],
+                    name: d.title,
+                    contractId: d.id,
+                }))} intl={intl} />
+            </Collapse>
+            
             <Modal
                 closeOnEscape={false}
                 closeOnClickOutside={false}

@@ -3,6 +3,7 @@ import { AxiosResponse } from 'axios';
 import { NoTokenError } from '../types/ErrorTypes';
 import axios from './axiosInstance';
 import {
+    Agreement,
     ContractCreateResponseType,
     DocumentsResponseType,
     GetAgreementResponse,
@@ -167,6 +168,18 @@ export class ContractHelper extends ApiHelper {
         let response = await axios.post<SyncSignerResponse>(
             `/contracts/${contract_id}/inputs/`,
             { input_fields },
+            { headers: { Authorization: `Bearer ${token}` } },
+        );
+        return response.data;
+    }
+
+    async getDrafts(): Promise<Agreement[]> {
+        let token = await this.getToken();
+        if (token === null) {
+            throw new NoTokenError('No token');
+        }
+        let response: AxiosResponse<Agreement[]> = await axios.get(
+            '/contracts/drafts/',
             { headers: { Authorization: `Bearer ${token}` } },
         );
         return response.data;

@@ -5,16 +5,22 @@ import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { ContractHelper } from '../../../helpers/ContractHelper';
 import { AppDispatch } from '../../../redux';
-import { DocumentsResponseType } from '../../../types/ContractTypes';
 
 type TemplateImageType = {
     id: string;
     name: string;
     image: string;
     error: boolean;
+    contractId: number;
 }
 
-const CATemplates:React.FC<{intl: IntlShape, templates: DocumentsResponseType[]}> = ({ intl, templates }) => {
+type DocNameId = {
+    name: string;
+    id: number;
+    contractId: number;
+}
+
+const DocumentCarousel:React.FC<{intl: IntlShape, docs: DocNameId[]}> = ({ intl, docs }) => {
     const [templateImages, setTemplateImages] = React.useState<TemplateImageType[]>([]);
     const [loading, setLoading] = React.useState(true);
     const dispatchFn = useDispatch<AppDispatch>();
@@ -23,22 +29,23 @@ const CATemplates:React.FC<{intl: IntlShape, templates: DocumentsResponseType[]}
 
     React.useEffect(() => {
         Promise.allSettled(
-            templates.map(doc => {
-                return contractHelper.getPdfCover(doc.id);
+            docs.map(d => {
+                return contractHelper.getPdfCover(d.id.toString());
             })
         ).then(results => {
             const images = results.map((result, index) => {
                 return {
-                    id: templates[index].id,
-                    name: templates[index].filename,
+                    id: docs[index].id.toString(),
+                    name: docs[index].name,
                     image: result.status === 'fulfilled' ? result.value : '',
                     error: result.status === 'rejected',
+                    contractId: docs[index].contractId,
                 }
             });
             setTemplateImages(images);
             setLoading(false);
         });
-    }, [templates, contractHelper]);
+    }, [docs, contractHelper]);
 
     return (
         <ScrollArea offsetScrollbars>
@@ -62,7 +69,7 @@ const CATemplates:React.FC<{intl: IntlShape, templates: DocumentsResponseType[]}
                                         <Menu size='sm'>
                                             <Menu.Item onClick={() => {
                                                 // open in new tab
-                                                window.open(`/documents/add-signers/${image.id}`, '_blank');
+                                                window.open(`/documents/add-signers/${image.contractId}`, '_blank');
                                             }} icon={<i className='simple-icon-share-alt'></i>}>Open</Menu.Item>
                                             <Menu.Item color='red' icon={ <i className='simple-icon-trash'></i> }>Delete</Menu.Item>
                                         </Menu>
@@ -97,4 +104,4 @@ const CATemplates:React.FC<{intl: IntlShape, templates: DocumentsResponseType[]}
     );
 }
 
-export default CATemplates;
+export default DocumentCarousel;
