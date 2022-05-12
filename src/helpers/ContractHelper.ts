@@ -4,6 +4,7 @@ import { NoTokenError } from '../types/ErrorTypes';
 import axios from './axiosInstance';
 import {
     Agreement,
+    AgreementTemplate,
     ContractCreateResponseType,
     DocumentsResponseType,
     GetAgreementResponse,
@@ -77,14 +78,18 @@ export class ContractHelper extends ApiHelper {
         return response.data;
     }
 
-    async createAgreement(document_id: number) {
+    async createAgreement(document_id: number, name?: string) {
         let token = await this.getToken();
         if (token === null) {
             throw new NoTokenError('No token');
         }
+        let agreementName = '';
+        if (name) {
+            agreementName = name;
+        }
         const response = await axios.post<ContractCreateResponseType>(
             `/contracts/new/`,
-            { document_id: document_id },
+            { document_id: document_id, name: agreementName },
             { headers: { Authorization: `Bearer ${token}` } },
         );
         return response.data;
@@ -192,6 +197,42 @@ export class ContractHelper extends ApiHelper {
         }
         let response: AxiosResponse<DocumentsResponseType[]> = await axios.get(
             '/contracts/doc/',
+            { headers: { Authorization: `Bearer ${token}` } },
+        );
+        return response.data;
+    }
+
+    async getAgreementTemplateCategories(): Promise<string[]> {
+        let token = await this.getToken();
+        if (token === null) {
+            throw new NoTokenError('No token');
+        }
+        let response: AxiosResponse<string[]> = await axios.get(
+            '/contracts/templates/categories/',
+            { headers: { Authorization: `Bearer ${token}` } },
+        );
+        return response.data;
+    }
+
+    async saveAgreementTemplate(contractId: string, name: string, description: string, category: string):Promise<{id: number}> {
+        let token = await this.getToken();
+        if (token === null) {
+            throw new NoTokenError('No token');
+        }
+        let response: AxiosResponse<{id: number}> = await axios.post(
+            `/contracts/templates/`, {contract_id: contractId, name: name, description, category},
+            { headers: { Authorization: `Bearer ${token}` } },
+        );
+        return response.data;
+    }
+
+    async getAgreementTemplates(): Promise<AgreementTemplate[]> {
+        let token = await this.getToken();
+        if (token === null) {
+            throw new NoTokenError('No token');
+        }
+        let response: AxiosResponse<AgreementTemplate[]> = await axios.get(
+            '/contracts/templates/',
             { headers: { Authorization: `Bearer ${token}` } },
         );
         return response.data;

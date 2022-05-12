@@ -25,6 +25,18 @@ export interface Agreement {
     updated_at: string;
 }
 
+export interface AgreementTemplate {
+    id: number;
+    name: string;
+    description: string;
+    category: string;
+    documents: number[],
+    user: number;
+    created_at: string;
+    updated_at: string;
+    organization: number;
+}
+
 export interface Signer {
     id: number;
     step: number;

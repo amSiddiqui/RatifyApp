@@ -18,6 +18,8 @@ import {
     ScrollArea,
     Modal,
     Tooltip,
+    Textarea,
+    Autocomplete,
 } from '@mantine/core';
 import { DatePicker } from '@mantine/dates';
 import { Card, CardBody } from 'reactstrap';
@@ -44,7 +46,7 @@ import DraggableInput from './form-elements/DraggableInput';
 import { getBgColorLight, PositionType, POSITION_OFFSET_X, POSITION_OFFSET_Y, PdfFormInputType, INPUT_WIDTH, INPUT_HEIGHT } from './types';
 import PdfFormInput from './form-elements/PdfFormInput';
 import { getRandomStringID } from '../../../helpers/Utils';
-import { useDebouncedValue } from '@mantine/hooks';
+import { useDebouncedValue, useDisclosure } from '@mantine/hooks';
 
 // luxon today date
 const today = DateTime.local();
@@ -101,6 +103,12 @@ const AgreementCreator: React.FC = () => {
         x: 0,
         y: 0,
     });
+
+    const [showSaveTemplate, saveTemplateHandlers] = useDisclosure(false);
+    const [templateCategories, setTemplateCategories] = React.useState<string[]>([]);
+    const [{templateCategory, templateName, templateDescription}, setTemplateProps] = React.useState({templateCategory: '', templateName: '', templateDescription: ''});
+    const [templateSaved, setTemplateSaved] = React.useState(false);
+    const [templateError, setTemplateError] = React.useState(false);
 
     const dispatchFn = useDispatch<AppDispatch>();
     const contractHelper = React.useMemo(
@@ -169,6 +177,28 @@ const AgreementCreator: React.FC = () => {
             setPageNumber(numPages);
         }
     };
+
+    const onSaveTemplate = () => {
+        if (templateName === '') {
+            setTemplateError(true);
+            return;
+        }
+        setTemplateError(false);
+        if (!contractId) {
+            return;
+        }
+        contractHelper.saveAgreementTemplate(contractId, templateName, templateDescription, templateCategory)
+        .then(_ => {
+            setTemplateSaved(true);
+            setTemplateProps({templateCategory: '', templateName: '', templateDescription: ''});
+            toast.success('Template created');
+            saveTemplateHandlers.close();
+        })
+        .catch(err => {
+            console.log(err);
+            toast.error('Error creating template');
+        });
+    }
 
     React.useEffect(() => {
         if (contractId) {
@@ -338,6 +368,14 @@ const AgreementCreator: React.FC = () => {
         }
     }, [inputElements, pdfLoading, contractId, contractHelper]);
 
+    React.useEffect(() => {
+        contractHelper.getAgreementTemplateCategories().then(data => {
+            setTemplateCategories(data);
+        }).catch(err => {
+            console.log(err);  
+        });
+    }, [contractHelper]);
+
     React.useLayoutEffect(() => {
         const onmouseup = () => {
             setIsDragging(false);
@@ -406,6 +444,7 @@ const AgreementCreator: React.FC = () => {
                 <Grid.Col span={3}>
                     <div className="flex items-center justify-center mb-2">
                         <Button
+                            onClick={saveTemplateHandlers.open}
                             className="contract-agreements-create-new flex h-14 items-center justify-center"
                             color="secondary"
                             style={{ width: '170px' }}
@@ -845,6 +884,41 @@ const AgreementCreator: React.FC = () => {
                     />
                 )}
             </Modal>
+            <Modal
+                centered
+                title='Save As Template'
+                opened={showSaveTemplate}
+                onClose={saveTemplateHandlers.close}
+            >
+                {!templateSaved && <Stack>
+                    <TextInput value={templateName} onChange={(e) => {setTemplateProps(prev => ({
+                        ...prev,
+                        templateName: e.currentTarget.value
+                    }))}} error={templateError && templateName.length === 0 ? 'Please provide template name' : ''} label='Template Name' required placeholder='Template Name' />
+                    <Textarea value={templateDescription} onChange={(e) => {setTemplateProps(prev => ({
+                        ...prev,
+                        templateDescription: e.currentTarget.value
+                    }))}} label='Template Description' placeholder='Template Description' />
+                    <Autocomplete value={templateCategory} onChange={(val) => {
+                        setTemplateProps(prev => ({
+                            ...prev,
+                            templateCategory: val
+                        }));
+                    }} label='Template Category' placeholder='Template Category' data={templateCategories}/>
+                    <Group position='right'>
+                        <Button onClick={saveTemplateHandlers.close} color='light'>Cancel</Button>
+                        <span onClick={onSaveTemplate}><Button color='success'>Save</Button></span>
+                    </Group>
+                </Stack>}
+                {templateSaved && 
+                <Stack>
+                    <span className="text-success text-center text-3xl">
+                        <i className="simple-icon-check"></i>
+                    </span>
+                    <p>Template Saved!</p>
+                </Stack>}
+            </Modal>
+
             {isDragging && (
                 <DraggableInput
                     pos={mousePosition}

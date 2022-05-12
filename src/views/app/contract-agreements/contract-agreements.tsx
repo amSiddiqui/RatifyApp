@@ -13,7 +13,7 @@ import { AppDispatch } from '../../../redux';
 import { useDispatch } from 'react-redux';
 import { toast } from 'react-toastify';
 import { Button } from 'reactstrap';
-import { Agreement } from '../../../types/ContractTypes';
+import { Agreement, AgreementTemplate } from '../../../types/ContractTypes';
 import { useDisclosure } from '@mantine/hooks';
 
 const ContractAgreements: React.FC = () => {
@@ -34,8 +34,12 @@ const ContractAgreements: React.FC = () => {
     const [progress, setProgress] = React.useState(0);
     const [newContractId, setNewContractId] = React.useState(-1);
     const [drafts, setDrafts] = React.useState<Agreement[]>([]);
+    const [templates, setTemplates] = React.useState<AgreementTemplate[]>([]);
+    const [selectedTemplate, setSelectedTemplate] = React.useState<AgreementTemplate | null>(null);
+    const [openTemplateConfirm, templateConfirmHandlers] = useDisclosure(false);
 
-    const [openedTemplate, handlersTemplate] = useDisclosure(true);
+    const [openedDrafts, handlersDrafts] = useDisclosure(true);
+    const [openedTemplates, handlersTemplates] = useDisclosure(false);
 
     const uploadProgress = React.useCallback((progressEvent: any) => {
         setProgress(progressEvent.loaded / progressEvent.total);
@@ -71,6 +75,18 @@ const ContractAgreements: React.FC = () => {
         },
         [uploadProgress, contractHelper],
     );
+    const onAgreementCreateFromTemplate = React.useCallback(() => {
+        if (selectedTemplate) {
+            contractHelper.createAgreement(selectedTemplate.documents[0], selectedTemplate.name).then((data) => {
+                toast.success('Agreement created!');
+                templateConfirmHandlers.close();
+                navigate(`/documents/add-signers/${data.id}`);
+            }).catch(err => {
+                toast.error('Failed to create agreement. Try again Later!');
+                console.log(err);
+            })
+        }
+    }, [selectedTemplate, contractHelper, navigate, templateConfirmHandlers]);
 
     React.useEffect(() => {
         contractHelper
@@ -81,6 +97,15 @@ const ContractAgreements: React.FC = () => {
             .catch((err) => {
                 console.log(err);
                 toast.error('Cannot fetch drafts. Try Again Later!');
+            });
+
+        contractHelper
+            .getAgreementTemplates().then(data => {
+                setTemplates(data);
+            })
+            .catch(err => {
+                console.log(err);
+                toast.error('Cannot fetch templates. Try Again Later!');
             });
     }, [contractHelper]);
 
@@ -111,11 +136,11 @@ const ContractAgreements: React.FC = () => {
                 label={<p className="text-2xl">OR</p>}
                 labelPosition="center"
             />
-            <div onClick={() => {handlersTemplate.toggle()}} className="flex justify-between items-center mb-2 cursor-pointer">
+            <div onClick={() => {handlersDrafts.toggle()}} className="flex justify-between items-center mb-2 cursor-pointer">
                 <div>
-                    <span className='relative' style={{top: '-2px'}}> {!openedTemplate && <i className="simple-icon-arrow-right"></i>} {openedTemplate && <i className="simple-icon-arrow-down"></i>} </span>
+                    <span className='relative' style={{top: '-2px'}}> {!openedDrafts && <i className="simple-icon-arrow-right"></i>} {openedDrafts && <i className="simple-icon-arrow-down"></i>} </span>
                     <h1 className="text-2xl mb-0">Drafts</h1>
-                    <Badge className='ml-2 relative' style={{top: '-4px'}} pill>{drafts.length}</Badge>
+                    {drafts.length > 0 && <Badge className='ml-2 relative' style={{top: '-4px'}} pill>{drafts.length}</Badge>}
                 </div>
                 {drafts.length === 0 && (
                     <p>No drafts</p>
@@ -125,17 +150,57 @@ const ContractAgreements: React.FC = () => {
                         {drafts.length}{' '}
                         {drafts.length > 1
                             ? 'drafts'
-                            : 'drafts'}{' '}
+                            : 'draft'}{' '}
                         found
                     </p>
                 )}
             </div>
-            <Collapse in={openedTemplate}>
+            <Collapse in={openedDrafts}>
                 <DocumentCarousel docs={drafts.map(d => ({
-                    id: d.documents[0],
+                    id: d.id,
+                    doc_id: d.documents[0],
                     name: d.title,
-                    contractId: d.id,
-                }))} intl={intl} />
+                }))} intl={intl} onClick={(id, blank) => {
+                    if (blank) {
+                        window.open(`/documents/add-signers/${id}`, '_blank');
+                    } else {
+                        navigate(`/documents/add-signers/${id}`);
+                    }
+                }} />
+            </Collapse>
+
+            <div onClick={() => {handlersTemplates.toggle()}} className="flex justify-between items-center mb-2 cursor-pointer">
+                <div>
+                    <span className='relative' style={{top: '-2px'}}> {!openedTemplates && <i className="simple-icon-arrow-right"></i>} {openedTemplates && <i className="simple-icon-arrow-down"></i>} </span>
+                    <h1 className="text-2xl mb-0">Select from saved templates</h1>
+                </div>
+                {drafts.length === 0 && (
+                    <p>No templates found</p>
+                )}
+                {drafts.length > 0 && (
+                    <p>
+                        {templates.length}{' '}
+                        {templates.length > 1
+                            ? 'templates'
+                            : 'template'}{' '}
+                        found
+                    </p>
+                )}
+            </div>
+            <Collapse in={openedTemplates}>
+                <DocumentCarousel docs={templates.map(d => ({
+                    id: d.id,
+                    doc_id: d.documents[0],
+                    name: d.name,
+                }))} intl={intl} onClick={(id, blank) => {
+                    // get template using id from templates
+                    const ts = templates.filter(t => t.id === id);
+                    if (ts.length > 0) {
+                        const tp = ts[0];
+                        setSelectedTemplate(tp);
+                        templateConfirmHandlers.open();
+                    }
+                }} />
             </Collapse>
             
             <Modal
@@ -216,6 +281,23 @@ const ContractAgreements: React.FC = () => {
                         </Group>
                     </div>
                 </div>
+            </Modal>
+            <Modal
+                opened={openTemplateConfirm}
+                onClose={templateConfirmHandlers.close}
+                centered
+            >
+                <Stack className='text-center' style={{marginBottom: (28 + 16)}}>
+                    <h5 className='mb-0'>Create agreement from template</h5>
+                    <div className='mb-3'>
+                        <h5>{selectedTemplate && selectedTemplate.name}</h5>
+                        <p className='mb-0 text-gray-600'>{selectedTemplate && selectedTemplate.description}</p>
+                    </div>
+                    <Group position='center'>
+                        <Button onClick={templateConfirmHandlers.close} color='light'>Cancel</Button>
+                        <span onClick={onAgreementCreateFromTemplate}><Button color='success'>Create</Button></span>
+                    </Group>
+                </Stack>
             </Modal>
         </>
     );

@@ -2,44 +2,42 @@ import { Center, Image, Menu, ScrollArea, Skeleton, Stack } from '@mantine/core'
 import React from 'react';
 import { IntlShape } from 'react-intl';
 import { useDispatch } from 'react-redux';
-import { useNavigate } from 'react-router-dom';
 import { ContractHelper } from '../../../helpers/ContractHelper';
 import { AppDispatch } from '../../../redux';
 
 type TemplateImageType = {
-    id: string;
+    doc_id: number;
+    id: number;
     name: string;
     image: string;
     error: boolean;
-    contractId: number;
 }
 
 type DocNameId = {
     name: string;
+    doc_id: number;
     id: number;
-    contractId: number;
 }
 
-const DocumentCarousel:React.FC<{intl: IntlShape, docs: DocNameId[]}> = ({ intl, docs }) => {
+const DocumentCarousel:React.FC<{intl: IntlShape, docs: DocNameId[], onClick: (id:number, blank:boolean) => void}> = ({ intl, docs, onClick }) => {
     const [templateImages, setTemplateImages] = React.useState<TemplateImageType[]>([]);
     const [loading, setLoading] = React.useState(true);
     const dispatchFn = useDispatch<AppDispatch>();
     const contractHelper = React.useMemo(() => new ContractHelper(dispatchFn), [dispatchFn]);
-    const navigate = useNavigate();
 
     React.useEffect(() => {
         Promise.allSettled(
             docs.map(d => {
-                return contractHelper.getPdfCover(d.id.toString());
+                return contractHelper.getPdfCover(d.doc_id.toString());
             })
         ).then(results => {
             const images = results.map((result, index) => {
                 return {
-                    id: docs[index].id.toString(),
+                    id: docs[index].id,
+                    doc_id: docs[index].doc_id,
                     name: docs[index].name,
                     image: result.status === 'fulfilled' ? result.value : '',
                     error: result.status === 'rejected',
-                    contractId: docs[index].contractId,
                 }
             });
             setTemplateImages(images);
@@ -69,14 +67,14 @@ const DocumentCarousel:React.FC<{intl: IntlShape, docs: DocNameId[]}> = ({ intl,
                                         <Menu size='sm'>
                                             <Menu.Item onClick={() => {
                                                 // open in new tab
-                                                window.open(`/documents/add-signers/${image.contractId}`, '_blank');
+                                                onClick(image.id ,true);
                                             }} icon={<i className='simple-icon-share-alt'></i>}>Open</Menu.Item>
                                             <Menu.Item color='red' icon={ <i className='simple-icon-trash'></i> }>Delete</Menu.Item>
                                         </Menu>
                                     </div>
                                     <div  style={{height: 150, width: 116}}>
                                         {image.error && (
-                                            <Center style={{height: 150, width: 116}} onClick={() => navigate(`/documents/add-signers/${image.id}`)} className='shadow-md cursor-pointer'>
+                                            <Center style={{height: 150, width: 116}} onClick={() => {onClick(image.id, false)}} className='shadow-md cursor-pointer'>
                                                 <div className='text-3xl'>
                                                     <i className='simple-icon-doc'></i>
                                                 </div>
@@ -85,7 +83,7 @@ const DocumentCarousel:React.FC<{intl: IntlShape, docs: DocNameId[]}> = ({ intl,
                                         {!image.error && (
                                             <Image 
                                                 className='shadow-md cursor-pointer' 
-                                                onClick={() => navigate(`/documents/add-signers/${image.id}`)} 
+                                                onClick={() => {onClick(image.id, false);}}
                                                 src={'data:image/jpeg;base64,' + image.image} 
                                                 alt={image.name} 
                                                 height={150} 
