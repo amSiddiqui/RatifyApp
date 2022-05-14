@@ -26,10 +26,12 @@ export type BoundType = {
 } | null;
 
 export const INPUT_WIDTH = 180;
-export const INPUT_HEIGHT = 38;
+export const INPUT_HEIGHT = 42;
+export const SIGN_INPUT_HEIGHT = 70;
 
 export const POSITION_OFFSET_X = INPUT_WIDTH / 2;
 export const POSITION_OFFSET_Y = INPUT_HEIGHT / 2;
+export const SIGN_POSITION_OFFSET_Y = SIGN_INPUT_HEIGHT / 2;
 
 export const colors = [
     'blue',

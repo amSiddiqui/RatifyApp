@@ -1,13 +1,14 @@
 import classNames from 'classnames';
 import React from 'react';
-import { getBgColorLight, getBorderColorBold, INPUT_HEIGHT, INPUT_WIDTH } from '../types';
+import { getBgColorLight, getBorderColorBold, INPUT_HEIGHT, INPUT_WIDTH, SIGN_INPUT_HEIGHT } from '../types';
 import { MdClear, MdDelete, MdSave } from 'react-icons/md';
 import { AiOutlineDrag } from 'react-icons/ai';
 import { DraggableCore } from 'react-draggable';
 import { useId } from '@mantine/hooks';
-import { Drawer, Checkbox, TextInput, Stack } from '@mantine/core';
+import { Drawer, Checkbox, TextInput, Stack, Center } from '@mantine/core';
 import { Button } from 'reactstrap';
 import { BoundType, INPUT_TOP_OFFSET } from '../types';
+import { DatePicker } from '@mantine/dates';
  
 
 interface Props {
@@ -19,9 +20,10 @@ interface Props {
     color: string;
     offsetParent: HTMLElement | undefined;
     bounds?: BoundType;
+    type: string;
 }
 
-const PdfFormInput: React.FC<Props> = ({ x: initX, y: initY, color, onDelete, placeholder, onReposition, offsetParent, bounds }) => {
+const PdfFormInput: React.FC<Props> = ({ x: initX, y: initY, color, onDelete, placeholder, onReposition, offsetParent, bounds, type }) => {
     const [[x, y], setPosition] = React.useState([initX, initY]);
     const [ph] = React.useState(placeholder);
     const [value, setValue] = React.useState<string>('');
@@ -33,23 +35,18 @@ const PdfFormInput: React.FC<Props> = ({ x: initX, y: initY, color, onDelete, pl
         resize: 'horizontal',
         overflow: 'auto',
         width: INPUT_WIDTH,
-        height: INPUT_HEIGHT,
+        height: type === 'signature' ? SIGN_INPUT_HEIGHT : INPUT_HEIGHT,
         position: 'absolute',
         top: y - INPUT_TOP_OFFSET,
         left: x,
     });
 
     React.useEffect(() => {
-        setInputStyles({
-            zIndex: 1,
-            resize: 'horizontal',
-            overflow: 'auto',
-            width: INPUT_WIDTH,
-            height: INPUT_HEIGHT,
-            position: 'absolute',
+        setInputStyles((prev:any) => ({
+            ...prev,
             top: y - INPUT_TOP_OFFSET,
             left: x,
-        });
+        }));
     }, [x, y]);
 
     return (
@@ -114,7 +111,7 @@ const PdfFormInput: React.FC<Props> = ({ x: initX, y: initY, color, onDelete, pl
                         <i id={uuid} className='flex justify-center items-center cursor-pointer'><AiOutlineDrag /></i>
                         <i onClick={onDelete} className='cursor-pointer text-danger'><MdClear /></i>
                     </div>
-                    <input
+                    {type === 'name' && <input
                         placeholder={ph}
                         type="text"
                         value={value}
@@ -131,7 +128,25 @@ const PdfFormInput: React.FC<Props> = ({ x: initX, y: initY, color, onDelete, pl
                             'focus:outline-none',
                             `focus:${getBorderColorBold(color)} focus:border-2`,
                         )}
-                    />
+                    />}
+                    {type === 'signature' && <Center
+                        className={classNames(
+                            'w-full h-full text-gray-500',
+                            getBgColorLight(color)
+                        )}
+                    >
+                        <span>{ph}</span>
+                    </Center>}
+                    {type === 'date' && <DatePicker 
+                        variant='unstyled'
+                        placeholder={ph}
+                        style={{height: INPUT_HEIGHT - INPUT_TOP_OFFSET, paddingLeft: 3}}
+                        size='xs'
+                        className={classNames(
+                            'pdf-form-input-date',
+                            getBgColorLight(color),
+                        )}
+                    />}
                 </div>
             </DraggableCore>
 

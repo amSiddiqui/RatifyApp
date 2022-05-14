@@ -43,7 +43,7 @@ import AddSigner from './add-signer';
 import { SignerElement } from '../../../types/ContractTypes';
 import { AiOutlineDrag } from 'react-icons/ai';
 import DraggableInput from './form-elements/DraggableInput';
-import { getBgColorLight, PositionType, POSITION_OFFSET_X, POSITION_OFFSET_Y, PdfFormInputType, INPUT_WIDTH, INPUT_HEIGHT } from './types';
+import { getBgColorLight, PositionType, POSITION_OFFSET_X, POSITION_OFFSET_Y, PdfFormInputType, INPUT_WIDTH, INPUT_HEIGHT, SIGN_POSITION_OFFSET_Y } from './types';
 import PdfFormInput from './form-elements/PdfFormInput';
 import { getRandomStringID } from '../../../helpers/Utils';
 import { useDebouncedValue, useDisclosure } from '@mantine/hooks';
@@ -300,7 +300,7 @@ const AgreementCreator: React.FC = () => {
             if (x < 0 || x > bounds.width || y < 0 || y > bounds.height) {
             } else {
                 setInputElements((prev) => [...prev, { 
-                    x: x - POSITION_OFFSET_X, y: y - POSITION_OFFSET_Y, 
+                    x: x - POSITION_OFFSET_X, y: dragInputType === 'signature' ? y - SIGN_POSITION_OFFSET_Y : y - POSITION_OFFSET_Y, 
                     color: dragInputColor, 
                     placeholder: dragInputText, 
                     signerId: dragInputId, 
@@ -444,7 +444,9 @@ const AgreementCreator: React.FC = () => {
                 <Grid.Col span={3}>
                     <div className="flex items-center justify-center mb-2">
                         <Button
-                            onClick={saveTemplateHandlers.open}
+                            onClick={() => {
+                                saveTemplateHandlers.open();
+                            }}
                             className="contract-agreements-create-new flex h-14 items-center justify-center"
                             color="secondary"
                             style={{ width: '170px' }}
@@ -605,6 +607,7 @@ const AgreementCreator: React.FC = () => {
                                                                 color={element.color}
                                                                 x={element.x}
                                                                 y={element.y}
+                                                                type={element.type}
                                                             />
                                                         );
                                                     } else {
@@ -921,6 +924,7 @@ const AgreementCreator: React.FC = () => {
 
             {isDragging && (
                 <DraggableInput
+                    type={dragInputType}
                     pos={mousePosition}
                     color={dragInputColor}
                     placeholder={dragInputText}

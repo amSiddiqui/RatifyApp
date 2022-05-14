@@ -73,3 +73,11 @@ label {
     background-color: #fff;
     color: #000;
 }
+
+.pdf-form-input-date input::placeholder {
+    color: #909090;
+}
+
+.pdf-form-input-date input::-webkit-input-placeholder {
+    color: #909090;
+}
