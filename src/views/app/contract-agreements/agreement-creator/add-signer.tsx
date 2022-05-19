@@ -20,9 +20,9 @@ import { useDrag } from '@use-gesture/react';
 import { clamp } from 'lodash-es';
 import { useMediaQuery } from '@mantine/hooks';
 import { GoPlus } from 'react-icons/go';
-import { colors, getBgColorLight as getColor } from './types';
-import { getRandomStringID } from '../../../helpers/Utils';
-import { SingerElementStyleProps, SignerElementFormProps, SignerElement } from '../../../types/ContractTypes';
+import { colors, getBgColorLight as getColor } from '../types';
+import { getRandomStringID } from '../../../../helpers/Utils';
+import { SingerElementStyleProps, SignerElementFormProps, SignerElement } from '../../../../types/ContractTypes';
 
 interface SignerRowProps extends SingerElementStyleProps {
     onDragStart: () => void;

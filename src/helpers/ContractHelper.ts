@@ -237,4 +237,17 @@ export class ContractHelper extends ApiHelper {
         );
         return response.data;
     }
+
+    async sendAgreement(id: string): Promise<{status: string, signer_status: {[id: number]: string}}> {
+        let token = await this.getToken();
+        if (token === null) {
+            throw new NoTokenError('No token');
+        }
+        let response: AxiosResponse<{status: string, signer_status: {[id: number]: string}}> = await axios.post(
+            `contracts/${id}/send/`,
+            {},
+            { headers: { Authorization: `Bearer ${token}` } },
+        );
+        return response.data;
+    }
 }

@@ -1,8 +1,8 @@
 import React from 'react';
 import { Row } from 'reactstrap';
 import { useIntl } from 'react-intl';
-import { Colxx, Separator } from '../../../components/common/CustomBootstrap';
-import Breadcrumb from '../../../containers/navs/Breadcrumb';
+import { Colxx, Separator } from '../../../../components/common/CustomBootstrap';
+import Breadcrumb from '../../../../containers/navs/Breadcrumb';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
 
 import {
@@ -20,13 +20,14 @@ import {
     Tooltip,
     Textarea,
     Autocomplete,
+    Menu,
 } from '@mantine/core';
 import { DatePicker } from '@mantine/dates';
 import { Card, CardBody } from 'reactstrap';
 import { Document, Page } from 'react-pdf/dist/esm/entry.webpack5';
 import { useDispatch } from 'react-redux';
-import { AppDispatch } from '../../../redux';
-import { ContractHelper } from '../../../helpers/ContractHelper';
+import { AppDispatch } from '../../../../redux';
+import { ContractHelper } from '../../../../helpers/ContractHelper';
 import { toast } from 'react-toastify';
 import classNames from 'classnames';
 import { MdCalendarToday } from 'react-icons/md';
@@ -40,16 +41,20 @@ import { DateTime } from 'luxon';
 import { Button } from 'reactstrap';
 import { GoPlus } from 'react-icons/go';
 import AddSigner from './add-signer';
-import { SignerElement } from '../../../types/ContractTypes';
+import { SignerElement } from '../../../../types/ContractTypes';
 import { AiOutlineDrag } from 'react-icons/ai';
-import DraggableInput from './form-elements/DraggableInput';
-import { getBgColorLight, PositionType, POSITION_OFFSET_X, POSITION_OFFSET_Y, PdfFormInputType, INPUT_WIDTH, INPUT_HEIGHT, SIGN_POSITION_OFFSET_Y } from './types';
-import PdfFormInput from './form-elements/PdfFormInput';
-import { getRandomStringID } from '../../../helpers/Utils';
+import DraggableInput from '../form-elements/DraggableInput';
+import { getBgColorLight, PositionType, POSITION_OFFSET_X, POSITION_OFFSET_Y, PdfFormInputType, INPUT_WIDTH, INPUT_HEIGHT, SIGN_POSITION_OFFSET_Y } from '../types';
+import PdfFormInput from '../form-elements/PdfFormInput';
+import { getRandomStringID } from '../../../../helpers/Utils';
 import { useDebouncedValue, useDisclosure } from '@mantine/hooks';
+import PrepareSend from './prepare-send';
 
 // luxon today date
 const today = DateTime.local();
+const GRID_COLUMNS = 20;
+const GRID_SIDE = 3;
+const GRID_CENTER = 14;
 
 const getBounds = (div: HTMLDivElement | null) => {
     if (div === null) {
@@ -70,6 +75,7 @@ const AgreementCreator: React.FC = () => {
     const intl = useIntl();
     const [agreementName, setAgreementName] = React.useState('');
     const [dbAgreementName] = useDebouncedValue(agreementName, 1000);
+    
     const [numPages, setNumPages] = React.useState(null);
     const [pageNumber, setPageNumber] = React.useState(1);
     const { contractId } = useParams();
@@ -77,15 +83,17 @@ const AgreementCreator: React.FC = () => {
     const [pdfLoading, setPdfLoading] = React.useState(true);
     const [pdfThumbnails, setPdfThumbnails] = React.useState<{[id: string]: string;}>({});
     const [thumbnailsLoading, setThumbnailsLoading] = React.useState(true);
+    
     const [showEndDate, setShowEndDate] = React.useState(false);
     const [endDate, setEndDate] = React.useState<DateTime>(() => {
         const endDate = today.plus({ months: 6 });
         return endDate;
     });
+    const [signSequence, setSignSequence] = React.useState<boolean>(false);
+    
     const [templateDate, setTemplateDate] = React.useState<string>('6');
     const [signedBefore, setSignedBefore] = React.useState<Date | null>();
     const [showSignerModal, setShowSignerModal] = React.useState(false);
-    const [signSequence, setSignSequence] = React.useState<boolean>(false);
     const [{dragInputText, dragInputColor, dragInputId, dragInputType}, setDragInputProps] = React.useState({dragInputText: 'Full Name', dragInputColor: 'red', dragInputId: -1, dragInputType: 'name'},);
     const [signers, setSigners] = React.useState<SignerElement[]>([]);
 
@@ -109,6 +117,9 @@ const AgreementCreator: React.FC = () => {
     const [{templateCategory, templateName, templateDescription}, setTemplateProps] = React.useState({templateCategory: '', templateName: '', templateDescription: ''});
     const [templateSaved, setTemplateSaved] = React.useState(false);
     const [templateError, setTemplateError] = React.useState(false);
+
+    const [prepareSend, prepareSendHandler] = useDisclosure(false);
+    const [showAgreementErrors, setShowAgreementErrors] = React.useState(false);
 
     const dispatchFn = useDispatch<AppDispatch>();
     const contractHelper = React.useMemo(
@@ -137,6 +148,15 @@ const AgreementCreator: React.FC = () => {
     const onSetSignerSequence = React.useCallback((signSequence: boolean) => {
         setSignSequence(signSequence);
     }, []);
+
+    const onPrepareSend = React.useCallback(() => {
+        if (agreementName.length === 0) {
+            setShowAgreementErrors(true);
+            toast.error('Please enter agreement title');
+            return;
+        }
+        prepareSendHandler.open();
+    }, [agreementName, prepareSendHandler]);
 
     function onDocumentLoadSuccess({ numPages }: any) {
         setNumPages(numPages);
@@ -413,6 +433,7 @@ const AgreementCreator: React.FC = () => {
                     className="center-input"
                     style={{ minWidth: '300px', width: '40%' }}
                     size="xl"
+                    error={showAgreementErrors && agreementName.length === 0 }
                     onChange={(event: React.FormEvent<HTMLInputElement>) => {
                         setAgreementName(event.currentTarget.value);
                     }}
@@ -422,8 +443,8 @@ const AgreementCreator: React.FC = () => {
                     })}
                 />
             </Center>
-            <Grid columns={20}>
-                <Grid.Col span={3}>
+            <Grid columns={GRID_COLUMNS}>
+                <Grid.Col span={GRID_SIDE}>
                     <div className="flex items-center justify-center mb-2">
                         <Button
                             className="contract-agreements-create-new flex h-14 items-center justify-center"
@@ -440,8 +461,8 @@ const AgreementCreator: React.FC = () => {
                         </Button>
                     </div>
                 </Grid.Col>
-                <Grid.Col span={14}></Grid.Col>
-                <Grid.Col span={3}>
+                <Grid.Col span={GRID_CENTER}></Grid.Col>
+                <Grid.Col span={GRID_SIDE}>
                     <div className="flex items-center justify-center mb-2">
                         <Button
                             onClick={() => {
@@ -460,8 +481,8 @@ const AgreementCreator: React.FC = () => {
                 </Grid.Col>
             </Grid>
 
-            <Grid columns={20}>
-                <Grid.Col span={3}>
+            <Grid columns={GRID_COLUMNS}>
+                <Grid.Col span={GRID_SIDE}>
                     <Card style={{ height: '1080px' }}>
                         <CardBody className="p-0">
                             <h5 className="text-center py-4">
@@ -559,7 +580,7 @@ const AgreementCreator: React.FC = () => {
                         </CardBody>
                     </Card>
                 </Grid.Col>
-                <Grid.Col span={14}>
+                <Grid.Col span={GRID_CENTER}>
                     <Card style={{ height: '1080px' }}>
                         <CardBody>
                             <Center>
@@ -643,7 +664,7 @@ const AgreementCreator: React.FC = () => {
                         </CardBody>
                     </Card>
                 </Grid.Col>
-                <Grid.Col span={3}>
+                <Grid.Col span={GRID_SIDE}>
                     <Card style={{ height: '1080px' }}>
                         <CardBody className="p-0">
                             <h5 className="text-center py-4">
@@ -705,50 +726,23 @@ const AgreementCreator: React.FC = () => {
                                                         >
                                                             <span
                                                                 className={classNames(
-                                                                    'border-4',
-                                                                    {
-                                                                        'border-sky-500':
-                                                                            pageNumber ===
-                                                                            parseInt(
-                                                                                key,
-                                                                            ) +
-                                                                                1,
-                                                                    },
-                                                                    {
-                                                                        'border-gray-300':
-                                                                            pageNumber !==
-                                                                            parseInt(
-                                                                                key,
-                                                                            ) +
-                                                                                1,
-                                                                    },
+                                                                    'border-4',{ 'border-sky-500': pageNumber === parseInt( key, ) + 1,},
+                                                                    { 'border-gray-300': pageNumber !== parseInt( key, ) +1,},
                                                                     'cursor-pointer',
                                                                 )}
                                                             >
                                                                 <img
-                                                                    src={
-                                                                        'data:image/jpeg;base64,' +
-                                                                        pdfThumbnails[
-                                                                            key
-                                                                        ]
-                                                                    }
+                                                                    src={ 'data:image/jpeg;base64,' + pdfThumbnails[ key ] }
                                                                     style={{
                                                                         height: 100,
                                                                     }}
                                                                     alt="Page"
-                                                                    onClick={() => {
-                                                                        setPageNumber(
-                                                                            parseInt(
-                                                                                key,
-                                                                            ) +
-                                                                                1,
-                                                                        );
+                                                                    onClick={() => { setPageNumber( parseInt( key, ) + 1, );
                                                                     }}
                                                                 />
                                                             </span>
                                                             <p className="text-center text-sm">
-                                                                {parseInt(key) +
-                                                                    1}
+                                                                {parseInt(key) + 1}
                                                             </p>
                                                         </div>
                                                     );
@@ -804,24 +798,19 @@ const AgreementCreator: React.FC = () => {
                                             }}
                                             data={[
                                                 {
-                                                    value: '1',
-                                                    label: '1 month',
+                                                    value: '1', label: '1 month',
                                                 },
                                                 {
-                                                    value: '6',
-                                                    label: '6 months',
+                                                    value: '6', label: '6 months',
                                                 },
                                                 {
-                                                    value: '12',
-                                                    label: '1 year',
+                                                    value: '12', label: '1 year',
                                                 },
                                                 {
-                                                    value: '24',
-                                                    label: '2 years',
+                                                    value: '24', label: '2 years',
                                                 },
                                                 {
-                                                    value: '36',
-                                                    label: '3 years',
+                                                    value: '36', label: '3 years',
                                                 },
                                             ]}
                                         />
@@ -830,19 +819,13 @@ const AgreementCreator: React.FC = () => {
                                             onChange={(value) => {
                                                 if (value !== null) {
                                                     setTemplateDate('');
-                                                    setEndDate(
-                                                        DateTime.fromJSDate(
-                                                            value,
-                                                        ),
-                                                    );
+                                                    setEndDate( DateTime.fromJSDate( value, ), );
                                                 }
                                             }}
                                             value={endDate.toJSDate()}
                                             inputFormat="DD/MM/YYYY"
                                             defaultValue={endDate.toJSDate()}
-                                            excludeDate={(dt) =>
-                                                dt < today.toJSDate()
-                                            }
+                                            excludeDate={(dt) => dt < today.toJSDate() }
                                             icon={<MdCalendarToday />}
                                             style={{ width: 150 }}
                                             placeholder="Select Date"
@@ -855,9 +838,8 @@ const AgreementCreator: React.FC = () => {
                                     inputFormat='DD/MM/YYYY'
                                     label="Document must be signed by"
                                     value={signedBefore}
-                                    onChange={(value) => {
-                                        setSignedBefore(value);
-                                    }}
+                                    onChange={(value) => { setSignedBefore(value); }}
+                                    error={showAgreementErrors && !signedBefore ? 'Please select a date': ''}
                                     excludeDate={(dt) => dt < today.toJSDate()}
                                     icon={<MdCalendarToday />}
                                     style={{ width: 150 }}
@@ -868,6 +850,22 @@ const AgreementCreator: React.FC = () => {
                     </Card>
                 </Grid.Col>
             </Grid>
+            <Grid className='mt-2' columns={GRID_COLUMNS}>
+                <Grid.Col span={GRID_SIDE}></Grid.Col>
+                <Grid.Col span={GRID_CENTER}>
+                    <Group position='right'>
+                        <Menu position='top' control={<div><Button color='primary' className='h-12' style={{width: '170px'}}>Actions</Button></div>}>
+                            <Menu.Item onClick={() => {saveTemplateHandlers.open()}} icon={<GoPlus />}>Save as template</Menu.Item>
+                            <Menu.Item onClick={() => {toast.success('Draft Saved!')}} icon={<GoPlus />}>Save as draft</Menu.Item>
+                            <Divider />
+                            <Menu.Item color='red' icon={<i className='simple-icon-trash' />}>Delete Template</Menu.Item>
+                        </Menu>
+                        <span onClick={() => {onPrepareSend()}}><Button color='success' className='h-12' style={{width: '170px'}}>Prepare to send</Button></span>
+                    </Group>
+                </Grid.Col>
+                <Grid.Col span={GRID_SIDE}></Grid.Col>
+            </Grid>
+
             <Modal
                 size="90%"
                 centered
@@ -920,6 +918,18 @@ const AgreementCreator: React.FC = () => {
                     </span>
                     <p>Template Saved!</p>
                 </Stack>}
+            </Modal>
+
+            <Modal 
+            size='lg'
+            closeOnEscape={false}
+            closeOnClickOutside={false}
+            withCloseButton={false}
+            opened = {prepareSend} onClose = {prepareSendHandler.close} centered
+            >
+                <PrepareSend onCancel={() => {
+                    prepareSendHandler.close();
+                }} contractId={contractId} contractHelper={contractHelper} title={agreementName} sequence={signSequence} signBefore={!!signedBefore ? DateTime.fromJSDate(signedBefore) : null} endDate={showEndDate ? endDate : null} signers={signers} />
             </Modal>
 
             {isDragging && (
