@@ -47,6 +47,9 @@ export interface Signer {
     job_title: string;
     text_field: boolean;
     every: number;
+    approved: boolean;
+    declined: boolean;
+    last_seen: string | null;
     every_unit: string;
     deleted: boolean;
     agreement: number;
@@ -89,6 +92,7 @@ export interface InputField {
     placeholder: string;
     value: string;
     color: string;
+    completed: boolean;
     page: number;
     signer: number;
 }
@@ -97,4 +101,35 @@ export type GetAgreementResponse = {
     agreement: Agreement;
     signers: Signer[];
     input_fields: InputField[];
+}
+
+export type SignerAgreementData = {
+    status: 'success' | 'error',
+    valid: boolean, 
+    data: {
+        agreement: Agreement;
+        signer: Signer;
+        clientName: string;
+        clientLogo: string;
+    }
+}
+
+export type SignerPdfResponse = {
+    status: 'success' | 'error',
+    valid: boolean,
+    data: string;
+}
+
+export type SignerPdfThumbnails = {
+    status: 'success' | 'error',
+    valid: boolean,
+    data: {
+        [id: string]: string;
+    }
+}
+
+export type SignerInputElements = {
+    status: 'success' | 'error',
+    valid: boolean,
+    data: InputField[];
 }

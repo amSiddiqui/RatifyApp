@@ -8,6 +8,10 @@ import {
     ContractCreateResponseType,
     DocumentsResponseType,
     GetAgreementResponse,
+    SignerAgreementData,
+    SignerInputElements,
+    SignerPdfResponse,
+    SignerPdfThumbnails,
     SyncSignerResponse,
 } from '../types/ContractTypes';
 import { BaseResponse } from '../types/AuthTypes';
@@ -214,13 +218,19 @@ export class ContractHelper extends ApiHelper {
         return response.data;
     }
 
-    async saveAgreementTemplate(contractId: string, name: string, description: string, category: string):Promise<{id: number}> {
+    async saveAgreementTemplate(
+        contractId: string,
+        name: string,
+        description: string,
+        category: string,
+    ): Promise<{ id: number }> {
         let token = await this.getToken();
         if (token === null) {
             throw new NoTokenError('No token');
         }
-        let response: AxiosResponse<{id: number}> = await axios.post(
-            `/contracts/templates/`, {contract_id: contractId, name: name, description, category},
+        let response: AxiosResponse<{ id: number }> = await axios.post(
+            `/contracts/templates/`,
+            { contract_id: contractId, name: name, description, category },
             { headers: { Authorization: `Bearer ${token}` } },
         );
         return response.data;
@@ -238,15 +248,72 @@ export class ContractHelper extends ApiHelper {
         return response.data;
     }
 
-    async sendAgreement(id: string): Promise<{status: string, signer_status: {[id: number]: string}}> {
+    async sendAgreement(
+        id: string,
+    ): Promise<{ status: string; signer_status: { [id: number]: string } }> {
         let token = await this.getToken();
         if (token === null) {
             throw new NoTokenError('No token');
         }
-        let response: AxiosResponse<{status: string, signer_status: {[id: number]: string}}> = await axios.post(
+        let response: AxiosResponse<{
+            status: string;
+            signer_status: { [id: number]: string };
+        }> = await axios.post(
             `contracts/${id}/send/`,
             {},
             { headers: { Authorization: `Bearer ${token}` } },
+        );
+        return response.data;
+    }
+
+    async validateSignToken(token: string) {
+        let response: AxiosResponse<{
+            status: 'success' | 'error';
+            valid: boolean;
+            data: {
+                signerEmail: string;
+                signerId: number;
+                signerType: string;
+                agreementId: number;
+                senderEmail: string;
+                fieldsCount: number;
+            }
+        }> = await axios.get(`contracts/sign-token-validate/?token=${token}`);
+        return response.data;
+    }
+
+    async getSignerData(token: string) {
+        let response: AxiosResponse<SignerAgreementData> = await axios.get(
+            `contracts/signer/data/?token=${token}`,
+        );
+        return response.data;
+    }
+
+    async getSignerPdf(token: string) {
+        let response: AxiosResponse<SignerPdfResponse> = await axios.get(
+            `contracts/signer/pdf/?token=${token}`,
+        );
+        return response.data;
+    }
+
+    async getSignerPdfThumbnails(token: string) {
+        let response: AxiosResponse<SignerPdfThumbnails> = await axios.get(
+            `contracts/signer/pdf/thumbnails/?token=${token}`,
+        )
+        return response.data;
+    }
+
+    async getSignerInputElements(token: string) {
+        let response: AxiosResponse<SignerInputElements> = await axios.get(
+            `contracts/signer/inputs/?token=${token}`,
+        );
+        return response.data;
+    }
+
+    async updateSignerResponse(token: string, data:Array<{id: number, completed: boolean, value: string}>) {
+        let response: AxiosResponse<{status: string, valid: boolean}> = await axios.post(
+            `contracts/signer/sign/`,
+            {token, responses: data}
         );
         return response.data;
     }

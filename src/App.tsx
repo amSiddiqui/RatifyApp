@@ -76,6 +76,10 @@ const Administration = React.lazy(() =>
   import(/* webpackChunkName: "views-admin" */ './views/admin')
 );
 
+const AgreementSign = React.lazy(() =>
+  import(/* webpackChunkName: "views-agreement-sign" */ './views/app/contract-agreements/agreement-sign')
+);
+
 type ProtectedRouteProps = {
     isAuthenticated: boolean;
     authenticationPath: string;
@@ -147,7 +151,6 @@ function App() {
                                     <Route path='blank' element={<BlankPage />} />
                                     <Route path='billing' element={<Billing />}></Route>
                                     <Route path='administration' element={<Administration />}></Route>
-
                                 </Route>
                                 <Route path='error' element={<ViewError></ViewError>} />
                                 <Route path='unauthorized' element={<ViewUnauthorized></ViewUnauthorized>} />
@@ -156,6 +159,9 @@ function App() {
                                     <Route path='login' element={<Login />} />
                                     <Route path='register' element={<Register />} />
                                     <Route path='verify-email' element={<VerifyEmail />} />
+                                </Route>
+                                <Route path='agreements' element={<><Outlet /></>}>
+                                    <Route path='sign' element={<AgreementSign />} />
                                 </Route>
                                 <Route path="*" element={<Navigate to='/error' />} />
                             </Routes>

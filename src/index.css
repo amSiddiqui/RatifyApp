@@ -2,6 +2,12 @@
 @tailwind components;
 @tailwind utilities;
 
+@font-face {
+    font-family: Scriptin;
+    src: url('./assets/fonts/signature/SCRIPTIN.ttf');
+}
+
+
 .profile-picture-container {
     display: flex;
     width: 100%;
@@ -57,11 +63,11 @@ label {
 }
 
 .pdf-input-element::placeholder {
-    color: #909090;
+    @apply text-gray-600;
 }
 
 .pdf-input-element::-webkit-input-placeholder {
-    color: #909090;
+    @apply text-gray-600;
 }
 
 .pdf-input-element.pdf-input-element-filled {
@@ -75,9 +81,27 @@ label {
 }
 
 .pdf-form-input-date input::placeholder {
-    color: #909090;
+    @apply text-gray-600;
 }
 
 .pdf-form-input-date input::-webkit-input-placeholder {
-    color: #909090;
+    @apply text-gray-600;
+}
+
+.pdf-form-input-date .mantine-DatePicker-wrapper {
+    margin-top: -3px;
+}
+
+.pdf-form-input-date.pdf-form-input-date-filled .mantine-DatePicker-wrapper {
+    margin-top: -5px;
+}
+
+.signature-font-scriptin {
+    font-family: Scriptin;
+}
+
+.sigCanvas {
+    border: 1px solid #ccc;
+    border-radius: 2px;
+    background-color: #fff;
 }

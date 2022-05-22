@@ -20,7 +20,6 @@ import {
     Tooltip,
     Textarea,
     Autocomplete,
-    Menu,
 } from '@mantine/core';
 import { DatePicker } from '@mantine/dates';
 import { Card, CardBody } from 'reactstrap';
@@ -464,19 +463,7 @@ const AgreementCreator: React.FC = () => {
                 <Grid.Col span={GRID_CENTER}></Grid.Col>
                 <Grid.Col span={GRID_SIDE}>
                     <div className="flex items-center justify-center mb-2">
-                        <Button
-                            onClick={() => {
-                                saveTemplateHandlers.open();
-                            }}
-                            className="contract-agreements-create-new flex h-14 items-center justify-center"
-                            color="secondary"
-                            style={{ width: '170px' }}
-                        >
-                            <i className="mr-2">
-                                <GoPlus />
-                            </i>
-                            <span>Save As Template</span>
-                        </Button>
+                        
                     </div>
                 </Grid.Col>
             </Grid>
@@ -853,14 +840,22 @@ const AgreementCreator: React.FC = () => {
             <Grid className='mt-2' columns={GRID_COLUMNS}>
                 <Grid.Col span={GRID_SIDE}></Grid.Col>
                 <Grid.Col span={GRID_CENTER}>
-                    <Group position='right'>
-                        <Menu position='top' control={<div><Button color='primary' className='h-12' style={{width: '170px'}}>Actions</Button></div>}>
-                            <Menu.Item onClick={() => {saveTemplateHandlers.open()}} icon={<GoPlus />}>Save as template</Menu.Item>
-                            <Menu.Item onClick={() => {toast.success('Draft Saved!')}} icon={<GoPlus />}>Save as draft</Menu.Item>
-                            <Divider />
-                            <Menu.Item color='red' icon={<i className='simple-icon-trash' />}>Delete Template</Menu.Item>
-                        </Menu>
-                        <span onClick={() => {onPrepareSend()}}><Button color='success' className='h-12' style={{width: '170px'}}>Prepare to send</Button></span>
+                    <Group position='apart'>
+                        <span><Button color='danger' className='h-12' style={{width: '170px'}}>Delete</Button></span>
+                        <Group position='right'>
+                            <span onClick={() => {toast.success('Draft saved!')}}><Button color='secondary' className='h-12' style={{width: '170px'}}>Save as draft</Button></span>
+                            <span><Button
+                            onClick={() => {
+                                saveTemplateHandlers.open();
+                            }}
+                            className="contract-agreements-create-new flex h-12 items-center justify-center"
+                            color="secondary"
+                            style={{ width: '170px' }}
+                        >
+                            <span>Save as template</span>
+                        </Button></span>
+                            <span onClick={() => {onPrepareSend()}}><Button color='success' className='h-12' style={{width: '170px'}}>Prepare to send</Button></span>
+                        </Group>
                     </Group>
                 </Grid.Col>
                 <Grid.Col span={GRID_SIDE}></Grid.Col>
