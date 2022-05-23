@@ -120,6 +120,8 @@ const AgreementCreator: React.FC = () => {
     const [prepareSend, prepareSendHandler] = useDisclosure(false);
     const [showAgreementErrors, setShowAgreementErrors] = React.useState(false);
 
+    const [confirmDeleteModal, deleteModalHandlers] = useDisclosure(false);
+
     const dispatchFn = useDispatch<AppDispatch>();
     const contractHelper = React.useMemo(
         () => new ContractHelper(dispatchFn),
@@ -252,6 +254,7 @@ const AgreementCreator: React.FC = () => {
 
                 setInputElements(agreement_input_fields.map((i) => ({
                     id: i.id,
+                    required: i.required,
                     signerId: i.signer,
                     placeholder: i.placeholder,
                     color: i.color,
@@ -322,6 +325,7 @@ const AgreementCreator: React.FC = () => {
                     x: x - POSITION_OFFSET_X, y: dragInputType === 'signature' ? y - SIGN_POSITION_OFFSET_Y : y - POSITION_OFFSET_Y, 
                     color: dragInputColor, 
                     placeholder: dragInputText, 
+                    required: dragInputType !== 'text',
                     signerId: dragInputId, 
                     page: pageNumber, 
                     uid: getRandomStringID(),
@@ -551,6 +555,24 @@ const AgreementCreator: React.FC = () => {
                                                         <AiOutlineDrag />
                                                     </i>
                                                 </Group>
+                                                {signer.text_field && <Group
+                                                    onMouseDown={() => {
+                                                        setDragInputProps({
+                                                            dragInputColor: signer.color,
+                                                            dragInputId: signer.id,
+                                                            dragInputText: 'Text Field',
+                                                            dragInputType: 'text'
+                                                        });
+                                                        setIsDragging(true);
+                                                    }}
+                                                    position="apart"
+                                                    className="border-2 cursor-pointer border-slate-300 rounded-sm bg-white p-2 text-slate-400"
+                                                >
+                                                    <span>Text Field</span>
+                                                    <i>
+                                                        <AiOutlineDrag />
+                                                    </i>
+                                                </Group>}
                                             </Stack>
                                         </Tooltip>
                                     )
@@ -593,6 +615,9 @@ const AgreementCreator: React.FC = () => {
                                                     if (element.page === pageNumber) {
                                                         return (
                                                             <PdfFormInput
+                                                                inputElementId={element.id}
+                                                                required={element.required}
+                                                                contractHelper={contractHelper}
                                                                 bounds={getBounds(canvasRef.current)}
                                                                 offsetParent={canvasRef.current ? canvasRef.current : undefined}
                                                                 onReposition={(dx, dy) => {
@@ -841,7 +866,7 @@ const AgreementCreator: React.FC = () => {
                 <Grid.Col span={GRID_SIDE}></Grid.Col>
                 <Grid.Col span={GRID_CENTER}>
                     <Group position='apart'>
-                        <span><Button color='danger' className='h-12' style={{width: '170px'}}>Delete</Button></span>
+                        <span onClick={deleteModalHandlers.open}><Button color='danger' className='h-12' style={{width: '170px'}}>Delete</Button></span>
                         <Group position='right'>
                             <span onClick={() => {toast.success('Draft saved!')}}><Button color='secondary' className='h-12' style={{width: '170px'}}>Save as draft</Button></span>
                             <span><Button
@@ -925,6 +950,45 @@ const AgreementCreator: React.FC = () => {
                 <PrepareSend onCancel={() => {
                     prepareSendHandler.close();
                 }} contractId={contractId} contractHelper={contractHelper} title={agreementName} sequence={signSequence} signBefore={!!signedBefore ? DateTime.fromJSDate(signedBefore) : null} endDate={showEndDate ? endDate : null} signers={signers} />
+            </Modal>
+
+            <Modal
+                opened={confirmDeleteModal}
+                onClose={deleteModalHandlers.close}
+                centered
+                title='Confirm Delete'
+            >
+                <Center>
+                    <Stack>
+                        <span className="text-center text-5xl text-danger">
+                            <i className="simple-icon-exclamation"></i>
+                        </span>
+                        <div>
+                            <p className='text-lg'>Are you sure you want to delete this agreement?</p>
+                            <p className='text-muted'>Note this will not delete the template, and keep the uploaded document.</p>
+                        </div>
+                        <Group position='right' className='mt-3'>
+                            <span onClick={deleteModalHandlers.close}><Button color='light'>Cancel</Button></span>
+                            <span onClick={() => {
+                                if (contractId) {
+                                    contractHelper.deleteAgreement(contractId).then(() => {
+                                        deleteModalHandlers.close();
+                                        if (agreementName) {
+                                            toast.success(`${agreementName} deleted!`);
+                                        } else {
+                                            toast.success('Agreement deleted!');
+                                        }
+                                        navigate('/documents');
+                                    }).catch(err => {
+                                        toast.error('Cannot delete agreement!');
+                                        deleteModalHandlers.close();
+                                        console.log(err);
+                                    });
+                                }
+                            }}><Button color='danger'>Delete</Button></span>
+                        </Group>
+                    </Stack>
+                </Center>
             </Modal>
 
             {isDragging && (

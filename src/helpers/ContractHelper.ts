@@ -182,6 +182,18 @@ export class ContractHelper extends ApiHelper {
         return response.data;
     }
 
+    async updateInputFieldSettings(id: number, placeholder: string, required: boolean) {
+        let token = await this.getToken();
+        if (token === null) {
+            throw new NoTokenError('No token');
+        }
+        await axios.post<BaseResponse>(
+            `/contracts/inputs/update/`,
+            { id: id, placeholder: placeholder, required: required },
+            { headers: { Authorization: `Bearer ${token}` } },
+        );
+    }
+
     async getDrafts(): Promise<Agreement[]> {
         let token = await this.getToken();
         if (token === null) {
@@ -264,6 +276,16 @@ export class ContractHelper extends ApiHelper {
             { headers: { Authorization: `Bearer ${token}` } },
         );
         return response.data;
+    }
+
+    async deleteAgreement(id: string) {
+        let token = await this.getToken();
+        if (token === null) {
+            throw new NoTokenError('No token');
+        }
+        await axios.post(`/contracts/${id}/delete/`, {}, {
+            headers: { Authorization: `Bearer ${token}` },
+        });
     }
 
     async validateSignToken(token: string) {

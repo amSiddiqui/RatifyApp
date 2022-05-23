@@ -90,6 +90,7 @@ export interface InputField {
     x: number;
     y: number;
     placeholder: string;
+    required: boolean;
     value: string;
     color: string;
     completed: boolean;

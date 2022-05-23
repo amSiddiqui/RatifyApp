@@ -80,6 +80,10 @@ const AgreementSign = React.lazy(() =>
   import(/* webpackChunkName: "views-agreement-sign" */ './views/app/contract-agreements/agreement-sign')
 );
 
+const AgreementGreetings = React.lazy(() =>
+  import(/* webpackChunkName: "views-agreement-greetings" */ './views/app/contract-agreements/agreement-sign/agreement-greetings')
+)
+
 type ProtectedRouteProps = {
     isAuthenticated: boolean;
     authenticationPath: string;
@@ -162,6 +166,7 @@ function App() {
                                 </Route>
                                 <Route path='agreements' element={<><Outlet /></>}>
                                     <Route path='sign' element={<AgreementSign />} />
+                                    <Route path='greeting' element={<AgreementGreetings />} />
                                 </Route>
                                 <Route path="*" element={<Navigate to='/error' />} />
                             </Routes>

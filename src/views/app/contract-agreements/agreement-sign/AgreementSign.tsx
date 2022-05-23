@@ -25,7 +25,7 @@ const GRID_CENTER = GRID_TOTAL - GRID_SIDE * 2;
 
 const getCompleteButtonLabel = (type: string) => {
     if (type === 'signer' || type === 'viewer') {
-        return 'complete';
+        return 'submit';
     }
     return 'approve';
 }
@@ -39,7 +39,7 @@ const checkInputPageAllComplete = (pageNumber: number, inputFields: InputField[]
     return reduced.length === 0;
 }
 
-const AgreementSignNav: React.FC = () => {
+export const AgreementSignNav: React.FC = () => {
     return (
         <nav className="navbar">
             <div className="d-flex align-items-center navbar-left"></div>
@@ -65,6 +65,8 @@ const AgreementSign: React.FC = () => {
     const [tokenValid, setTokenValid] = React.useState(false);
     const [loading, setLoading] = React.useState(true);
     const [startingModal, startingModalHandlers] = useDisclosure(true);
+
+    const [confirmationModal, confirmationModalHandlers] = useDisclosure(false);
 
 
     const [token, setToken] = React.useState<string>('');
@@ -136,6 +138,14 @@ const AgreementSign: React.FC = () => {
             setPageNumber(numPages);
         }
     };
+
+    const onDocumentComplete = () => {
+        if (completedFields !== totalFields) {
+            // toast.error('Please complete all the fields before submitting');
+            return;
+        }
+        confirmationModalHandlers.open();
+    }
 
     React.useEffect(() => {
         const token = searchParams.get('token');
@@ -215,9 +225,11 @@ const AgreementSign: React.FC = () => {
     }, [token, tokenValid, contractHelper]);
 
     React.useEffect(() => {
-        setCompletedFields(() => {
-            return inputElements.filter(field => field.completed).length;
-        });
+        const completed = inputElements.filter(field => field.completed).length;
+        if (completed === inputElements.length && inputElements.length !== 0) {
+            toast.success('Please click on Complete button to proceed');
+        }
+        setCompletedFields(completed);
     }, [inputElements]);
 
     React.useEffect(() => {
@@ -269,9 +281,7 @@ const AgreementSign: React.FC = () => {
                         </Center>
                     </Grid.Col>
                     <Grid.Col span={GRID_SIDE}>
-                        <Center>
-                            <span><Button className='h-14 items-center justify-center capitalize' style={{width: '170px'}} color='success'>{basicInfo ? getCompleteButtonLabel(basicInfo.signerType) : ''}</Button></span>
-                        </Center>
+                        
                     </Grid.Col>
                 </Grid>
 
@@ -305,9 +315,7 @@ const AgreementSign: React.FC = () => {
                         </Group>
                     </Grid.Col>
                     <Grid.Col span={GRID_SIDE}>
-                        <Center>
-                            <span><Button color='danger' className='h-14' style={{width: '170px'}}>Decline</Button></span>
-                        </Center>
+                        
                     </Grid.Col>
                 </Grid>
 
@@ -510,6 +518,23 @@ const AgreementSign: React.FC = () => {
                     </Grid.Col>
                 </Grid>
 
+                <Grid columns={GRID_TOTAL}>
+                    <Grid.Col span={GRID_SIDE}>
+
+                    </Grid.Col>
+                    
+                    <Grid.Col span={GRID_CENTER}>
+                        <Group position='apart'>
+                            <span><Button color='danger' className='h-14' style={{width: '170px'}}>Decline</Button></span>
+                            <span onClick={onDocumentComplete}><Button className='h-14 items-center justify-center capitalize' style={{width: '170px'}} color='success'>{basicInfo ? getCompleteButtonLabel(basicInfo.signerType) : ''}</Button></span>
+                        </Group>
+                    </Grid.Col>
+                    <Grid.Col span={GRID_SIDE}>
+
+                    </Grid.Col>
+
+                </Grid>
+
             </div>
 
             <Modal
@@ -519,7 +544,7 @@ const AgreementSign: React.FC = () => {
                 closeOnEscape={false}
                 opened={startingModal}
                 onClose={startingModalHandlers.close}
-                size="lg">
+                size={'xl'}>
                 {loading && (
                     <Center className="h-36">
                         <Loader size={'lg'} />
@@ -555,7 +580,7 @@ const AgreementSign: React.FC = () => {
                     </Center>
                 )}
                 {!loading && tokenValid && !!basicInfo && (
-                    <Stack>
+                    <Stack> 
                         <p className="text-lg">Hi {basicInfo.signerEmail}</p>
                         <Divider />
                         <p>
@@ -568,7 +593,6 @@ const AgreementSign: React.FC = () => {
                         </p>
                         {basicInfo.signerType === 'signer' && (
                             <p>
-                                {' '}
                                 There are {basicInfo.fieldsCount} required
                                 fields in this document
                             </p>
@@ -581,6 +605,22 @@ const AgreementSign: React.FC = () => {
                         </Group>
                     </Stack>
                 )}
+            </Modal>
+
+            <Modal centered opened={confirmationModal} onClose={() => {
+                confirmationModalHandlers.close();
+            }}>
+                <Center>
+                    <div className='text-center'>
+                        <p className='text-lg'>Complete this form?</p>
+                        <p className='text-muted'>Complete this form. You can go back to make changes?</p>
+                    </div>
+                </Center>
+                
+                <Group position='right' className='mt-5'>
+                    <span><Button color='light'>Back</Button></span>
+                    <span><Button color='success'>Complete</Button></span>
+                </Group>
             </Modal>
         </>
     );

@@ -11,6 +11,7 @@ export type PdfFormInputType = {
     y: number;
     placeholder: string;
     color: string;
+    required: boolean;
     page: number;
     id: number;
     uid: string;

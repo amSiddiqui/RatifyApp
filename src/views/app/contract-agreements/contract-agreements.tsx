@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Badge, Row } from 'reactstrap';
 import { useIntl } from 'react-intl';
