@@ -9,6 +9,7 @@ import {
     DocumentsResponseType,
     GetAgreementResponse,
     SignerAgreementData,
+    SignerErrorTypes,
     SignerInputElements,
     SignerPdfResponse,
     SignerPdfThumbnails,
@@ -292,8 +293,11 @@ export class ContractHelper extends ApiHelper {
         let response: AxiosResponse<{
             status: 'success' | 'error';
             valid: boolean;
+            errorType: SignerErrorTypes;
             data: {
                 signerEmail: string;
+                signerName: string;
+                organizationName: string;
                 signerId: number;
                 signerType: string;
                 agreementId: number;

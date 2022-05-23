@@ -59,7 +59,13 @@ const SignatureInput:React.FC<Props> = ({placeholder, onSignComplete, initialVal
                 html2canvas(writtenSignRef.current).then(canvas => {
                     image = canvas.toDataURL();
                     setFinalImage(image);
+                    setSigned(true);
+                    setDrawing(false);
+                    setImageUploaded(false);
+                    onSignComplete(image);
+                    signModalHandlers.close();
                 });
+                return;
             }
         }
         if (drawing) {

@@ -134,3 +134,5 @@ export type SignerInputElements = {
     valid: boolean,
     data: InputField[];
 }
+
+export type SignerErrorTypes =  'DELETED' | 'EXPIRED' | 'SEQUENCE' | 'UNAUTHORIZED' | 'SERVER';

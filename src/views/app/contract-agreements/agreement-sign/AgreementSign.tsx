@@ -6,7 +6,7 @@ import { ContractHelper } from '../../../../helpers/ContractHelper';
 import { AppDispatch } from '../../../../redux';
 import { useDisclosure } from '@mantine/hooks';
 import { Button, Card, CardBody } from 'reactstrap';
-import { Agreement, InputField } from '../../../../types/ContractTypes';
+import { Agreement, InputField, SignerErrorTypes } from '../../../../types/ContractTypes';
 import { toast } from 'react-toastify';
 import { DateTime } from 'luxon';
 import {
@@ -39,6 +39,24 @@ const checkInputPageAllComplete = (pageNumber: number, inputFields: InputField[]
     return reduced.length === 0;
 }
 
+
+const errorTypeToText = (errorType: SignerErrorTypes) => {
+    switch (errorType) {
+        case 'DELETED':
+            return 'Looks like the document was removed by the sender.';
+        case 'EXPIRED':
+            return 'Looks like the document has expired.';
+        case 'SEQUENCE':
+            return 'Looks like the signer before you has not signed yet.';
+        case 'UNAUTHORIZED':
+            return 'Looks like you are not authorized to sign this document.';
+        case 'SERVER':
+            return 'Looks like something went wrong. Please try again later.';
+        default:
+            return 'Looks like something went wrong. Please try again later.';
+    }
+}
+
 export const AgreementSignNav: React.FC = () => {
     return (
         <nav className="navbar">
@@ -63,6 +81,7 @@ const AgreementSign: React.FC = () => {
     );
 
     const [tokenValid, setTokenValid] = React.useState(false);
+    const [tokenErrorType, setTokenErrorType] = React.useState<SignerErrorTypes | null>(null);
     const [loading, setLoading] = React.useState(true);
     const [startingModal, startingModalHandlers] = useDisclosure(true);
 
@@ -94,6 +113,8 @@ const AgreementSign: React.FC = () => {
         signerId: number;
         agreementId: number;
         senderEmail: string;
+        organizationName: string;
+        signerName: string;
         fieldsCount: number;
         signerType: string;
     }>();
@@ -140,10 +161,7 @@ const AgreementSign: React.FC = () => {
     };
 
     const onDocumentComplete = () => {
-        if (completedFields !== totalFields) {
-            // toast.error('Please complete all the fields before submitting');
-            return;
-        }
+        console.log({totalFields, completedFields});
         confirmationModalHandlers.open();
     }
 
@@ -162,13 +180,17 @@ const AgreementSign: React.FC = () => {
                     setBasicInfo(resp.data);
                 } else {
                     setTokenValid(false);
+                    setTokenErrorType(resp.errorType);
                 }
                 setLoading(false);
             })
             .catch((err) => {
-                console.log(err);
                 setLoading(false);
                 setTokenValid(false);
+                if (err.response && err.response.data) {
+                    setTokenErrorType(err.response.data.errorType ? err.response.data.errorType : 'SERVER');
+                }
+
             });
     }, [searchParams, navigate, contractHelper]);
 
@@ -230,6 +252,9 @@ const AgreementSign: React.FC = () => {
             toast.success('Please click on Complete button to proceed');
         }
         setCompletedFields(completed);
+
+        console.log({completed, length: inputElements.length, inputElements});
+
     }, [inputElements]);
 
     React.useEffect(() => {
@@ -559,8 +584,7 @@ const AgreementSign: React.FC = () => {
                                     style={{ fontSize: '3rem' }}
                                 />
                                 <p className="text-lg">
-                                    Looks like you are not authorized to view
-                                    this document.
+                                    {!!tokenErrorType && errorTypeToText(tokenErrorType)}
                                 </p>
                                 <p className="text-muted text-lg">
                                     Please contact the sender using the contact
@@ -573,7 +597,7 @@ const AgreementSign: React.FC = () => {
                                     onClick={() => {
                                         navigate('/');
                                     }}>
-                                    <Button color="primary">Home</Button>
+                                    <Button color="primary">Ok</Button>
                                 </span>
                             </Group>
                         </Stack>
