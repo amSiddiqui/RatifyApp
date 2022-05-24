@@ -56,7 +56,7 @@ const SignerInput:React.FC<Props> = ({x, y, type, placeholder, onFilled, initial
             </Group>}
         </div>
 
-        {type === 'name' && 
+        {(type === 'name' || type === 'text') && 
         <input
             placeholder={placeholder}
             type='text'

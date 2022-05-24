@@ -1,4 +1,5 @@
 // eslint-disable-next-line import/no-cycle
+import { DateTime } from 'luxon';
 import {
     defaultColor,
     themeColorStorageKey,
@@ -150,4 +151,31 @@ export const swap = (arr: any[], i: number, j: number) => {
 
 export const getRandomStringID = () => {
     return Math.random().toString(36).substring(2, 11) + Math.random().toString(36).substring(2, 11);
+}
+
+export const getLastSeenFromDate = (lastSeen: string) => {
+    const dt = DateTime.fromISO(lastSeen);
+    const today = DateTime.utc();
+    // check if diff is less than a minute
+    if (today.diff(dt, 'minutes').minutes < 1) {
+        return 'Few seconds ago';
+    }
+    // if diff is less than a day
+    if (today.diff(dt, 'days').days < 1) {
+        return dt.toFormat('HH:mm');
+    }
+
+    // if diff is less than a week
+    if (today.diff(dt, 'weeks').weeks < 1) {
+        // get diff in days
+        const diffInDays = today.diff(dt, 'days').days;
+        if (diffInDays === 1) {
+            return 'Yesterday';
+        }
+        if (diffInDays < 7) {
+            return `${diffInDays} days ago`;
+        }
+    }
+    // return date
+    return dt.toFormat('dd/MM/yyyy');
 }

@@ -18,6 +18,7 @@ import {
 import { Document, Page } from 'react-pdf/dist/esm/entry.webpack5';
 import classNames from 'classnames';
 import SignerInput from '../form-elements/SignerInput';
+import SignerComments from './SignerCommments';
 
 const GRID_TOTAL = 16;
 const GRID_SIDE = 3;
@@ -35,7 +36,7 @@ const getFormatDateFromIso = (isoDate: string) => {
 }
 
 const checkInputPageAllComplete = (pageNumber: number, inputFields: InputField[]) => {
-    const reduced = inputFields.filter(inputField => inputField.page === pageNumber && inputField.completed === false);
+    const reduced = inputFields.filter(inputField => inputField.page === pageNumber && inputField.completed === false && inputField.required);
     return reduced.length === 0;
 }
 
@@ -253,7 +254,6 @@ const AgreementSign: React.FC = () => {
         }
         setCompletedFields(completed);
 
-        console.log({completed, length: inputElements.length, inputElements});
 
     }, [inputElements]);
 
@@ -340,7 +340,9 @@ const AgreementSign: React.FC = () => {
                         </Group>
                     </Grid.Col>
                     <Grid.Col span={GRID_SIDE}>
-                        
+                        <Center>
+                            <span><Button className='agreement-button' color='primary'>Contact Sender</Button></span>
+                        </Center>
                     </Grid.Col>
                 </Grid>
 
@@ -477,7 +479,7 @@ const AgreementSign: React.FC = () => {
                                                                         setInputElements(prev => {
                                                                             const newElements = [...prev];
                                                                             const element = newElements[index];
-                                                                            if ((element.type === 'name' || element.type === 'signature') && typeof value === 'string') {
+                                                                            if ((element.type === 'name' || element.type === 'signature' || element.type === 'text') && typeof value === 'string') {
                                                                                 newElements[index].value = value;
                                                                                 newElements[index].completed = value.trim().length > 0;
                                                                             }
@@ -537,7 +539,11 @@ const AgreementSign: React.FC = () => {
                     <Grid.Col span={GRID_SIDE}>
                         <Card style={{height: '1080px'}}>
                             <CardBody className='p-0'>
-                                
+                                <h5 className='text-center py-4'>
+                                    Comments
+                                </h5>
+                                <Divider className='mb-4' />
+                                {!!basicInfo && <SignerComments token={token} signerId={basicInfo.signerId} contractHelper={contractHelper} />}
                             </CardBody>
                         </Card>
                     </Grid.Col>
@@ -550,8 +556,8 @@ const AgreementSign: React.FC = () => {
                     
                     <Grid.Col span={GRID_CENTER}>
                         <Group position='apart'>
-                            <span><Button color='danger' className='h-14' style={{width: '170px'}}>Decline</Button></span>
-                            <span onClick={onDocumentComplete}><Button className='h-14 items-center justify-center capitalize' style={{width: '170px'}} color='success'>{basicInfo ? getCompleteButtonLabel(basicInfo.signerType) : ''}</Button></span>
+                            <span><Button color='danger' className='agreement-button' >Decline</Button></span>
+                            <span onClick={onDocumentComplete}><Button className='items-center justify-center capitalize agreement-button' color='success'>{basicInfo ? getCompleteButtonLabel(basicInfo.signerType) : ''}</Button></span>
                         </Group>
                     </Grid.Col>
                     <Grid.Col span={GRID_SIDE}>

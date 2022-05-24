@@ -136,3 +136,15 @@ export type SignerInputElements = {
 }
 
 export type SignerErrorTypes =  'DELETED' | 'EXPIRED' | 'SEQUENCE' | 'UNAUTHORIZED' | 'SERVER';
+
+export type SignerComment = {
+    id: number;
+    comment: string;
+    signer: string;
+    signerId: number | null;
+    userId: number | null;
+    user: string;
+    agreement: number;
+    created_at: string;
+    updated_at: string;
+}

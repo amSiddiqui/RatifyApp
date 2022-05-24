@@ -105,3 +105,8 @@ label {
     border-radius: 2px;
     background-color: #fff;
 }
+
+.agreement-button {
+    width: 170px;
+    @apply h-12;
+}

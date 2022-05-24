@@ -9,6 +9,7 @@ import {
     DocumentsResponseType,
     GetAgreementResponse,
     SignerAgreementData,
+    SignerComment,
     SignerErrorTypes,
     SignerInputElements,
     SignerPdfResponse,
@@ -343,4 +344,35 @@ export class ContractHelper extends ApiHelper {
         );
         return response.data;
     }
-}
+
+    async getSignerComments(token: string) {
+        let response: AxiosResponse<{ status: 'success' | 'error', valid: boolean, data: SignerComment[] }> = await axios.get(
+            `contracts/signer/comment/?token=${token}`
+        );
+        return response.data;
+    }
+
+    async createSignerComment(token: string, comment: string) {
+        let response: AxiosResponse<{ status: 'success' | 'error', valid: boolean, data: SignerComment }> = await axios.post(
+            `contracts/signer/comment/?token=${token}`,
+            { comment },
+        );
+        return response.data;
+    }
+
+    async updateSignerComment(token:string, id: number, comment: string) {
+        let response: AxiosResponse< { status: 'success' | 'error', valid: boolean, data: SignerComment } > = await axios.put(
+            `contracts/signer/comment/${id}/?token=${token}`,
+            { comment },
+        );
+        return response.data;
+    }
+
+    async deleteSignerComment(token: string, id: number) {
+        let response: AxiosResponse< { status: 'success' | 'error', valid: boolean } > = await axios.post(
+            `contracts/signer/comment/${id}/delete/?token=${token}`,
+            {},
+        );
+        return response.data;
+    }
+} 

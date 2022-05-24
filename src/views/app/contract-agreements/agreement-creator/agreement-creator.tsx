@@ -450,12 +450,11 @@ const AgreementCreator: React.FC = () => {
                 <Grid.Col span={GRID_SIDE}>
                     <div className="flex items-center justify-center mb-2">
                         <Button
-                            className="contract-agreements-create-new flex h-14 items-center justify-center"
+                            className="contract-agreements-create-new flex agreement-button items-center justify-center"
                             color="primary"
                             onClick={() => {
                                 setShowSignerModal(true);
                             }}
-                            style={{ width: '170px' }}
                         >
                             <i className="mr-2">
                                 <GoPlus />
@@ -866,20 +865,19 @@ const AgreementCreator: React.FC = () => {
                 <Grid.Col span={GRID_SIDE}></Grid.Col>
                 <Grid.Col span={GRID_CENTER}>
                     <Group position='apart'>
-                        <span onClick={deleteModalHandlers.open}><Button color='danger' className='h-12' style={{width: '170px'}}>Delete</Button></span>
+                        <span onClick={deleteModalHandlers.open}><Button color='danger' className='agreement-button' >Delete</Button></span>
                         <Group position='right'>
-                            <span onClick={() => {toast.success('Draft saved!')}}><Button color='secondary' className='h-12' style={{width: '170px'}}>Save as draft</Button></span>
+                            <span onClick={() => {toast.success('Draft saved!')}}><Button color='secondary' className='agreement-button' >Save as draft</Button></span>
                             <span><Button
                             onClick={() => {
                                 saveTemplateHandlers.open();
                             }}
-                            className="contract-agreements-create-new flex h-12 items-center justify-center"
+                            className="contract-agreements-create-new flex agreement-button items-center justify-center"
                             color="secondary"
-                            style={{ width: '170px' }}
                         >
                             <span>Save as template</span>
                         </Button></span>
-                            <span onClick={() => {onPrepareSend()}}><Button color='success' className='h-12' style={{width: '170px'}}>Prepare to send</Button></span>
+                            <span onClick={() => {onPrepareSend()}}><Button color='success' className='agreement-button' >Prepare to send</Button></span>
                         </Group>
                     </Group>
                 </Grid.Col>
