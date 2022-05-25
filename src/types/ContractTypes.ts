@@ -17,7 +17,7 @@ export interface Agreement {
     signed_before: string | null;
     sequence: boolean;
     draft: boolean;
-    send: boolean;
+    sent: boolean;
     user: number;
     organization: number;
     documents: number[],

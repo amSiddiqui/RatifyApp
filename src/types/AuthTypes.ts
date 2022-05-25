@@ -8,6 +8,23 @@ export type UserType = {
     role: number;
 };
 
+export type Organization = {
+    id: number;
+    name: string;
+    description: string;
+    address: string;
+    city: string;
+    state: string;
+    zipcode: string;
+    country: string;
+    phone: string;
+    email: string;
+    website: string;
+    created_at: string;
+    updated_at: string;
+    clientLogo: string | null;
+}
+
 export type AuthInitialStateType = {
     isAuthenticated: boolean;
     user: UserType | null;

@@ -345,34 +345,72 @@ export class ContractHelper extends ApiHelper {
         return response.data;
     }
 
-    async getSignerComments(token: string) {
-        let response: AxiosResponse<{ status: 'success' | 'error', valid: boolean, data: SignerComment[] }> = await axios.get(
-            `contracts/signer/comment/?token=${token}`
-        );
+    async getSignerComments(token: string, type: 'signer' | 'sender') {
+        let response: AxiosResponse<{ status: 'success' | 'error', valid: boolean, data: SignerComment[] }>;
+        if (type === 'signer') {
+            response = await axios.get(
+                `contracts/signer/comment/?token=${token}`
+            );
+        } else {
+            let jwtToken = await this.getToken();
+            if (jwtToken === null) {
+                throw new NoTokenError('No token');
+            }
+            response = await axios.get(
+                `contracts/${token}/comment/`,
+                { headers: { Authorization: `Bearer ${jwtToken}` } }
+            );
+        }
         return response.data;
     }
 
-    async createSignerComment(token: string, comment: string) {
-        let response: AxiosResponse<{ status: 'success' | 'error', valid: boolean, data: SignerComment }> = await axios.post(
-            `contracts/signer/comment/?token=${token}`,
-            { comment },
-        );
+    async createSignerComment(token: string, comment: string, type: 'signer' | 'sender') {
+        let response: AxiosResponse<{ status: 'success' | 'error', valid: boolean, data: SignerComment }>;
+        if (type === 'signer') {
+            response = await axios.post(
+                `contracts/signer/comment/?token=${token}`,
+                { comment },
+            );
+        } else {
+            response = await axios.post(
+                `contracts/${token}/comment/`,
+                { comment },
+                { headers: { Authorization: `Bearer ${await this.getToken()}` } },
+            );
+        }
         return response.data;
     }
 
-    async updateSignerComment(token:string, id: number, comment: string) {
-        let response: AxiosResponse< { status: 'success' | 'error', valid: boolean, data: SignerComment } > = await axios.put(
-            `contracts/signer/comment/${id}/?token=${token}`,
-            { comment },
-        );
+    async updateSignerComment(token:string, id: number, comment: string, type: 'signer' | 'sender') {
+        let response: AxiosResponse< { status: 'success' | 'error', valid: boolean, data: SignerComment } >;
+        if (type === 'signer') {
+            response = await axios.put(
+                `contracts/signer/comment/${id}/?token=${token}`,
+                { comment },
+            );
+        } else {
+            response = await axios.put(
+                `contracts/${token}/comment/${id}/`,
+                { comment },
+                { headers: { Authorization: `Bearer ${await this.getToken()}` } },
+            );
+        }
         return response.data;
     }
 
-    async deleteSignerComment(token: string, id: number) {
-        let response: AxiosResponse< { status: 'success' | 'error', valid: boolean } > = await axios.post(
-            `contracts/signer/comment/${id}/delete/?token=${token}`,
-            {},
-        );
+    async deleteSignerComment(token: string, id: number, type: 'signer' | 'sender') {
+        let response: AxiosResponse< { status: 'success' | 'error', valid: boolean } >;
+        if (type === 'signer') {
+            response = await axios.post(
+                `contracts/signer/comment/${id}/delete/?token=${token}`,
+                {},
+            );
+        } else {
+            response = await axios.delete(
+                `contracts/${token}/comment/${id}/`,
+                { headers: { Authorization: `Bearer ${await this.getToken()}` } },
+            );
+        }
         return response.data;
     }
 } 

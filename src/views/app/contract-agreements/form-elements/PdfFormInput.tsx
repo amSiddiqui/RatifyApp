@@ -31,7 +31,6 @@ interface Props {
 const PdfFormInput: React.FC<Props> = ({ x: initX, y: initY, color, onDelete, placeholder, onReposition, offsetParent, bounds, type, contractHelper, required, inputElementId }) => {
     const [[x, y], setPosition] = React.useState([initX, initY]);
     const [ph, setPh] = React.useState(placeholder);
-    const [initialHide, setInitialHide] = React.useState(true);
     const [req, setReq] = React.useState(required);
     const [value, setValue] = React.useState<string>('');
     const [showSettings, setShowSettings] = React.useState(false);
@@ -55,14 +54,6 @@ const PdfFormInput: React.FC<Props> = ({ x: initX, y: initY, color, onDelete, pl
             left: x,
         }));
     }, [x, y]);
-
-    React.useEffect(() => {
-        const timeout = setTimeout(() => {
-            setInitialHide(false);
-        }, 700);
-        return () => clearTimeout(timeout);
-    }, []);
-
 
     const PdfInput = <input
             placeholder={ph}
@@ -121,7 +112,7 @@ const PdfFormInput: React.FC<Props> = ({ x: initX, y: initY, color, onDelete, pl
                 <div
                     ref={nodeRef}
                     style={inputStyles}
-                    className={classNames('flex-col pdf-form-input', {'flex': !initialHide, 'hidden': initialHide})}
+                    className={classNames('flex-col pdf-form-input flex')}
                 >
                     <div className='flex items-center justify-between' style={{height: INPUT_TOP_OFFSET + 'px', fontSize: '1rem'}}>
                         <i id={uuid} className='flex text-black text-xl justify-center items-center cursor-pointer'><AiOutlineDrag /></i>

@@ -19,6 +19,7 @@ import { Document, Page } from 'react-pdf/dist/esm/entry.webpack5';
 import classNames from 'classnames';
 import SignerInput from '../form-elements/SignerInput';
 import SignerComments from './SignerCommments';
+import { getFormatDateFromIso } from '../../../../helpers/Utils';
 
 const GRID_TOTAL = 16;
 const GRID_SIDE = 3;
@@ -31,9 +32,6 @@ const getCompleteButtonLabel = (type: string) => {
     return 'approve';
 }
 
-const getFormatDateFromIso = (isoDate: string) => {
-    return DateTime.fromISO(isoDate).toLocaleString(DateTime.DATE_FULL);
-}
 
 const checkInputPageAllComplete = (pageNumber: number, inputFields: InputField[]) => {
     const reduced = inputFields.filter(inputField => inputField.page === pageNumber && inputField.completed === false && inputField.required);
@@ -298,17 +296,6 @@ const AgreementSign: React.FC = () => {
                     <Grid.Col span={GRID_SIDE}></Grid.Col>
                 </Grid>
 
-                <Grid style={{marginTop: '-65px'}} columns={GRID_TOTAL}>
-                    <Grid.Col span={GRID_SIDE}></Grid.Col>
-                    <Grid.Col span={GRID_CENTER}>
-                        <Center className='h-full'>
-                            
-                        </Center>
-                    </Grid.Col>
-                    <Grid.Col span={GRID_SIDE}>
-                        
-                    </Grid.Col>
-                </Grid>
 
                 <Grid columns={GRID_TOTAL}>
                     <Grid.Col span={GRID_SIDE}></Grid.Col>
@@ -386,8 +373,8 @@ const AgreementSign: React.FC = () => {
                                 <Center>
                                 {thumbnailsLoading && (
                                     <Stack>
-                                        <Skeleton height={150} width={120} />
-                                        <Skeleton height={10} width={120} />
+                                        <Skeleton style={{zIndex: 1}} height={150} width={120} />
+                                        <Skeleton style={{zIndex: 1}} height={10} width={120} />
                                     </Stack>
                                 )}
                                 {!thumbnailsLoading && (
@@ -543,7 +530,7 @@ const AgreementSign: React.FC = () => {
                                     Comments
                                 </h5>
                                 <Divider className='mb-4' />
-                                {!!basicInfo && <SignerComments token={token} signerId={basicInfo.signerId} contractHelper={contractHelper} />}
+                                {!!basicInfo && <SignerComments type='signer' token={token} signerId={basicInfo.signerId} contractHelper={contractHelper} />}
                             </CardBody>
                         </Card>
                     </Grid.Col>

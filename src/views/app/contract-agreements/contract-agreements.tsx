@@ -81,7 +81,7 @@ const ContractAgreements: React.FC = () => {
             contractHelper.createAgreement(selectedTemplate.documents[0], selectedTemplate.name).then((data) => {
                 toast.success('Agreement created!');
                 templateConfirmHandlers.close();
-                navigate(`/documents/add-signers/${data.id}`);
+                navigate(`/agreements/add-signers/${data.id}`);
             }).catch(err => {
                 toast.error('Failed to create agreement. Try again Later!');
                 console.log(err);
@@ -163,9 +163,9 @@ const ContractAgreements: React.FC = () => {
                     name: d.title,
                 }))} intl={intl} onClick={(id, blank) => {
                     if (blank) {
-                        window.open(`/documents/add-signers/${id}`, '_blank');
+                        window.open(`/agreements/add-signers/${id}`, '_blank');
                     } else {
-                        navigate(`/documents/add-signers/${id}`);
+                        navigate(`/agreements/add-signers/${id}`);
                     }
                 }} />
             </Collapse>
@@ -262,7 +262,7 @@ const ContractAgreements: React.FC = () => {
                                 <Button
                                     onClick={() => {
                                         navigate(
-                                            `/documents/add-signers/${newContractId}`,
+                                            `/agreements/add-signers/${newContractId}`,
                                         );
                                     }}
                                     disabled={uploading}

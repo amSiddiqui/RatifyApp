@@ -155,27 +155,16 @@ export const getRandomStringID = () => {
 
 export const getLastSeenFromDate = (lastSeen: string) => {
     const dt = DateTime.fromISO(lastSeen);
-    const today = DateTime.utc();
-    // check if diff is less than a minute
-    if (today.diff(dt, 'minutes').minutes < 1) {
-        return 'Few seconds ago';
-    }
-    // if diff is less than a day
+    // check if dt is less than a day
+    const today = DateTime.local();
+    // check iff today is less than a day
     if (today.diff(dt, 'days').days < 1) {
         return dt.toFormat('HH:mm');
     }
 
-    // if diff is less than a week
-    if (today.diff(dt, 'weeks').weeks < 1) {
-        // get diff in days
-        const diffInDays = today.diff(dt, 'days').days;
-        if (diffInDays === 1) {
-            return 'Yesterday';
-        }
-        if (diffInDays < 7) {
-            return `${diffInDays} days ago`;
-        }
-    }
-    // return date
     return dt.toFormat('dd/MM/yyyy');
+}
+
+export const getFormatDateFromIso = (isoDate: string) => {
+    return DateTime.fromISO(isoDate).toLocaleString(DateTime.DATE_FULL);
 }

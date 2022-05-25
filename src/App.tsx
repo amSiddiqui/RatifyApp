@@ -82,7 +82,11 @@ const AgreementSign = React.lazy(() =>
 
 const AgreementGreetings = React.lazy(() =>
   import(/* webpackChunkName: "views-agreement-greetings" */ './views/app/contract-agreements/agreement-sign/agreement-greetings')
-)
+);
+
+const SenderAgreement = React.lazy(() =>
+  import(/* webpackChunkName: "views-sender-agreement" */ './views/app/contract-agreements/sender-view/sender-agreement')
+);
 
 type ProtectedRouteProps = {
     isAuthenticated: boolean;
@@ -141,9 +145,10 @@ function App() {
                             <Routes>
                                 <Route path='/' element={<ProtectedRoute {...defaultProtectedRouteProps} outlet={<ViewApp />} />}>
                                     <Route index element={<DashboardAnalytics />} />
-                                    <Route path='documents' element={<><Outlet /></>}>
+                                    <Route path='agreements' element={<><Outlet /></>}>
                                         <Route index element={<ContractsAgreements></ContractsAgreements>} />
                                         <Route path='add-signers/:contractId' element={<AgreementCreator />} />
+                                        <Route path=':contractId' element={ <SenderAgreement /> } />
                                     </Route>
                                     <Route path='reports' element={<Reports></Reports>}></Route>
                                     <Route path='account' element={<><Outlet /></>}>

@@ -225,6 +225,10 @@ const AgreementCreator: React.FC = () => {
         if (contractId) {
             contractHelper.getAgreement(contractId).then((data) => {
                 const agreement = data.agreement;
+                if (agreement.sent) {
+                    navigate('/agreements/'+contractId);
+                    return;
+                }
                 const agreement_signers = data.signers;
                 const agreement_input_fields = data.input_fields;
                 setAgreementName(agreement.title);
@@ -293,16 +297,16 @@ const AgreementCreator: React.FC = () => {
             }).catch(err => {
                 console.log(err);
                 if (err.response && err.response.status === 404) {
-                    navigate(`/documents/?error=404`);
+                    navigate(`/agreements/?error=404`);
                 } else {
-                    navigate(`/documents/?error=500`);
+                    navigate(`/agreements/?error=500`);
                 }
             });
 
         } else {
             toast.error('Cannot Find Document. Redirecting to Contract List');
             setTimeout(() => {
-                navigate('/documents');
+                navigate('/agreements');
             }, 4000);
         }
     }, [contractHelper, contractId, navigate]);
@@ -714,8 +718,8 @@ const AgreementCreator: React.FC = () => {
                             <Center>
                                 {thumbnailsLoading && (
                                     <Stack>
-                                        <Skeleton height={150} width={120} />
-                                        <Skeleton height={10} width={120} />
+                                        <Skeleton style={{zIndex: 1}} height={150} width={120} />
+                                        <Skeleton style={{zIndex: 1}} height={10} width={120} />
                                     </Stack>
                                 )}
                                 {!thumbnailsLoading && (
@@ -976,7 +980,7 @@ const AgreementCreator: React.FC = () => {
                                         } else {
                                             toast.success('Agreement deleted!');
                                         }
-                                        navigate('/documents');
+                                        navigate('/agreements');
                                     }).catch(err => {
                                         toast.error('Cannot delete agreement!');
                                         deleteModalHandlers.close();

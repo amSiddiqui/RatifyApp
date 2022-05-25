@@ -8,10 +8,10 @@ const data = [
         to: `/`,
     },
     {
-        id: 'documents',
+        id: 'agreements',
         icon: 'iconsminds-box-with-folders',
         label: 'menu.agreements',
-        to: `/documents`,
+        to: `/agreements`,
     },
     {
         id: 'reports',
