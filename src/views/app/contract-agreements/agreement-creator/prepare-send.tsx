@@ -1,6 +1,7 @@
 import { Group, List, Stack, Tooltip } from '@mantine/core';
 import { DateTime } from 'luxon';
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { Card, CardBody, Button } from 'reactstrap';
 import { ContractHelper } from '../../../../helpers/ContractHelper';
@@ -39,6 +40,8 @@ const PrepareSend: React.FC<Props> = ({
     const [sendStatus, setSendStatus] = React.useState<'' | 'sending' | 'sent'>(
         '',
     );
+    
+    const navigate = useNavigate();
 
     const onSend = () => {
         if (contractHelper && contractId) {
@@ -167,7 +170,9 @@ const PrepareSend: React.FC<Props> = ({
                         </span>
                     )}
                     {sendStatus === 'sent' && (
-                        <span>
+                        <span onClick={() => {
+                            navigate(`/agreements/${contractId}`);
+                        }}>
                             <Button color='primary'>Continue</Button>
                         </span>
                     )}
