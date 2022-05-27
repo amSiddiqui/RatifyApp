@@ -1,4 +1,4 @@
-import { Center, Checkbox, Grid, Loader, Stack, Table } from '@mantine/core';
+import { Center, Checkbox, Grid, Loader, Stack, Table, Badge } from '@mantine/core';
 import React from 'react';
 import { MdOpenInNew } from 'react-icons/md';
 import { useDispatch } from 'react-redux';
@@ -13,16 +13,37 @@ import Breadcrumb from '../../../../containers/navs/Breadcrumb';
 import { ContractHelper } from '../../../../helpers/ContractHelper';
 import { getFormatDateFromIso } from '../../../../helpers/Utils';
 import { AppDispatch } from '../../../../redux';
-import { Agreement } from '../../../../types/ContractTypes';
+import { AgreementRowData } from '../../../../types/ContractTypes';
+
+const getBadgeColorFromStatus = (status: string) => {
+    switch(status) {
+        case 'in progress':
+            return 'blue';
+        case 'error':
+            return 'red';
+        case 'completed':
+            return 'green';
+        default:
+            return 'gray';
+    }
+}
+
+const columns = ['Agreement ID',
+'Agreement title',
+'Sent on',
+'Sent to',
+'Sender',
+'Status']
 
 const AgreementDashboard: React.FC = () => {
 
     const match = useLocation();
     const navigate = useNavigate();
 
-    const [agreements, setAgreements] = React.useState<Agreement[]>([]);
+    const [agreements, setAgreements] = React.useState<AgreementRowData[]>([]);
     const [loading, setLoading] = React.useState(true);
     const [error, setError] = React.useState(false);
+    const [showColumns, setShowColumns] = React.useState<boolean[]>(new Array(columns.length).fill(true));
     
     const dispatchFn = useDispatch<AppDispatch>();
     const contractHelper = React.useMemo(
@@ -58,8 +79,8 @@ const AgreementDashboard: React.FC = () => {
             <Grid columns={12}>
                 <Grid.Col span={2}>
                     <Center className='h-full m-3'>
-                        <span>
-                            <Button className='w-32' color="primary">
+                        <span onClick={() => navigate(`agreements`)}>
+                            <Button className='w-32 agreement-button' color="primary">
                                 Create New
                             </Button>
                         </span>
@@ -109,13 +130,15 @@ const AgreementDashboard: React.FC = () => {
                 <Grid.Col span={2}>
                     <Card className=''>
                         <CardBody>
+                            <h5 className='mb-4'>Select Columns</h5>
                             <Stack spacing={'lg'}>
-                                <Checkbox label='Agreement ID' />
-                                <Checkbox label='Agreement title' />
-                                <Checkbox label='Sent on' />
-                                <Checkbox label='Sent to' />
-                                <Checkbox label='Sender' />
-                                <Checkbox label='Status' />
+                                {columns.map((column, index) => (
+                                    <Checkbox checked={showColumns[index]} onChange={(ckd) => {
+                                        const newShowColumns = [...showColumns];
+                                        newShowColumns[index] = ckd.currentTarget.checked;
+                                        setShowColumns(newShowColumns);
+                                    }} key={index} label={column} />
+                                ))}
                             </Stack>
                         </CardBody>
                     </Card>
@@ -127,38 +150,50 @@ const AgreementDashboard: React.FC = () => {
                     {!loading && error && <p className='text-2xl text-muted'>
                         Cannot fetch data right now. Please try again later.    
                     </p>}
-                    {!loading && !error && <div>
+                    {!loading && !error && agreements.length === 0 && <p className='text-2xl text-muted'>
+                        No agreements found. Please click on create new button to create a new agreement.
+                    </p>}
+                    {!loading && !error && agreements.length > 0 && <div>
 
                         <Card>
                             <CardBody>
+                                <h5 className='mb-4'>Contracts & Agreements</h5>
                                 <Table verticalSpacing={'lg'}>
                                     <thead>
                                         <tr>
-                                            <th>ID</th>
-                                            <th>Title</th>
-                                            <th>Sent On</th>
-                                            <th>Signer / Approver</th>
-                                            <th>Sender</th>
-                                            <th>Status</th>
-                                            <th></th>
+                                            {showColumns[0] && <th>ID</th>}
+                                            {showColumns[1] && <th>Title</th>}
+                                            {showColumns[2] && <th>Sent On</th>}
+                                            {showColumns[3] && <th>Signer / Approver</th>}
+                                            {showColumns[4] && <th>Sender</th>}
+                                            {showColumns[5] && <th>Status</th>}
+                                            {showColumns[5] && <th></th>}
                                         </tr>
                                     </thead>
                                     <tbody>
                                         {agreements.map(agreement => (
                                             <tr key={agreement.id}>
-                                                <th scope='row'>{agreement.id}</th>
-                                                <td>
+                                                {showColumns[0] && <th scope='row'>{agreement.id}</th>}
+                                                {showColumns[1] && <td>
                                                     <Link to={agreement.sent ? `/agreements/${agreement.id}` : `/agreements/add-signers/${agreement.id}`}>
                                                         {agreement.title}    
                                                     </Link>
-                                                </td>
-                                                <td>{getFormatDateFromIso(agreement.sent_on)}</td>
-                                                <td>Signer</td>
-                                                <td>Sender</td>
-                                                <td>{agreement.sent ? 'Sent' : 'Draft'}</td>
-                                                <td>
+                                                </td>}
+                                                {showColumns[2] && <td>{getFormatDateFromIso(agreement.sent_on)}</td>}
+                                                {showColumns[3] && <td className='w-44'>
+                                                    <p className='w-full'>{agreement.signers.join(', ')}</p>
+                                                </td>}
+                                                {showColumns[4] && <td>{agreement.user_name}</td>}
+                                                {showColumns[5] && <td>
+                                                    <Badge color={
+                                                        getBadgeColorFromStatus(agreement.status)
+                                                    }>
+                                                        {agreement.status}
+                                                    </Badge>
+                                                </td>}
+                                                {showColumns[5] && <td>
                                                     <MdOpenInNew className='text-lg cursor-pointer' onClick={() => navigate(agreement.sent ? `/agreements/${agreement.id}` : `/agreements/add-signers/${agreement.id}`)} />
-                                                </td>
+                                                </td>}
                                             </tr>
                                         ))}
                                     </tbody>

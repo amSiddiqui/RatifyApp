@@ -4,6 +4,7 @@ import { NoTokenError } from '../types/ErrorTypes';
 import axios from './axiosInstance';
 import {
     Agreement,
+    AgreementRowData,
     AgreementTemplate,
     ContractCreateResponseType,
     DocumentsResponseType,
@@ -153,7 +154,7 @@ export class ContractHelper extends ApiHelper {
     }
 
     async getAllAgreements() {
-        let response: AxiosResponse<Agreement[]> = await axios.get(
+        let response: AxiosResponse<AgreementRowData[]> = await axios.get(
             `/contracts/`,
             { headers: { Authorization: `Bearer ${await this.getToken()}` } },
         );

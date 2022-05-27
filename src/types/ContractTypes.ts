@@ -26,6 +26,12 @@ export interface Agreement {
     updated_at: string;
 }
 
+export interface AgreementRowData extends Agreement {
+    user_name: string;
+    signers: string[];
+    status: 'error' | 'completed' | 'sent' | 'draft';
+}
+
 export interface AgreementTemplate {
     id: number;
     name: string;
