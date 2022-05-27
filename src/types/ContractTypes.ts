@@ -18,6 +18,7 @@ export interface Agreement {
     sequence: boolean;
     draft: boolean;
     sent: boolean;
+    sent_on: string | null;
     user: number;
     organization: number;
     documents: number[],

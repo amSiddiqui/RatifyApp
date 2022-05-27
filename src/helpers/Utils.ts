@@ -165,6 +165,7 @@ export const getLastSeenFromDate = (lastSeen: string) => {
     return dt.toFormat('dd/MM/yyyy');
 }
 
-export const getFormatDateFromIso = (isoDate: string) => {
+export const getFormatDateFromIso = (isoDate: string | null) => {
+    if (!isoDate) return '';
     return DateTime.fromISO(isoDate).toLocaleString(DateTime.DATE_FULL);
 }

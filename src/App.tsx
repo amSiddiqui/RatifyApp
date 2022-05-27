@@ -53,9 +53,6 @@ const Reports = React.lazy(() =>
   import(/* webpackChunkName: "views-reports" */ './views/app/reports')
 );
 
-const DashboardAnalytics = React.lazy(() =>
-  import(/* webpackChunkName: "views-analytics-dashboard" */ './views/app/dashboards/analytics')
-);
 const ProfileSettings = React.lazy(() =>
   import(/* webpackChunkName: "views-profile-settings" */ './views/accounts/profile-settings')
 );
@@ -86,6 +83,10 @@ const AgreementGreetings = React.lazy(() =>
 
 const SenderAgreement = React.lazy(() =>
   import(/* webpackChunkName: "views-sender-agreement" */ './views/app/contract-agreements/sender-view/sender-agreement')
+);
+
+const AgreementDashboard = React.lazy(() =>
+  import(/* webpackChunkName: "views-agreement-dashboard" */'./views/app/contract-agreements/dashboard')
 );
 
 type ProtectedRouteProps = {
@@ -144,9 +145,10 @@ function App() {
                         <BrowserRouter>
                             <Routes>
                                 <Route path='/' element={<ProtectedRoute {...defaultProtectedRouteProps} outlet={<ViewApp />} />}>
-                                    <Route index element={<DashboardAnalytics />} />
+                                    <Route index element={<AgreementDashboard />} />
                                     <Route path='agreements' element={<><Outlet /></>}>
                                         <Route index element={<ContractsAgreements></ContractsAgreements>} />
+                                        <Route path='dashboard' element={<AgreementDashboard />} />
                                         <Route path='add-signers/:contractId' element={<AgreementCreator />} />
                                         <Route path=':contractId' element={ <SenderAgreement /> } />
                                     </Route>

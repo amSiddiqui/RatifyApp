@@ -489,6 +489,7 @@ const AgreementCreator: React.FC = () => {
                             <Stack
                                 style={{ userSelect: 'none' }}
                                 className="px-3 my-4"
+                                spacing='lg'
                             >
                                 {signers.map((signer, index) => {
                                     return (
@@ -582,10 +583,7 @@ const AgreementCreator: React.FC = () => {
                                 })}
                                 {signers.length > 0 && (
                                     <Group position='right'>
-                                        <div className='px-3 py-1 transition cursor-pointer shadow-sm hover:scale-110' onClick={() => {setShowSignerModal(true);}}>
-                                            <span className='relative' style={{top: '1px'}}><i className='simple-icon-pencil text-xs relative mr-1'></i></span>
-                                            <span className='mr-1'>Edit</span>
-                                        </div>
+                                        <span onClick={() => setShowSignerModal(true)}><Button color='secondary' size='xs'>Edit Signers</Button></span>
                                     </Group>
                                 )}
                             </Stack>
@@ -829,7 +827,7 @@ const AgreementCreator: React.FC = () => {
                                                 },
                                             ]}
                                         />
-                                        <div>OR</div>
+                                        <div>Or pick a date</div>
                                         <DatePicker
                                             onChange={(value) => {
                                                 if (value !== null) {
@@ -848,6 +846,7 @@ const AgreementCreator: React.FC = () => {
                                     </Stack>
                                 )}
                             </Stack>
+                            <Divider className='mt-6 mb-2' />
                             <Stack spacing={'lg'} className="px-4 mt-4">
                                 <DatePicker
                                     inputFormat='DD/MM/YYYY'
@@ -865,22 +864,24 @@ const AgreementCreator: React.FC = () => {
                     </Card>
                 </Grid.Col>
             </Grid>
-            <Grid className='mt-2' columns={GRID_COLUMNS}>
+            <Grid className='mt-4' columns={GRID_COLUMNS}>
                 <Grid.Col span={GRID_SIDE}></Grid.Col>
                 <Grid.Col span={GRID_CENTER}>
                     <Group position='apart'>
-                        <span onClick={deleteModalHandlers.open}><Button color='danger' className='agreement-button' >Delete</Button></span>
-                        <Group position='right'>
+                        <Group>
+                            <span onClick={deleteModalHandlers.open}><Button color='danger' className='agreement-button' >Delete</Button></span>
                             <span onClick={() => {toast.success('Draft saved!')}}><Button color='secondary' className='agreement-button' >Save as draft</Button></span>
                             <span><Button
-                            onClick={() => {
-                                saveTemplateHandlers.open();
-                            }}
-                            className="contract-agreements-create-new flex agreement-button items-center justify-center"
-                            color="secondary"
-                        >
-                            <span>Save as template</span>
-                        </Button></span>
+                                onClick={() => {
+                                    saveTemplateHandlers.open();
+                                }}
+                                className="contract-agreements-create-new flex agreement-button items-center justify-center"
+                                color="secondary"
+                            >
+                                <span>Save as template</span>
+                            </Button></span>
+                        </Group>
+                        <Group position='right'>
                             <span onClick={() => {onPrepareSend()}}><Button color='success' className='agreement-button' >Prepare to send</Button></span>
                         </Group>
                     </Group>

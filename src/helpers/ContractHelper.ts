@@ -152,6 +152,14 @@ export class ContractHelper extends ApiHelper {
         return response.data;
     }
 
+    async getAllAgreements() {
+        let response: AxiosResponse<Agreement[]> = await axios.get(
+            `/contracts/`,
+            { headers: { Authorization: `Bearer ${await this.getToken()}` } },
+        );
+        return response.data;
+    }
+
     async syncSigners(
         contract_id: string,
         signers: SignerElement[],

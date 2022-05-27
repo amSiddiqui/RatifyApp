@@ -109,13 +109,13 @@ const AgreementSign: React.FC = () => {
 
     const [basicInfo, setBasicInfo] = React.useState<{
         signerEmail: string;
+        signerName: string;
+        organizationName: string;
         signerId: number;
+        signerType: string;
         agreementId: number;
         senderEmail: string;
-        organizationName: string;
-        signerName: string;
         fieldsCount: number;
-        signerType: string;
     }>();
 
     const onPreviousPage = () => {
@@ -598,10 +598,10 @@ const AgreementSign: React.FC = () => {
                 )}
                 {!loading && tokenValid && !!basicInfo && (
                     <Stack> 
-                        <p className="text-lg">Hi {basicInfo.signerEmail}</p>
+                        <p className="text-lg">Hi {basicInfo.signerName} <span className='text-muted'>({basicInfo.signerEmail})</span></p>
                         <Divider />
                         <p>
-                            {basicInfo.senderEmail} has invited you to{' '}
+                            {basicInfo.organizationName} has invited you to{' '}
                             {basicInfo.signerType.substring(
                                 0,
                                 basicInfo.signerType.length - 2,

@@ -107,6 +107,6 @@ label {
 }
 
 .agreement-button {
-    width: 170px;
-    @apply h-12;
+    width: 150px;
+    @apply h-11;
 }
