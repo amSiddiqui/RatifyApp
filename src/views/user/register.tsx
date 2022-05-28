@@ -21,22 +21,7 @@ import { SignUpDataType } from '../../types/AuthTypes';
 import { useIntl } from 'react-intl';
 import { AxiosError } from 'axios';
 import { toast } from 'react-toastify';
-
-const passwordValidation = (value:string | undefined) => {
-    if (typeof value !== 'string') {
-        return false;
-    }
-    if (value.length < 8) {
-        return false;
-    }
-    if (!/[A-Z]/.test(value)) {
-        return false;
-    }
-    if (!/[0-9]/.test(value)) {
-        return false;
-    }
-    return true;
-};
+import { passwordValidation } from '../../helpers/Utils';
 
 const Register = () => {
     const navigate = useNavigate();

@@ -6,7 +6,24 @@ export type UserType = {
     img: string;
     last_seen: string;
     role: number;
+    email: string;
 };
+
+export interface UserSettingsFormType {
+    email: string;
+    firstName: string;
+    changePassword: boolean;
+    lastName?: string;
+    oldPassword?: string;
+    newPassword?: string;
+    confirmPassword?: string;
+};
+
+export interface UserSettingsWithImage extends UserSettingsFormType {
+    img?: string;
+    imgUpdated: boolean;
+}
+
 
 export type Organization = {
     id: number;

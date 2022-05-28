@@ -12,7 +12,7 @@ import {
     Input,
 } from 'reactstrap';
 
-import { NavLink, useNavigate, Link } from 'react-router-dom';
+import { NavLink, useNavigate } from 'react-router-dom';
 
 import {
     menuHiddenBreakpoint,
@@ -298,14 +298,20 @@ const TopNav = ({ intl }) => {
                             </span>
                             <span className='inline'>
                                 <img
+                                    className='object-cover rounded-full shadow-sm'
                                     alt="Profile"
-                                    src="/static/img/default.jpg"
+                                    style={{height: 36, width: 36}}
+                                    src={
+                                        !auth.user || auth.user.img.length === 0
+                                            ? '/static/img/default.jpg'
+                                            : 'data:image/jpeg;base64,' + auth.user.img
+                                    }
                                 />
                             </span>
                         </DropdownToggle>
                         <DropdownMenu className="mt-3" right>
-                            <DropdownItem className='active:text-white'>
-                                <Link className='active:text-white w-full' to='/account/profile-settings'>Account</Link>
+                            <DropdownItem className='active:text-white' onClick={() => {navigate('/account/profile-settings')}}>
+                                <p className='active:text-white w-full'>Account</p>
                             </DropdownItem>
                             <DropdownItem divider />
                             <DropdownItem onClick={() => handleLogout()}>

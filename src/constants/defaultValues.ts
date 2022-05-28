@@ -1,5 +1,3 @@
-import { UserType } from "../types/AuthTypes";
-
 export const UserRole = {
     Admin: 99,
     Editor: 1,
@@ -19,15 +17,6 @@ export const localeOptions = [
     { id: "es", name: "Español", direction: "ltr" },
     { id: "enrtl", name: "English - RTL", direction: "rtl" },
 ];
-export const currentUser:UserType = {
-    id: 1,
-    first_name: "Sarah",
-    last_name: 'Courtney',
-    img: "/static/img/profiles/l-1.jpg",
-    last_seen: "Last seen today 15:24",
-    role: UserRole.Admin,
-    verified: true,
-};
 
 export const adminRoot = "/";
 export const searchPath = `${adminRoot}/#`;

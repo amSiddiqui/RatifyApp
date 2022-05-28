@@ -5,6 +5,7 @@ import {
     SignUpDataType,
     UserType,
     Organization,
+    UserSettingsWithImage,
 } from '../types/AuthTypes';
 import { authActions } from '../redux/auth-slice';
 import { LoginDataType } from '../types/AuthTypes';
@@ -64,32 +65,13 @@ export class AuthHelper extends ApiHelper {
         }
     }
 
-    async getUserImage(): Promise<string> {
-        let token = await this.getToken();
-        if (token !== null) {
-            let response: AxiosResponse<string> = await axios.get(
-                `/auth/user/image/`,
-                { headers: { Authorization: `Bearer ${token}` } },
-            );
-            this.dispatchFn(authActions.setImage(response.data));
-            // TODO: Get user image and set img tag to data
-            return response.data;
-        }
-        throw new NoTokenError('No token');
-    }
 
-    async updateUser(userData: UserType) {
-        let token = await this.getToken();
-        if (token !== null) {
-            let response: AxiosResponse<UserType> = await axios.put(
-                '/auth/user/',
-                userData,
-                { headers: { Authorization: `Bearer ${token}` } },
-            );
-            this.dispatchFn(authActions.setUser(response.data));
-            return response.data;
-        }
-        throw new NoTokenError('No token');
+    async updateUser(userData: UserSettingsWithImage) {
+        await axios.put(
+            `/auth/user/`,
+            userData,
+            { headers: { Authorization: `Bearer ${await this.getToken()}` } },
+        );
     }
 
     async getUserOrganization() {
