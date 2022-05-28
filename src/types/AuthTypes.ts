@@ -39,7 +39,6 @@ export type Organization = {
     website: string;
     created_at: string;
     updated_at: string;
-    clientLogo: string | null;
 }
 
 export type AuthInitialStateType = {

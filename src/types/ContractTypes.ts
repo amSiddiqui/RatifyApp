@@ -118,7 +118,6 @@ export type SignerAgreementData = {
         agreement: Agreement;
         signer: Signer;
         clientName: string;
-        clientLogo: string;
     }
 }
 

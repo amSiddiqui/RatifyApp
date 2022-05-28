@@ -110,35 +110,41 @@ const SenderInputView: React.FC<Props> = ({ inputField }) => {
                 {type === 'signature' && (
                     <>
                         {!completed && (
-                            <Center
-                                className={
-                                    'text-muted ' + getBgColorLight(color)
-                                }
-                                style={{
-                                    height: SIGN_INPUT_HEIGHT,
-                                    width: INPUT_WIDTH,
-                                }}>
-                                {placeholder}
-                            </Center>
+                            <>
+                                <p style={{height: INPUT_TOP_OFFSET, width: INPUT_WIDTH}}></p>
+                                <Center
+                                    className={
+                                        'text-muted ' + getBgColorLight(color)
+                                    }
+                                    style={{
+                                        height: SIGN_INPUT_HEIGHT - INPUT_TOP_OFFSET,
+                                        width: INPUT_WIDTH,
+                                    }}>
+                                    {placeholder}
+                                </Center>
+                            </>
                         )}
                         {completed && (
-                            <div
-                                className={
-                                    getBorderColorBold(color) + ' border-2'
-                                }
-                                style={{
-                                    height: SIGN_INPUT_HEIGHT,
-                                    width: INPUT_WIDTH,
-                                }}>
-                                <img
-                                    src={value}
+                            <>
+                                <p style={{height: INPUT_TOP_OFFSET, width: INPUT_WIDTH}}></p>
+                                <div
+                                    className={
+                                        getBorderColorBold(color) + ' border-2'
+                                    }
                                     style={{
-                                        height: SIGN_INPUT_HEIGHT,
-                                        width: 'auto',
-                                    }}
-                                    alt="Signature"
-                                />
-                            </div>
+                                        height: SIGN_INPUT_HEIGHT - INPUT_TOP_OFFSET,
+                                        width: INPUT_WIDTH,
+                                    }}>
+                                    <img
+                                        src={value}
+                                        style={{
+                                            height: SIGN_INPUT_HEIGHT - INPUT_TOP_OFFSET,
+                                            width: 'auto',
+                                        }}
+                                        alt="Signature"
+                                    />
+                                </div>
+                            </>
                         )}
                     </>
                 )}

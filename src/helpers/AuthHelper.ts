@@ -78,11 +78,27 @@ export class AuthHelper extends ApiHelper {
         let token = await this.getToken();
         if (token !== null) {
             let response: AxiosResponse<Organization> = await axios.get(
-                'auth/user/organization/',
+                '/auth/user/organization/',
                 { headers: { Authorization: `Bearer ${token}` } },
             );
             return response.data;
         }
         throw new NoTokenError('No token');
+    }
+
+    async getOrganizationLogo() {
+        let response: AxiosResponse<string> = await axios.get(
+            `/auth/user/organization/logo/`,
+            { headers: { Authorization: `Bearer ${await this.getToken()}` } },
+        );
+        return response.data;
+    }
+
+    async updateOrganizationLogo(logo: string) {
+        await axios.put(
+            `/auth/user/organization/logo/`,
+            {img: logo},
+            { headers: { Authorization: `Bearer ${await this.getToken()}` } },
+        );
     }
 }

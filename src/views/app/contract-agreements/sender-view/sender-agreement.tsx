@@ -47,7 +47,6 @@ const SenderAgreement:React.FC = () => {
     const [agreement, setAgreement] = React.useState<Agreement | null>(null);
     const [signers, setSigners] = React.useState<Signer[]>([]);
     const [inputElements, setInputElements] = React.useState<InputField[]>([]);
-
     
     const [pdf, setPdf] = React.useState('');
     const [pdfLoading, setPdfLoading] = React.useState(true);
@@ -57,6 +56,8 @@ const SenderAgreement:React.FC = () => {
     const [pageNumber, setPageNumber] = React.useState(1);
     const canvasRef = React.useRef<HTMLDivElement>(null);
     const [organization, setOrganization] = React.useState<Organization | null>(null);
+    const [clientLogo, setClientLogo] = React.useState('');
+    const inputRef = React.useRef<HTMLInputElement>(null);
 
     const onPreviousPage = () => {
         setPageNumber((prev) => {
@@ -98,6 +99,22 @@ const SenderAgreement:React.FC = () => {
             setPageNumber(numPages);
         }
     };
+
+    const onLogoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.currentTarget.files && e.currentTarget.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                authHelper.updateOrganizationLogo(reader.result as string).then(() => {
+                    setClientLogo(reader.result as string);
+                    toast.success('Updated organization logo');
+                }).catch(err => {
+                    toast.error('Failed to update organization logo');
+                });
+            };
+            reader.readAsDataURL(file);
+        }
+    }
 
     React.useEffect(() => {
         if (contractId) {
@@ -157,6 +174,12 @@ const SenderAgreement:React.FC = () => {
         }).catch(err => {
             console.log(err);
         });
+
+        authHelper.getOrganizationLogo().then(data => {
+            setClientLogo(data);
+        }).catch(err => {
+            console.log(err.response);
+        });
     }, [authHelper]);
 
     return (<>
@@ -174,14 +197,18 @@ const SenderAgreement:React.FC = () => {
                 <Grid.Col span={GRID_SIDE}>
                     <Center>
                         <Stack style={{height: '108px'}} spacing={'xs'}>
-                            {organization && organization.clientLogo && <div style={{height: 75, width: 75}}>
-                                <img src={"data:image/jpeg;base64," + organization.clientLogo} alt={organization.name} />
+                            {organization && clientLogo && <div style={{height: 75, width: 75}}>
+                                <img src={clientLogo} alt={organization.name} />
                             </div>}
-                            {organization && !organization.clientLogo && 
-                            <Center style={{height: 75, width: 75}} className='bg-slate-200 shadow-sm text-lg cursor-pointer text-muted font-bold'>
+                            {!clientLogo && 
+                            <Center onClick={() => {
+                                if (inputRef.current) {
+                                    inputRef.current.click();
+                                }
+                            }} style={{height: 75, width: 75}} className='bg-slate-200 shadow-sm text-lg cursor-pointer text-muted font-bold'>
                                 Logo
                             </Center>}
-                            <input type="file" className='hidden' />
+                            <input accept='image/*' onChange={onLogoUpload} ref={inputRef} type="file" className='hidden' />
                             {organization && <p>{organization.name}</p>}
                         </Stack>
                     </Center>
@@ -210,7 +237,6 @@ const SenderAgreement:React.FC = () => {
                                     <p className='ml-2'>This document must be signed by {agreement && agreement.end_date ? getFormatDateFromIso(agreement.end_date) : ''}.</p>
                                 </div>
                             </Group>
-                            
                         </div>
                     </Group>
                 </Grid.Col>

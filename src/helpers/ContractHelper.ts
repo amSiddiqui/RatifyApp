@@ -325,6 +325,13 @@ export class ContractHelper extends ApiHelper {
         return response.data;
     }
 
+    async getSignerClientLogo(token: string) {
+        let response:AxiosResponse<{ status: string, valid: boolean, data: string }> = await axios.get(
+            `/contracts/signer/client-logo/?token=${token}`
+        );
+        return response.data;
+    }
+
     async getSignerPdf(token: string) {
         let response: AxiosResponse<SignerPdfResponse> = await axios.get(
             `contracts/signer/pdf/?token=${token}`,

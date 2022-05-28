@@ -110,3 +110,8 @@ label {
     width: 150px;
     @apply h-11;
 }
+
+.client-logo-text {
+    font-size: 22px;
+    font-weight: bold;
+}

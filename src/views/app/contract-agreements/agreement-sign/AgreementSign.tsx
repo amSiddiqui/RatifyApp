@@ -90,6 +90,7 @@ const AgreementSign: React.FC = () => {
     const [token, setToken] = React.useState<string>('');
     const [agreement, setAgreement] = React.useState<Agreement | null>(null);
     const [clientLogo, setClientLogo] = React.useState('');
+    const [loadingLogo, setLoadingLogo] = React.useState(true);
     const [clientName, setClientName] = React.useState('');
 
 
@@ -177,6 +178,13 @@ const AgreementSign: React.FC = () => {
                 if (resp.valid) {
                     setTokenValid(true);
                     setBasicInfo(resp.data);
+                    contractHelper.getSignerClientLogo(token).then(data => {
+                        setClientLogo(data.data);
+                        setLoadingLogo(false);
+                    }).catch(err => {
+                        setLoadingLogo(false);
+                        console.log(err);
+                    });
                 } else {
                     setTokenValid(false);
                     setTokenErrorType(resp.errorType);
@@ -191,6 +199,8 @@ const AgreementSign: React.FC = () => {
                 }
 
             });
+        
+        
     }, [searchParams, navigate, contractHelper]);
 
 
@@ -202,7 +212,6 @@ const AgreementSign: React.FC = () => {
         contractHelper.getSignerData(token).then(resp => {
             if (resp.valid) {
                 setAgreement(resp.data.agreement);
-                setClientLogo(resp.data.clientLogo);
                 setClientName(resp.data.clientName);
             }
         }).catch(err => {
@@ -281,10 +290,14 @@ const AgreementSign: React.FC = () => {
                     <Grid.Col span={GRID_SIDE}>
                         <Center>
                             <Stack style={{height: '108px'}} spacing={'xs'}>
-                                {clientLogo && <div style={{height: 75, width: 75}}>
-                                    <img src={"data:image/jpeg;base64," + clientLogo} alt={clientName} />
+                                {loadingLogo && <Center style={{height: 75, width: 75}}>
+                                    <Loader />
+                                </Center>}
+                                {!loadingLogo && clientLogo && <div style={{height: 75, width: 75}}>
+                                    <img src={clientLogo} alt={clientName} />
                                 </div>}
-                                {clientName && <p>{clientName}</p>}
+                                {((loadingLogo) || (!loadingLogo && clientLogo)) && clientName && <p>{clientName}</p>}
+                                {(!loadingLogo && !clientLogo && clientName) && <p className='client-logo-text'>{clientName}</p>}
                             </Stack>
                         </Center>
                     </Grid.Col>
