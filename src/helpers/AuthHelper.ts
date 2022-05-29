@@ -94,10 +94,48 @@ export class AuthHelper extends ApiHelper {
         return response.data;
     }
 
+    async updateOrganization(organization: Organization) {
+        await axios.put(
+            `/auth/user/organization/`,
+            organization,
+            { headers: { Authorization: `Bearer ${await this.getToken()}` } },
+        );
+    }
+
     async updateOrganizationLogo(logo: string) {
         await axios.put(
             `/auth/user/organization/logo/`,
             {img: logo},
+            { headers: { Authorization: `Bearer ${await this.getToken()}` } },
+        );
+    }
+
+    async deleteOrganizationLogo() {
+        await axios.delete(
+            `/auth/user/organization/logo/`,
+            { headers: { Authorization: `Bearer ${await this.getToken()}` } },
+        );
+    }
+
+    async getUserVerified() {
+        let response: AxiosResponse<{verified: boolean, last_verification_sent: string}> = await axios.get(
+            `/auth/user/verified/`,
+            { headers: { Authorization: `Bearer ${await this.getToken()}` } },
+        )
+        return response.data;
+    }
+
+    async sendVerificationLink() {
+        await axios.post(
+            `/auth/user/resend-verification/`,
+            {},
+            { headers: { Authorization: `Bearer ${await this.getToken()}` } },
+        );
+    }
+
+    async deleteProfileImage() {
+        await axios.delete(
+            `/auth/user/image/`,
             { headers: { Authorization: `Bearer ${await this.getToken()}` } },
         );
     }

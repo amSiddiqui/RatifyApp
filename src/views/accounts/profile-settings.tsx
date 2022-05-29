@@ -1,14 +1,13 @@
 import React from 'react';
-import { Row, Card, CardBody, Button } from 'reactstrap';
+import { Row, Card, CardBody, Button, Alert } from 'reactstrap';
 import { Colxx, Separator } from '../../components/common/CustomBootstrap';
 import Breadcrumb from '../../containers/navs/Breadcrumb';
 import { useLocation } from 'react-router-dom';
 import { useIntl } from 'react-intl';
-import { Center, Collapse, Grid, Group, Stack, TextInput } from '@mantine/core';
+import { Center, Collapse, Grid, Group, Menu, Stack, TextInput } from '@mantine/core';
 import { useDispatch, useSelector } from 'react-redux';
 import { AppDispatch, RootState } from '../../redux';
 import { AuthHelper } from '../../helpers/AuthHelper';
-import { MdEdit } from 'react-icons/md';
 import * as Yup from 'yup';
 import { toast } from 'react-toastify';
 import { passwordValidation } from '../../helpers/Utils';
@@ -16,6 +15,19 @@ import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { UserSettingsFormType, UserSettingsWithImage, UserType } from '../../types/AuthTypes';
 import { authActions } from '../../redux/auth-slice';
+import { DateTime } from 'luxon';
+
+const WAIT_BEFORE_RESENT_EMAIL_IN_SECONDS = 60 * 10;
+
+const getDateDiff = (date: DateTime | null) => {
+    if (!date) {
+        return 0;
+    }
+    const now = DateTime.local();
+    // get diff in seconds
+    const diff = now.diff(date).as('seconds');
+    return diff;
+}
 
 const ProfileSettings: React.FC = () => {
     const match = useLocation();
@@ -34,6 +46,10 @@ const ProfileSettings: React.FC = () => {
         () => new AuthHelper(dispatchFn),
         [dispatchFn],
     );
+
+    const [lastVerificationSent, setLastVerificationSent] = React.useState<DateTime | null>(null);
+    const [verificationSent, setVerificationSent] = React.useState(false);
+    const [userVerified, setUserVerified] = React.useState(auth.user ? auth.user.verified : false);
 
     const schema = Yup.object().shape({
         changePassword: Yup.boolean(),
@@ -147,6 +163,16 @@ const ProfileSettings: React.FC = () => {
         });  
     };
 
+    React.useEffect(() => {
+        authHelper.getUserVerified().then(data => {
+            setUserVerified(data.verified);
+            setLastVerificationSent(DateTime.fromISO(data.last_verification_sent).toLocal());
+        }).catch(err => {
+            toast.error('Cannot user at the moment. Try again later!');
+            console.log(err);
+        });
+    }, [authHelper]);
+
     return (
         <>
             <Row>
@@ -159,156 +185,207 @@ const ProfileSettings: React.FC = () => {
                 </Colxx>
             </Row>
             <Center>
-                <Card>
-                    <CardBody>
-                        <form
-                            onSubmit={handleSubmit(onSubmit)}>
-                            <Stack>
-                                <div className="profile-picture-container">
-                                    <img
-                                        src={
-                                            image.length === 0
-                                                ? '/static/img/default.jpg'
-                                                : image
-                                        }
-                                        className="object-cover w-24 h-24 rounded-full shadow"
-                                        alt="Profile"
-                                    />
-                                    <span
-                                        onClick={() => {
-                                            if (fileInputRef.current) {
-                                                fileInputRef.current.click();
-                                            }
-                                        }}
-                                        className="relative top-10 right-6 p-1 cursor-pointer rounded bg-blue-500 ">
-                                        <MdEdit className="text-md text-white" />
-                                    </span>
-                                    <input
-                                        onChange={onImageUpload}
-                                        accept="image/*"
-                                        ref={fileInputRef}
-                                        type="file"
-                                        className="hidden"
-                                    />
-                                </div>
-                                <Grid columns={12}>
-                                    <Grid.Col span={6}>
-                                        <TextInput
-                                            {...register('firstName')}
-                                            error={
-                                                errors.firstName
-                                                    ? errors.firstName.message
-                                                    : ''
-                                            }
-                                            placeholder={intl.formatMessage({
-                                                id: 'profile-settings.first-name',
-                                            })}
-                                            label={intl.formatMessage({
-                                                id: 'profile-settings.first-name',
-                                            })}
-                                        />
-                                    </Grid.Col>
-                                    <Grid.Col span={6}>
-                                        <TextInput
-                                            {...register('lastName')}
-                                            error={
-                                                errors.lastName
-                                                    ? errors.lastName.message
-                                                    : ''
-                                            }
-                                            placeholder={intl.formatMessage({
-                                                id: 'profile-settings.first-name',
-                                            })}
-                                            label={intl.formatMessage({
-                                                id: 'profile-settings.last-name',
-                                            })}
-                                        />
-                                    </Grid.Col>
-                                </Grid>
-                                <TextInput
-                                    {...register('email')}
-                                    error={
-                                        errors.email ? errors.email.message : ''
+                <Stack>
+                    <Center>
+                        {auth.user && !userVerified && 
+                        <>
+                        {!verificationSent && 
+                            <Alert color='danger' style={{width: 450}}>
+                                <Stack>
+                                    <p>Please verify your account using the link provided in the email. If you have not received the email, request for a new email</p>
+                                    {getDateDiff(lastVerificationSent) > WAIT_BEFORE_RESENT_EMAIL_IN_SECONDS ?
+                                        <span onClick={() => {
+                                            authHelper.sendVerificationLink()
+                                            .then(() => {
+                                                setVerificationSent(true);
+                                            })
+                                            .catch(err => {
+                                                toast.error('Cannot send a verification email. Try again later!');
+                                            });
+                                        }}><Button color='primary' size='xs'>Resend Verification</Button></span> :
+                                        <p className='text-muted'>Wait 10 minutes before creating a new link.</p>
                                     }
-                                    placeholder={intl.formatMessage({
-                                        id: 'profile-settings.email',
-                                    })}
-                                    label={intl.formatMessage({
-                                        id: 'profile-settings.email',
-                                    })}
-                                />
-
-                                <p
-                                    className="cursor-pointer"
-                                    onClick={() => {
-                                        let prev = getValues().changePassword;
-                                        setValue(
-                                            'changePassword',
-                                            !prev,
-                                        );
-                                    }}>
-                                    <i
-                                        className={
-                                            showPassword
-                                                ? 'simple-icon-arrow-down'
-                                                : 'simple-icon-arrow-right '
+                                </Stack>
+                            </Alert>
+                        }
+                        {verificationSent &&
+                            <Alert color='success' style={{width: 450}}>
+                                <p>Verification email sent. Please check your email.</p>
+                            </Alert>
+                        }
+                        </>
+                        }
+                    </Center>
+                    <Card>
+                        <CardBody>
+                            <form
+                                onSubmit={handleSubmit(onSubmit)}>
+                                <Stack>
+                                    <div className="profile-picture-container ml-2">
+                                        <img
+                                        src={
+                                                image.length === 0
+                                                    ? '/static/img/default.jpg'
+                                                    : image
+                                            }
+                                            className="object-cover w-24 h-24 rounded-full shadow"
+                                            alt="Profile"
+                                        />
+                                        <span>
+                                            <Menu className='relative top-10 right-4'>
+                                                <Menu.Item className='hover:bg-gray-100' onClick={() => {
+                                                    if (fileInputRef.current) {
+                                                        fileInputRef.current.click();
+                                                    }
+                                                }}>
+                                                    Upload
+                                                </Menu.Item>
+                                                <Menu.Item onClick={() => {
+                                                    authHelper.deleteProfileImage().then(() => {
+                                                        if (auth.user) {
+                                                            setImage('');
+                                                            setImgUpdated(false);
+                                                            dispatchFn(authActions.setUser({...auth.user, img: ''}));
+                                                        }
+                                                    }).catch(err => {
+                                                        toast.error('Cannot delete profile image. Try again later!');
+                                                        console.log(err);
+                                                    });
+                                                }} className='hover:bg-gray-100' color='red'>
+                                                    Remove
+                                                </Menu.Item>
+                                            </Menu>
+                                        </span>
+                                        
+                                        <input
+                                            onChange={onImageUpload}
+                                            accept="image/*"
+                                            ref={fileInputRef}
+                                            type="file"
+                                            className="hidden"
+                                        />
+                                    </div>
+                                    <Grid columns={12}>
+                                        <Grid.Col span={6}>
+                                            <TextInput
+                                                required={true}
+                                                {...register('firstName')}
+                                                error={
+                                                    errors.firstName
+                                                        ? errors.firstName.message
+                                                        : ''
+                                                }
+                                                placeholder={intl.formatMessage({
+                                                    id: 'profile-settings.first-name',
+                                                })}
+                                                label={intl.formatMessage({
+                                                    id: 'profile-settings.first-name',
+                                                })}
+                                            />
+                                        </Grid.Col>
+                                        <Grid.Col span={6}>
+                                            <TextInput
+                                                {...register('lastName')}
+                                                error={
+                                                    errors.lastName
+                                                        ? errors.lastName.message
+                                                        : ''
+                                                }
+                                                placeholder={intl.formatMessage({
+                                                    id: 'profile-settings.first-name',
+                                                })}
+                                                label={intl.formatMessage({
+                                                    id: 'profile-settings.last-name',
+                                                })}
+                                            />
+                                        </Grid.Col>
+                                    </Grid>
+                                    <TextInput
+                                        required={true}
+                                        {...register('email')}
+                                        error={
+                                            errors.email ? errors.email.message : ''
                                         }
+                                        placeholder={intl.formatMessage({
+                                            id: 'profile-settings.email',
+                                        })}
+                                        label={intl.formatMessage({
+                                            id: 'profile-settings.email',
+                                        })}
                                     />
-                                    <span className="ml-3">
-                                        Change Password
-                                    </span>
-                                </p>
-                                <Collapse in={showPassword}>
-                                    <Stack>
-                                        <TextInput
-                                            {...register('oldPassword')}
-                                            error={
-                                                errors.oldPassword
-                                                    ? errors.oldPassword.message
-                                                    : ''
-                                            }
-                                            type="password"
-                                            label="Old Password"
-                                            placeholder="Old Password"
-                                        />
-                                        <TextInput
-                                            {...register('newPassword')}
-                                            error={
-                                                errors.newPassword
-                                                    ? errors.newPassword.message
-                                                    : ''
-                                            }
-                                            type="password"
-                                            label="New Password"
-                                            placeholder="New Password"
-                                        />
-                                        <TextInput
-                                            {...register('confirmPassword')}
-                                            error={
-                                                errors.confirmPassword
-                                                    ? errors.confirmPassword.message
-                                                    : ''
-                                            }
-                                            type="password"
-                                            label="Confirm Password"
-                                            placeholder="Confirm Password"
-                                        />
-                                    </Stack>
-                                </Collapse>
 
-                                <Group position="right">
-                                    <span>
-                                        <Button color="primary">
-                                            {intl.formatMessage({
-                                                id: 'profile-settings.save',
-                                            })}
-                                        </Button>
-                                    </span>
-                                </Group>
-                            </Stack>
-                        </form>
-                    </CardBody>
-                </Card>
+                                    <p
+                                        className="cursor-pointer"
+                                        onClick={() => {
+                                            let prev = getValues().changePassword;
+                                            setValue(
+                                                'changePassword',
+                                                !prev,
+                                            );
+                                        }}>
+                                        <i
+                                            className={
+                                                showPassword
+                                                    ? 'simple-icon-arrow-down'
+                                                    : 'simple-icon-arrow-right '
+                                            }
+                                        />
+                                        <span className="ml-3">
+                                            Change Password
+                                        </span>
+                                    </p>
+                                    <Collapse in={showPassword}>
+                                        <Stack>
+                                            <TextInput
+                                                {...register('oldPassword')}
+                                                error={
+                                                    errors.oldPassword
+                                                        ? errors.oldPassword.message
+                                                        : ''
+                                                }
+                                                type="password"
+                                                label="Old Password"
+                                                placeholder="Old Password"
+                                            />
+                                            <TextInput
+                                                {...register('newPassword')}
+                                                error={
+                                                    errors.newPassword
+                                                        ? errors.newPassword.message
+                                                        : ''
+                                                }
+                                                type="password"
+                                                label="New Password"
+                                                placeholder="New Password"
+                                            />
+                                            <TextInput
+                                                {...register('confirmPassword')}
+                                                error={
+                                                    errors.confirmPassword
+                                                        ? errors.confirmPassword.message
+                                                        : ''
+                                                }
+                                                type="password"
+                                                label="Confirm Password"
+                                                placeholder="Confirm Password"
+                                            />
+                                        </Stack>
+                                    </Collapse>
+
+                                    <Group position="right">
+                                        <span>
+                                            <Button color="primary">
+                                                {intl.formatMessage({
+                                                    id: 'profile-settings.save',
+                                                })}
+                                            </Button>
+                                        </span>
+                                    </Group>
+                                </Stack>
+                            </form>
+                        </CardBody>
+                    </Card>
+                </Stack>
             </Center>
         </>
     );

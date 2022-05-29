@@ -66,6 +66,12 @@ const authSlice = createSlice({
             state.user = action.payload;
         },
 
+        setUserVerified: (state, action:PayloadAction<boolean>) => {
+            if (state.user) {
+                state.user.verified = action.payload;
+            }
+        },
+
         setImage: (state, action:PayloadAction<string>) => {
             state.image = action.payload;
         }

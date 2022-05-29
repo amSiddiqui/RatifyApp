@@ -133,7 +133,7 @@ const AgreementDashboard: React.FC = () => {
                             <h5 className='mb-4'>Select Columns</h5>
                             <Stack spacing={'lg'}>
                                 {columns.map((column, index) => (
-                                    <Checkbox checked={showColumns[index]} onChange={(ckd) => {
+                                    <Checkbox size='xs' className='cursor-pointer' checked={showColumns[index]} onChange={(ckd) => {
                                         const newShowColumns = [...showColumns];
                                         newShowColumns[index] = ckd.currentTarget.checked;
                                         setShowColumns(newShowColumns);
