@@ -15,6 +15,7 @@ import {
     SignerInputElements,
     SignerPdfResponse,
     SignerPdfThumbnails,
+    SignerProgressType,
     SyncSignerResponse,
 } from '../types/ContractTypes';
 import { BaseResponse } from '../types/AuthTypes';
@@ -427,6 +428,22 @@ export class ContractHelper extends ApiHelper {
                 { headers: { Authorization: `Bearer ${await this.getToken()}` } },
             );
         }
+        return response.data;
+    }
+
+    async sendDocumentAgain(id: number, name: string, email: string) {
+        await axios.post(
+            `contracts/signer/send/`,
+            { id, name, email },
+            { headers: { Authorization: `Bearer ${await this.getToken()}` } },
+        );
+    }
+
+    async getSignerProgress(id: string) {
+        let response: AxiosResponse<SignerProgressType> = await axios.get(
+            `contracts/${id}/signers/progress/`,
+            { headers: { Authorization: `Bearer ${await this.getToken()}` } },
+        );
         return response.data;
     }
 } 

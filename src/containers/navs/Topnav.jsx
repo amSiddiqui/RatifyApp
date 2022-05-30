@@ -302,7 +302,7 @@ const TopNav = ({ intl }) => {
                                     alt="Profile"
                                     style={{height: 36, width: 36}}
                                     src={
-                                        !auth.user || auth.user.img.length === 0
+                                        !auth.user || !auth.user.img || auth.user.img.length === 0
                                             ? '/static/img/default.jpg'
                                             : 'data:image/jpeg;base64,' + auth.user.img
                                     }

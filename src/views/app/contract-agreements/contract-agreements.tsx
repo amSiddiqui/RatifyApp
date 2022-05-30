@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Badge, Row } from 'reactstrap';
+import { Row } from 'reactstrap';
 import { useIntl } from 'react-intl';
 import { Colxx, Separator } from '../../../components/common/CustomBootstrap';
 import Breadcrumb from '../../../containers/navs/Breadcrumb';
@@ -38,9 +38,7 @@ const ContractAgreements: React.FC = () => {
     const [templates, setTemplates] = React.useState<AgreementTemplate[]>([]);
     const [selectedTemplate, setSelectedTemplate] = React.useState<AgreementTemplate | null>(null);
     const [openTemplateConfirm, templateConfirmHandlers] = useDisclosure(false);
-
-    const [openedDrafts, handlersDrafts] = useDisclosure(true);
-    const [openedTemplates, handlersTemplates] = useDisclosure(false);
+    const [openedTemplates, handlersTemplates] = useDisclosure(true);
 
     const uploadProgress = React.useCallback((progressEvent: any) => {
         setProgress(progressEvent.loaded / progressEvent.total);
@@ -137,38 +135,7 @@ const ContractAgreements: React.FC = () => {
                 label={<p className="text-2xl">OR</p>}
                 labelPosition="center"
             />
-            <div onClick={() => {handlersDrafts.toggle()}} className="flex justify-between items-center mb-2 cursor-pointer">
-                <div>
-                    <span className='relative' style={{top: '-2px'}}> {!openedDrafts && <i className="simple-icon-arrow-right"></i>} {openedDrafts && <i className="simple-icon-arrow-down"></i>} </span>
-                    <h1 className="text-2xl mb-0">Drafts</h1>
-                    {drafts.length > 0 && <Badge className='ml-2 relative' style={{top: '-4px'}} pill>{drafts.length}</Badge>}
-                </div>
-                {drafts.length === 0 && (
-                    <p>No drafts</p>
-                )}
-                {drafts.length > 0 && (
-                    <p>
-                        {drafts.length}{' '}
-                        {drafts.length > 1
-                            ? 'drafts'
-                            : 'draft'}{' '}
-                        found
-                    </p>
-                )}
-            </div>
-            <Collapse in={openedDrafts}>
-                <DocumentCarousel docs={drafts.map(d => ({
-                    id: d.id,
-                    doc_id: d.documents[0],
-                    name: d.title,
-                }))} intl={intl} onClick={(id, blank) => {
-                    if (blank) {
-                        window.open(`/agreements/add-signers/${id}`, '_blank');
-                    } else {
-                        navigate(`/agreements/add-signers/${id}`);
-                    }
-                }} />
-            </Collapse>
+            
 
             <div onClick={() => {handlersTemplates.toggle()}} className="flex justify-between items-center mb-2 cursor-pointer">
                 <div>

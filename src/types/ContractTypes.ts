@@ -59,6 +59,7 @@ export interface Signer {
     last_seen: string | null;
     every_unit: string;
     deleted: boolean;
+    status: 'completed' | 'error' | 'sent';
     agreement: number;
     signed: boolean;
     signed_on: string | null;
@@ -68,6 +69,10 @@ export interface Signer {
 
 export interface SyncSignerResponse {
     ids: {[uid: string]: number};
+}
+
+export type SignerProgressType = {
+    [id: number]: {completed: number, total: number}
 }
 
 export interface SingerElementStyleProps {

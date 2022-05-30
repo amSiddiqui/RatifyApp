@@ -147,10 +147,10 @@ const AgreementDashboard: React.FC = () => {
                     {loading && <Center className='w-1/2 h-80'>
                         <Loader size='lg' />
                     </Center>}
-                    {!loading && error && <p className='text-2xl text-muted'>
+                    {!loading && error && <p className='text-2xl text-muted text-center'>
                         Cannot fetch data right now. Please try again later.    
                     </p>}
-                    {!loading && !error && agreements.length === 0 && <p className='text-2xl text-muted'>
+                    {!loading && !error && agreements.length === 0 && <p className='text-2xl text-center text-muted'>
                         No agreements found. Please click on create new button to create a new agreement.
                     </p>}
                     {!loading && !error && agreements.length > 0 && <div>
