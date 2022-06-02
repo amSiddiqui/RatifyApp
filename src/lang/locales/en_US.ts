@@ -81,9 +81,10 @@ export const enMessages = {
         'Password must contain at least one capital letter and one number',
     'auth.password.mismatch': 'Passwords do not match',
     'auth.password.confirm': 'Please confirm your password',
-    'auth.email.required': 'Please enter an email',
+    'auth.email.required': 'Please enter your email',
     'auth.email.invalid': 'Please enter a valid email',
     'auth.login.notify': 'Invalid email or password',
+    'auth.login.error': 'Invalid email or password',
 
     // 06. Account
     'account.account': 'My Account',

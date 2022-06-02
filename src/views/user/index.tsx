@@ -1,5 +1,5 @@
 import React, { Suspense } from 'react';
-import UserLayout from '../../components/layout/UserLayout';
+import UserLayout from '../../components/layout/UserLayout_v2';
 import { Outlet } from 'react-router-dom';
 
 

@@ -22,15 +22,15 @@ const ViewUser = React.lazy(() =>
 );
 
 const Login = React.lazy(() =>
-  import(/* webpackChunkName: "user-login" */ './views/user/login')
+  import(/* webpackChunkName: "user-login" */ './views/user/login_v2')
 );
 
 const Register = React.lazy(() =>
-  import(/* webpackChunkName: "user-register" */ './views/user/register')
+  import(/* webpackChunkName: "user-register" */ './views/user/register_v2')
 );
 
 const VerifyEmail = React.lazy(() =>
-  import(/* webpackChunkName: "user-verify-email" */ './views/user/verify-email')
+  import(/* webpackChunkName: "user-verify-email" */ './views/user/verify-email_v2')
 );
 
 const BlankPage = React.lazy(() =>
