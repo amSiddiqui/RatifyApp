@@ -9,6 +9,7 @@
     "@mantine/dates": "^4.1.4",
     "@mantine/dropzone": "^4.1.4",
     "@mantine/hooks": "^4.1.4",
+    "@mantine/modals": "^4.2.7",
     "@reduxjs/toolkit": "^1.8.1",
     "@testing-library/jest-dom": "^5.16.2",
     "@testing-library/react": "^12.1.2",

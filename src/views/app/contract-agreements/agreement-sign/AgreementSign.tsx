@@ -464,7 +464,7 @@ const AgreementSign: React.FC = () => {
                                                     width: '791px',
                                                     position: 'absolute',
                                                     top: '28px',
-                                                    zIndex: '1',
+                                                    zIndex: 1,
                                                 }}
                                                 className="bg-transparent"
                                                 id='pdf-form-input-container'

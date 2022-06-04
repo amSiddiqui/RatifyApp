@@ -4,7 +4,16 @@ import { Colxx, Separator } from '../../components/common/CustomBootstrap';
 import Breadcrumb from '../../containers/navs/Breadcrumb';
 import { useLocation } from 'react-router-dom';
 import { useIntl } from 'react-intl';
-import { Center, Collapse, Grid, Group, Menu, Stack, TextInput } from '@mantine/core';
+import {
+    Center,
+    Collapse,
+    Grid,
+    Group,
+    Menu,
+    PasswordInput,
+    Stack,
+    TextInput,
+} from '@mantine/core';
 import { useDispatch, useSelector } from 'react-redux';
 import { AppDispatch, RootState } from '../../redux';
 import { AuthHelper } from '../../helpers/AuthHelper';
@@ -13,9 +22,14 @@ import { toast } from 'react-toastify';
 import { passwordValidation } from '../../helpers/Utils';
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
-import { UserSettingsFormType, UserSettingsWithImage, UserType } from '../../types/AuthTypes';
+import {
+    UserSettingsFormType,
+    UserSettingsWithImage,
+    UserType,
+} from '../../types/AuthTypes';
 import { authActions } from '../../redux/auth-slice';
 import { DateTime } from 'luxon';
+import PasswordStrength from '../user/password-strength';
 
 const WAIT_BEFORE_RESENT_EMAIL_IN_SECONDS = 60 * 10;
 
@@ -27,7 +41,7 @@ const getDateDiff = (date: DateTime | null) => {
     // get diff in seconds
     const diff = now.diff(date).as('seconds');
     return diff;
-}
+};
 
 const ProfileSettings: React.FC = () => {
     const match = useLocation();
@@ -47,9 +61,12 @@ const ProfileSettings: React.FC = () => {
         [dispatchFn],
     );
 
-    const [lastVerificationSent, setLastVerificationSent] = React.useState<DateTime | null>(null);
+    const [lastVerificationSent, setLastVerificationSent] =
+        React.useState<DateTime | null>(null);
     const [verificationSent, setVerificationSent] = React.useState(false);
-    const [userVerified, setUserVerified] = React.useState(auth.user ? auth.user.verified : false);
+    const [userVerified, setUserVerified] = React.useState(
+        auth.user ? auth.user.verified : false,
+    );
 
     const schema = Yup.object().shape({
         changePassword: Yup.boolean(),
@@ -111,7 +128,7 @@ const ProfileSettings: React.FC = () => {
             confirmPassword: '',
         },
     });
-    
+
     const showPassword = watch('changePassword');
 
     const fileInputRef = React.useRef<HTMLInputElement>(null);
@@ -129,7 +146,7 @@ const ProfileSettings: React.FC = () => {
     };
 
     const onSubmit = (data: UserSettingsFormType) => {
-        let userData = {...data, imgUpdated: false} as UserSettingsWithImage;
+        let userData = { ...data, imgUpdated: false } as UserSettingsWithImage;
         let newImg = auth.user ? auth.user.img : '';
         if (imgUpdated) {
             let userImage = image;
@@ -141,36 +158,48 @@ const ProfileSettings: React.FC = () => {
             userData.imgUpdated = true;
             newImg = userImage;
         }
-        console.log('Sending data: ', {userData});
-        authHelper.updateUser(userData).then(() => {
-            const newUser = {
-                ...auth.user,
-                first_name: userData.firstName,
-                last_name: userData.lastName,
-                email: userData.email,
-                img: newImg,
-            } as UserType;
-            console.log('Setting user: ', {newUser});
-            dispatchFn(authActions.setUser(newUser));
-            toast.success('User updated successfully');
-        }).catch(err => {
-            if (err.response && err.response.data && err.response.data.status === 'error') {
-                toast.error(err.response.data.message);
-            } else {
-                toast.error('Something went wrong! Try again later!');
-            }
-            console.log(err);
-        });  
+        console.log('Sending data: ', { userData });
+        authHelper
+            .updateUser(userData)
+            .then(() => {
+                const newUser = {
+                    ...auth.user,
+                    first_name: userData.firstName,
+                    last_name: userData.lastName,
+                    email: userData.email,
+                    img: newImg,
+                } as UserType;
+                console.log('Setting user: ', { newUser });
+                dispatchFn(authActions.setUser(newUser));
+                toast.success('User updated successfully');
+            })
+            .catch((err) => {
+                if (
+                    err.response &&
+                    err.response.data &&
+                    err.response.data.status === 'error'
+                ) {
+                    toast.error(err.response.data.message);
+                } else {
+                    toast.error('Something went wrong! Try again later!');
+                }
+                console.log(err);
+            });
     };
 
     React.useEffect(() => {
-        authHelper.getUserVerified().then(data => {
-            setUserVerified(data.verified);
-            setLastVerificationSent(DateTime.fromISO(data.last_verification_sent).toLocal());
-        }).catch(err => {
-            toast.error('Cannot user at the moment. Try again later!');
-            console.log(err);
-        });
+        authHelper
+            .getUserVerified()
+            .then((data) => {
+                setUserVerified(data.verified);
+                setLastVerificationSent(
+                    DateTime.fromISO(data.last_verification_sent).toLocal(),
+                );
+            })
+            .catch((err) => {
+                toast.error('Cannot user at the moment. Try again later!');
+                console.log(err);
+            });
     }, [authHelper]);
 
     return (
@@ -187,43 +216,71 @@ const ProfileSettings: React.FC = () => {
             <Center>
                 <Stack>
                     <Center>
-                        {auth.user && !userVerified && 
-                        <>
-                        {!verificationSent && 
-                            <Alert color='danger' style={{width: 450}}>
-                                <Stack>
-                                    <p>Please verify your account using the link provided in the email. If you have not received the email, request for a new email</p>
-                                    {getDateDiff(lastVerificationSent) > WAIT_BEFORE_RESENT_EMAIL_IN_SECONDS ?
-                                        <span onClick={() => {
-                                            authHelper.sendVerificationLink()
-                                            .then(() => {
-                                                setVerificationSent(true);
-                                            })
-                                            .catch(err => {
-                                                toast.error('Cannot send a verification email. Try again later!');
-                                            });
-                                        }}><Button color='primary' size='xs'>Resend Verification</Button></span> :
-                                        <p className='text-muted'>Wait 10 minutes before creating a new link.</p>
-                                    }
-                                </Stack>
-                            </Alert>
-                        }
-                        {verificationSent &&
-                            <Alert color='success' style={{width: 450}}>
-                                <p>Verification email sent. Please check your email.</p>
-                            </Alert>
-                        }
-                        </>
-                        }
+                        {auth.user && !userVerified && (
+                            <>
+                                {!verificationSent && (
+                                    <Alert
+                                        color="danger"
+                                        style={{ width: 450 }}>
+                                        <Stack>
+                                            <p>
+                                                Please verify your account using
+                                                the link provided in the email.
+                                                If you have not received the
+                                                email, request for a new email
+                                            </p>
+                                            {getDateDiff(lastVerificationSent) >
+                                            WAIT_BEFORE_RESENT_EMAIL_IN_SECONDS ? (
+                                                <span
+                                                    onClick={() => {
+                                                        authHelper
+                                                            .sendVerificationLink()
+                                                            .then(() => {
+                                                                setVerificationSent(
+                                                                    true,
+                                                                );
+                                                            })
+                                                            .catch((err) => {
+                                                                toast.error(
+                                                                    'Cannot send a verification email. Try again later!',
+                                                                );
+                                                            });
+                                                    }}>
+                                                    <Button
+                                                        color="primary"
+                                                        size="xs">
+                                                        Resend Verification
+                                                    </Button>
+                                                </span>
+                                            ) : (
+                                                <p className="text-muted">
+                                                    Wait 10 minutes before
+                                                    creating a new link.
+                                                </p>
+                                            )}
+                                        </Stack>
+                                    </Alert>
+                                )}
+                                {verificationSent && (
+                                    <Alert
+                                        color="success"
+                                        style={{ width: 450 }}>
+                                        <p>
+                                            Verification email sent. Please
+                                            check your email.
+                                        </p>
+                                    </Alert>
+                                )}
+                            </>
+                        )}
                     </Center>
                     <Card>
                         <CardBody>
-                            <form
-                                onSubmit={handleSubmit(onSubmit)}>
+                            <form style={{maxWidth: 475}} onSubmit={handleSubmit(onSubmit)}>
                                 <Stack>
                                     <div className="profile-picture-container ml-2">
                                         <img
-                                        src={
+                                            src={
                                                 image.length === 0
                                                     ? '/static/img/default.jpg'
                                                     : image
@@ -232,31 +289,56 @@ const ProfileSettings: React.FC = () => {
                                             alt="Profile"
                                         />
                                         <span>
-                                            <Menu className='relative top-10 right-4'>
-                                                <Menu.Item className='hover:bg-gray-100' onClick={() => {
-                                                    if (fileInputRef.current) {
-                                                        fileInputRef.current.click();
-                                                    }
-                                                }}>
+                                            <Menu className="relative top-10 right-4">
+                                                <Menu.Item
+                                                    className="hover:bg-gray-100"
+                                                    onClick={() => {
+                                                        if (
+                                                            fileInputRef.current
+                                                        ) {
+                                                            fileInputRef.current.click();
+                                                        }
+                                                    }}>
                                                     Upload
                                                 </Menu.Item>
-                                                <Menu.Item onClick={() => {
-                                                    authHelper.deleteProfileImage().then(() => {
-                                                        if (auth.user) {
-                                                            setImage('');
-                                                            setImgUpdated(false);
-                                                            dispatchFn(authActions.setUser({...auth.user, img: ''}));
-                                                        }
-                                                    }).catch(err => {
-                                                        toast.error('Cannot delete profile image. Try again later!');
-                                                        console.log(err);
-                                                    });
-                                                }} className='hover:bg-gray-100' color='red'>
+                                                <Menu.Item
+                                                    onClick={() => {
+                                                        authHelper
+                                                            .deleteProfileImage()
+                                                            .then(() => {
+                                                                if (auth.user) {
+                                                                    setImage(
+                                                                        '',
+                                                                    );
+                                                                    setImgUpdated(
+                                                                        false,
+                                                                    );
+                                                                    dispatchFn(
+                                                                        authActions.setUser(
+                                                                            {
+                                                                                ...auth.user,
+                                                                                img: '',
+                                                                            },
+                                                                        ),
+                                                                    );
+                                                                }
+                                                            })
+                                                            .catch((err) => {
+                                                                toast.error(
+                                                                    'Cannot delete profile image. Try again later!',
+                                                                );
+                                                                console.log(
+                                                                    err,
+                                                                );
+                                                            });
+                                                    }}
+                                                    className="hover:bg-gray-100"
+                                                    color="red">
                                                     Remove
                                                 </Menu.Item>
                                             </Menu>
                                         </span>
-                                        
+
                                         <input
                                             onChange={onImageUpload}
                                             accept="image/*"
@@ -272,12 +354,15 @@ const ProfileSettings: React.FC = () => {
                                                 {...register('firstName')}
                                                 error={
                                                     errors.firstName
-                                                        ? errors.firstName.message
+                                                        ? errors.firstName
+                                                              .message
                                                         : ''
                                                 }
-                                                placeholder={intl.formatMessage({
-                                                    id: 'profile-settings.first-name',
-                                                })}
+                                                placeholder={intl.formatMessage(
+                                                    {
+                                                        id: 'profile-settings.first-name',
+                                                    },
+                                                )}
                                                 label={intl.formatMessage({
                                                     id: 'profile-settings.first-name',
                                                 })}
@@ -288,12 +373,15 @@ const ProfileSettings: React.FC = () => {
                                                 {...register('lastName')}
                                                 error={
                                                     errors.lastName
-                                                        ? errors.lastName.message
+                                                        ? errors.lastName
+                                                              .message
                                                         : ''
                                                 }
-                                                placeholder={intl.formatMessage({
-                                                    id: 'profile-settings.first-name',
-                                                })}
+                                                placeholder={intl.formatMessage(
+                                                    {
+                                                        id: 'profile-settings.first-name',
+                                                    },
+                                                )}
                                                 label={intl.formatMessage({
                                                     id: 'profile-settings.last-name',
                                                 })}
@@ -304,7 +392,9 @@ const ProfileSettings: React.FC = () => {
                                         required={true}
                                         {...register('email')}
                                         error={
-                                            errors.email ? errors.email.message : ''
+                                            errors.email
+                                                ? errors.email.message
+                                                : ''
                                         }
                                         placeholder={intl.formatMessage({
                                             id: 'profile-settings.email',
@@ -317,11 +407,9 @@ const ProfileSettings: React.FC = () => {
                                     <p
                                         className="cursor-pointer"
                                         onClick={() => {
-                                            let prev = getValues().changePassword;
-                                            setValue(
-                                                'changePassword',
-                                                !prev,
-                                            );
+                                            let prev =
+                                                getValues().changePassword;
+                                            setValue('changePassword', !prev);
                                         }}>
                                         <i
                                             className={
@@ -336,33 +424,43 @@ const ProfileSettings: React.FC = () => {
                                     </p>
                                     <Collapse in={showPassword}>
                                         <Stack>
-                                            <TextInput
+                                            <PasswordInput
                                                 {...register('oldPassword')}
                                                 error={
                                                     errors.oldPassword
-                                                        ? errors.oldPassword.message
+                                                        ? errors.oldPassword
+                                                              .message
                                                         : ''
                                                 }
                                                 type="password"
                                                 label="Old Password"
                                                 placeholder="Old Password"
                                             />
-                                            <TextInput
-                                                {...register('newPassword')}
-                                                error={
-                                                    errors.newPassword
-                                                        ? errors.newPassword.message
-                                                        : ''
+                                            <PasswordStrength
+                                                name={
+                                                    register('newPassword').name
                                                 }
-                                                type="password"
                                                 label="New Password"
                                                 placeholder="New Password"
+                                                size="md"
+                                                onChange={
+                                                    register('newPassword')
+                                                        .onChange
+                                                }
+                                                onBlur={
+                                                    register('newPassword')
+                                                        .onBlur
+                                                }
+                                                ref={
+                                                    register('newPassword').ref
+                                                }
                                             />
-                                            <TextInput
+                                            <PasswordInput
                                                 {...register('confirmPassword')}
                                                 error={
                                                     errors.confirmPassword
-                                                        ? errors.confirmPassword.message
+                                                        ? errors.confirmPassword
+                                                              .message
                                                         : ''
                                                 }
                                                 type="password"

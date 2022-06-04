@@ -7,6 +7,7 @@ import {
     Group,
     Checkbox,
     Loader,
+    PasswordInput,
 } from '@mantine/core';
 import { useMediaQuery } from '@mantine/hooks';
 import React from 'react';
@@ -103,7 +104,7 @@ const Login: React.FC = () => {
                                 label="Email"
                                 placeholder="Email"
                             />
-                            <TextInput
+                            <PasswordInput
                                 {...register('password')}
                                 error={
                                     errors.password
