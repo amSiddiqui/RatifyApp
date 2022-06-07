@@ -358,6 +358,7 @@ const ProfileSettings: React.FC = () => {
                                                               .message
                                                         : ''
                                                 }
+                                                icon={<i className='simple-icon-user' />}
                                                 placeholder={intl.formatMessage(
                                                     {
                                                         id: 'profile-settings.first-name',
@@ -377,9 +378,10 @@ const ProfileSettings: React.FC = () => {
                                                               .message
                                                         : ''
                                                 }
+                                                icon={<i className='simple-icon-user' />}
                                                 placeholder={intl.formatMessage(
                                                     {
-                                                        id: 'profile-settings.first-name',
+                                                        id: 'profile-settings.last-name',
                                                     },
                                                 )}
                                                 label={intl.formatMessage({
@@ -396,6 +398,7 @@ const ProfileSettings: React.FC = () => {
                                                 ? errors.email.message
                                                 : ''
                                         }
+                                        icon={<i className='simple-icon-envelope' />}
                                         placeholder={intl.formatMessage({
                                             id: 'profile-settings.email',
                                         })}
@@ -433,6 +436,7 @@ const ProfileSettings: React.FC = () => {
                                                         : ''
                                                 }
                                                 type="password"
+                                                icon={<i className='simple-icon-lock' />}
                                                 label="Old Password"
                                                 placeholder="Old Password"
                                             />
@@ -463,6 +467,7 @@ const ProfileSettings: React.FC = () => {
                                                               .message
                                                         : ''
                                                 }
+                                                icon={<i className='simple-icon-lock' />}
                                                 type="password"
                                                 label="Confirm Password"
                                                 placeholder="Confirm Password"
@@ -471,6 +476,14 @@ const ProfileSettings: React.FC = () => {
                                     </Collapse>
 
                                     <Group position="right">
+                                        {showPassword && <span onClick={() => {
+                                            let prev = getValues().changePassword;
+                                            setValue('changePassword', !prev);
+                                        }}>
+                                            <Button color='light'>
+                                                Cancel
+                                            </Button>
+                                        </span>}
                                         <span>
                                             <Button color="primary">
                                                 {intl.formatMessage({

@@ -41,6 +41,22 @@ export type Organization = {
     updated_at: string;
 }
 
+export interface Address {
+    address1: string;
+    address2: string;
+    city: string;
+    state: string;
+    zipcode: string;
+    country: string;
+}
+
+export interface OrganizationBasicInfo extends Address {
+    id: number;
+    name: string;
+    description: string;
+    website: string;
+}
+
 export type AuthInitialStateType = {
     isAuthenticated: boolean;
     user: UserType | null;
