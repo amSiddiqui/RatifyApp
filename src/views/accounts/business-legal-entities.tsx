@@ -13,17 +13,23 @@ const functionalType = [
     'Managers & Acquisition',
 ]
 
-const BusinessLegalEntities:React.FC = () => {
+const BusinessLegalEntities:React.FC<{ prevStep: () => void }> = ({ prevStep }) => {
     const [legalEntities, setLegalEntities] = React.useState<Array<{id: number, name: string, description: string }>>([
         {id: 1, name: 'Business Name', description: ''}
     ]);
     const [businessFunctions, setBusinessFunctions] = React.useState<Array<{
         id: number,
         label: string,
-        value: string
+        entity: string
     }>>([]);
 
+    const [showError, setShowError] = React.useState(false);
+
     const matches = useMediaQuery('(max-width:800px)');
+
+    const onSubmit = () => {
+        setShowError(true);
+    }
 
     return <>
         <div className='mt-4'>
@@ -43,7 +49,9 @@ const BusinessLegalEntities:React.FC = () => {
                                                 setLegalEntities(les);
                                             }} className='simple-icon-trash text-danger cursor-pointer' /></Tooltip>}
                                         </Group>
-                                        <TextInput label='Name' placeholder='Name' value={legalEntity.name} onChange={(event) => {
+                                        <TextInput error={
+                                            showError && legalEntities[index].name === '' ? 'Please provide a name' : ''
+                                        } label='Name' placeholder='Name' value={legalEntity.name} onChange={(event) => {
                                             const newLegalEntities = [...legalEntities];
                                             newLegalEntities[index].name = event.currentTarget.value;
                                             setLegalEntities(newLegalEntities);
@@ -81,17 +89,21 @@ const BusinessLegalEntities:React.FC = () => {
                             {businessFunctions.map((func, index) => (
                                 <List.Item key={func.id}>
                                     <SimpleGrid cols={2}>
-                                        <Autocomplete data={functionalType} value={func.label} onChange={(value) => {
+                                        <Autocomplete error={
+                                            showError && func.label === '' ? 'Please provide a business function' : ''
+                                        } data={functionalType} value={func.label} onChange={(value) => {
                                             const newBF = [...businessFunctions];
                                             newBF[index].label = value;
                                             setBusinessFunctions(newBF);
                                         }} placeholder='Function type' />
                                         <Grid columns={12}>
                                             <Grid.Col span={11}>
-                                                <Select value={func.value} onChange={(value) => {
+                                                <Select error={
+                                                    showError && (func.entity === '' || func.entity === null) ? 'Please provide a legal entity' : ''
+                                                } value={func.entity} onChange={(value) => {
                                                     if (value !== null) {
                                                         const newBF = [...businessFunctions];
-                                                        newBF[index].value = value;
+                                                        newBF[index].entity = value;
                                                         setBusinessFunctions(newBF);
                                                     }
                                                 }} placeholder='Entity' data={legalEntities.map(e => e.name)} />
@@ -112,7 +124,7 @@ const BusinessLegalEntities:React.FC = () => {
                         </List>
                         <Group position={ matches ? 'left':  'right'}>
                             <span onClick={() => {
-                                const newBusinessFunction = {id: Math.floor(Math.random() * 1000000), label: '', value: ''};
+                                const newBusinessFunction = {id: Math.floor(Math.random() * 1000000), label: '', entity: ''};
                                 setBusinessFunctions([...businessFunctions, newBusinessFunction]);
                             }}><Button color='secondary'>
                                 <Group position='center' spacing='xs'>
@@ -123,8 +135,15 @@ const BusinessLegalEntities:React.FC = () => {
                         </Group>
                     </Stack>
                 </Grid.Col>
-                
             </Grid>
+            <Group position='right' className='mt-4'>
+                <span onClick={prevStep}>
+                    <Button color='light'>Back</Button>
+                </span>
+                <span onClick={onSubmit}>
+                    <Button color='primary'>Submit</Button>
+                </span>
+            </Group>
         </div>
     </>;
 }

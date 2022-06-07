@@ -34,7 +34,6 @@ const BusinessLogo: React.FC<{authHelper: AuthHelper}> = ( {authHelper} ) => {
                 setImage(data);
             })
             .catch((err) => {
-                console.log(err);
             });
     }, [authHelper]);
 

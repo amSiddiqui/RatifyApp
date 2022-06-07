@@ -50,11 +50,45 @@ export interface Address {
     country: string;
 }
 
-export interface OrganizationBasicInfo extends Address {
+export interface OrganizationBasicInfo {
     id: number;
     name: string;
     description: string;
     website: string;
+    billingAddress: Address;
+    companyAddressSame: boolean;
+    companyAddress?: Address;
+}
+
+export interface Contact {
+    name: string;
+    email: string;
+    phone: string;
+}
+
+export interface LegalEntity {
+    id: number;
+    name: string;
+    description: string;
+}
+
+export interface BusinessFunction {
+    id: number;
+    label: string;
+    entity: string;
+}
+
+export interface BusinessLegalEntities {
+    legalEntity: LegalEntity[];
+    businessFunctions: BusinessFunction[];
+}
+
+export interface OrganizationContactInfo {
+    primaryContact: Contact;
+    showSecondaryContact: boolean;
+    secondaryContact?: Contact;
+    sameBillingContact: boolean;
+    billingContact?: Contact;
 }
 
 export type AuthInitialStateType = {

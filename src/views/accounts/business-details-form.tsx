@@ -13,30 +13,37 @@ import React from 'react';
 import { useForm } from 'react-hook-form';
 import { AuthHelper } from '../../helpers/AuthHelper';
 import * as Yup from 'yup';
-import { Organization } from '../../types/AuthTypes';
-import { toast } from 'react-toastify';
+import { OrganizationBasicInfo } from '../../types/AuthTypes';
+import { Button } from 'reactstrap';
 
-const BusinessDetailsForm: React.FC<{ authHelper: AuthHelper }> = ({
-    authHelper,
-}) => {
+const addressSchema = Yup.object().shape({
+    address1: Yup.string().required('Please enter an address'),
+    address2: Yup.string().optional(),
+    city: Yup.string().required('Please enter a city'),
+    state: Yup.string().required('Please enter a state'),
+    zipcode: Yup.string().required('Please enter a zip code'),
+    country: Yup.string().required('Please enter a country'),
+});
+
+const BusinessDetailsForm: React.FC<{
+    authHelper: AuthHelper;
+    onNextStep: () => void;
+}> = ({ authHelper, onNextStep }) => {
     const [loading, setLoading] = React.useState(true);
     const [error, setError] = React.useState(false);
 
     const schema = Yup.object().shape({
         name: Yup.string().required('Please enter a business name'),
         description: Yup.string().optional(),
-        address: Yup.string().optional(),
-        city: Yup.string().optional(),
-        state: Yup.string().optional(),
-        zipcode: Yup.string().optional(),
-        country: Yup.string().optional(),
-        phone: Yup.string().optional(),
-        email: Yup.string()
-            .email('Please enter a valid email address')
-            .optional(),
         website: Yup.string()
             .url('Please enter a valid website url')
             .optional(),
+        companyAddressSame: Yup.boolean(),
+        billingAddress: addressSchema,
+        companyAddress: Yup.object().when('companyAddressSame', {
+            is: false,
+            then: addressSchema,
+        }),
     });
 
     const {
@@ -44,57 +51,35 @@ const BusinessDetailsForm: React.FC<{ authHelper: AuthHelper }> = ({
         handleSubmit,
         formState: { errors },
         setValue,
-    } = useForm<Organization>({
+        watch,
+    } = useForm<OrganizationBasicInfo>({
         resolver: yupResolver(schema),
     });
 
-    const onSubmit = (values: Organization) => {
-        authHelper
-            .updateOrganization(values)
-            .then(() => {
-                toast.success('Business profile updated successfully');
-            })
-            .catch((err) => {
-                toast.error('Error updating business profile. Try again later');
-            });
+    const sameAddress = watch('companyAddressSame');
+
+    const onSubmit = (values: OrganizationBasicInfo) => {
+        console.log('Submitted values: ', {values});
     };
 
     React.useEffect(() => {
-        authHelper
-            .getUserOrganization()
-            .then((data) => {
-                setLoading(false);
-                if (data.name !== 'Default') {
-                    setValue('name', data.name);
-                }
-                setValue('description', data.description);
-                setValue('address', data.address);
-                setValue('city', data.city);
-                setValue('state', data.state);
-                setValue('zipcode', data.zipcode);
-                setValue('country', data.country);
-                setValue('phone', data.phone);
-                setValue('email', data.email);
-                setValue('website', data.website);
-            })
-            .catch((err) => {
-                setLoading(false);
-                setError(true);
-                console.log(err);
-            });
-    }, [authHelper, setValue]);
+        setLoading(false);
+        setError(false);
+    }, []);
+
 
     return (
         <>
-            {!loading && !error && (
-                <form className="mt-4" onSubmit={handleSubmit(onSubmit)}>
+            <form
+                className="mt-4"
+                onSubmit={handleSubmit(onSubmit)}>
+                {!loading && !error && (
                     <Stack>
-                        <SimpleGrid cols={2} breakpoints={[
-                            {maxWidth: 600, cols: 1},
-                        ]}>
+                        <SimpleGrid
+                            cols={2}
+                            breakpoints={[{ maxWidth: 600, cols: 1 }]}>
                             <Stack className="p-4">
                                 <TextInput
-                                    required={true}
                                     placeholder="Business Name"
                                     label="Business Name"
                                     {...register('name')}
@@ -127,18 +112,20 @@ const BusinessDetailsForm: React.FC<{ authHelper: AuthHelper }> = ({
                             </Stack>
                         </SimpleGrid>
 
-                        <SimpleGrid cols={2} breakpoints={[
-                            {maxWidth: 600, cols: 1},
-                        ]}>
-                            <Stack className='p-4'>
+                        <SimpleGrid
+                            cols={2}
+                            breakpoints={[{ maxWidth: 600, cols: 1 }]}>
+                            <Stack className="p-4">
                                 <h4 className="font-bold my-2">
-                                    Billing Address
+                                    Billing Address{' '}
+                                    <span className="text-danger">*</span>
                                 </h4>
                                 <TextInput
-                                    {...register('address')}
+                                    {...register('billingAddress.address1')}
                                     error={
-                                        errors.address
-                                            ? errors.address.message
+                                        errors.billingAddress?.address1
+                                            ? errors.billingAddress.address1
+                                                  .message
                                             : ''
                                     }
                                     placeholder="Address"
@@ -146,45 +133,24 @@ const BusinessDetailsForm: React.FC<{ authHelper: AuthHelper }> = ({
                                 />
 
                                 <TextInput
-                                    {...register('address')}
+                                    {...register('billingAddress.address2')}
                                     error={
-                                        errors.address
-                                            ? errors.address.message
+                                        errors.billingAddress?.address2
+                                            ? errors.billingAddress.address2
+                                                  .message
                                             : ''
                                     }
                                     placeholder="Address"
                                     label="Address Line 2"
                                 />
-                                <SimpleGrid cols={2}>
-                                    <TextInput
-                                        {...register('city')}
-                                        error={
-                                            errors.city
-                                                ? errors.city.message
-                                                : ''
-                                        }
-                                        placeholder="City"
-                                        label="City"
-                                    />
-
-                                    <TextInput
-                                        {...register('state')}
-                                        error={
-                                            errors.state
-                                                ? errors.state.message
-                                                : ''
-                                        }
-                                        placeholder="State"
-                                        label="State"
-                                    />
-                                </SimpleGrid>
 
                                 <SimpleGrid cols={2}>
                                     <TextInput
-                                        {...register('country')}
+                                        {...register('billingAddress.country')}
                                         error={
-                                            errors.country
-                                                ? errors.country.message
+                                            errors.billingAddress?.country
+                                                ? errors.billingAddress.country
+                                                      .message
                                                 : ''
                                         }
                                         placeholder="Country"
@@ -192,29 +158,68 @@ const BusinessDetailsForm: React.FC<{ authHelper: AuthHelper }> = ({
                                     />
 
                                     <TextInput
-                                        {...register('zipcode')}
+                                        {...register('billingAddress.zipcode')}
                                         error={
-                                            errors.zipcode
-                                                ? errors.zipcode.message
+                                            errors.billingAddress?.zipcode
+                                                ? errors.billingAddress.zipcode
+                                                      .message
                                                 : ''
                                         }
                                         placeholder="Zip"
                                         label="Zip"
+                                    />
+                                </SimpleGrid>
+
+                                <SimpleGrid cols={2}>
+                                    <TextInput
+                                        {...register('billingAddress.city')}
+                                        error={
+                                            errors.billingAddress?.city
+                                                ? errors.billingAddress.city
+                                                      .message
+                                                : ''
+                                        }
+                                        placeholder="City"
+                                        label="City"
+                                    />
+
+                                    <TextInput
+                                        {...register('billingAddress.state')}
+                                        error={
+                                            errors.billingAddress?.state
+                                                ? errors.billingAddress.state
+                                                      .message
+                                                : ''
+                                        }
+                                        placeholder="State"
+                                        label="State"
                                     />
                                 </SimpleGrid>
                             </Stack>
-                            <Stack className='p-4'>
-                                <Group position='apart'>
+                            <Stack className="p-4">
+                                <Group position="apart">
                                     <h4 className="font-bold my-2">
                                         Company Address
                                     </h4>
-                                    <Checkbox label='Same billing address' size='md' />
+                                    <Checkbox
+                                        defaultChecked={sameAddress}
+                                        onChange={(event) => {
+                                            setValue(
+                                                'companyAddressSame',
+                                                event.target.checked,
+                                            );
+                                        }}
+                                        label="Same billing address"
+                                        size="md"
+                                    />
                                 </Group>
                                 <TextInput
-                                    {...register('address')}
+                                    disabled={sameAddress}
+                                    {...register('companyAddress.address1')}
                                     error={
-                                        errors.address
-                                            ? errors.address.message
+                                        errors.companyAddress?.address1
+                                            ? errors.companyAddress.address1
+                                                  .message
                                             : ''
                                     }
                                     placeholder="Address"
@@ -222,45 +227,26 @@ const BusinessDetailsForm: React.FC<{ authHelper: AuthHelper }> = ({
                                 />
 
                                 <TextInput
-                                    {...register('address')}
+                                    disabled={sameAddress}
+                                    {...register('companyAddress.address2')}
                                     error={
-                                        errors.address
-                                            ? errors.address.message
+                                        errors.companyAddress?.address2
+                                            ? errors.companyAddress.address2
+                                                  .message
                                             : ''
                                     }
                                     placeholder="Address"
                                     label="Address Line 2"
                                 />
-                                <SimpleGrid cols={2}>
-                                    <TextInput
-                                        {...register('city')}
-                                        error={
-                                            errors.city
-                                                ? errors.city.message
-                                                : ''
-                                        }
-                                        placeholder="City"
-                                        label="City"
-                                    />
-
-                                    <TextInput
-                                        {...register('state')}
-                                        error={
-                                            errors.state
-                                                ? errors.state.message
-                                                : ''
-                                        }
-                                        placeholder="State"
-                                        label="State"
-                                    />
-                                </SimpleGrid>
 
                                 <SimpleGrid cols={2}>
                                     <TextInput
-                                        {...register('country')}
+                                        disabled={sameAddress}
+                                        {...register('companyAddress.country')}
                                         error={
-                                            errors.country
-                                                ? errors.country.message
+                                            errors.companyAddress?.country
+                                                ? errors.companyAddress.country
+                                                      .message
                                                 : ''
                                         }
                                         placeholder="Country"
@@ -268,34 +254,69 @@ const BusinessDetailsForm: React.FC<{ authHelper: AuthHelper }> = ({
                                     />
 
                                     <TextInput
-                                        {...register('zipcode')}
+                                        {...register('companyAddress.zipcode')}
+                                        disabled={sameAddress}
                                         error={
-                                            errors.zipcode
-                                                ? errors.zipcode.message
+                                            errors.companyAddress?.zipcode
+                                                ? errors.companyAddress.zipcode
+                                                      .message
                                                 : ''
                                         }
                                         placeholder="Zip"
                                         label="Zip"
+                                    />
+                                </SimpleGrid>
+
+                                <SimpleGrid cols={2}>
+                                    <TextInput
+                                        {...register('companyAddress.city')}
+                                        disabled={sameAddress}
+                                        error={
+                                            errors.companyAddress?.city
+                                                ? errors.companyAddress.city
+                                                      .message
+                                                : ''
+                                        }
+                                        placeholder="City"
+                                        label="City"
+                                    />
+
+                                    <TextInput
+                                        {...register('companyAddress.state')}
+                                        disabled={sameAddress}
+                                        error={
+                                            errors.companyAddress?.state
+                                                ? errors.companyAddress.state
+                                                      .message
+                                                : ''
+                                        }
+                                        placeholder="State"
+                                        label="State"
                                     />
                                 </SimpleGrid>
                             </Stack>
                         </SimpleGrid>
                     </Stack>
-                </form>
-            )}
-            {loading && (
-                <Center style={{ height: 200 }}>
-                    <Loader />
-                </Center>
-            )}
-            {!loading && error && (
-                <Center style={{ height: 200 }}>
-                    <h4 className="text-muted text-center text-lg">
-                        Cannot load the business form the moment. Try again
-                        later!
-                    </h4>
-                </Center>
-            )}
+                )}
+                {loading && (
+                    <Center style={{ height: 200 }}>
+                        <Loader />
+                    </Center>
+                )}
+                {!loading && error && (
+                    <Center style={{ height: 200 }}>
+                        <h4 className="text-muted text-center text-lg">
+                            Cannot load the business form the moment. Try again
+                            later!
+                        </h4>
+                    </Center>
+                )}
+                {!loading && <Group position="right" className="mt-4">
+                    <Button type="submit" color='primary'>
+                        Save and continue
+                    </Button>
+                </Group>}
+            </form>
         </>
     );
 };
