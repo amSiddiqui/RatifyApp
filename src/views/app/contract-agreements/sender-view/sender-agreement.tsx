@@ -21,7 +21,6 @@ import {
     Separator,
 } from '../../../../components/common/CustomBootstrap';
 import Breadcrumb from '../../../../containers/navs/Breadcrumb';
-import { Organization } from '../../../../types/AuthTypes';
 import { Button, Card, CardBody } from 'reactstrap';
 import { getFormatDateFromIso } from '../../../../helpers/Utils';
 import { Document, Page } from 'react-pdf/dist/esm/entry.webpack5';
@@ -35,7 +34,7 @@ import classNames from 'classnames';
 import { toast } from 'react-toastify';
 import SenderInputView from '../form-elements/SenderInputView';
 import { AuthHelper } from '../../../../helpers/AuthHelper';
-import SignerComments from '../agreement-sign/SignerCommments';
+import SignerComments from '../agreement-sign/signer-comments';
 import SignerProgress from './signer-progress';
 
 const GRID_TOTAL = 20;
@@ -71,9 +70,7 @@ const SenderAgreement: React.FC = () => {
     const [numPages, setNumPages] = React.useState(null);
     const [pageNumber, setPageNumber] = React.useState(1);
     const canvasRef = React.useRef<HTMLDivElement>(null);
-    const [organization, setOrganization] = React.useState<Organization | null>(
-        null,
-    );
+    const [organizationName, setOrganizationName] = React.useState<string>('');
     const [clientLogo, setClientLogo] = React.useState('');
     const inputRef = React.useRef<HTMLInputElement>(null);
 
@@ -216,9 +213,9 @@ const SenderAgreement: React.FC = () => {
 
     React.useEffect(() => {
         authHelper
-            .getUserOrganization()
+            .getOrganizationName()
             .then((data) => {
-                setOrganization(data);
+                setOrganizationName(data);
             })
             .catch((err) => {
                 console.log(err);
@@ -250,11 +247,11 @@ const SenderAgreement: React.FC = () => {
                     <Grid.Col span={GRID_SIDE}>
                         <Center>
                             <Stack style={{ height: '108px' }} spacing={'xs'}>
-                                {organization && clientLogo && (
+                                {organizationName.length > 0 && clientLogo && (
                                     <div style={{ height: 75, width: 75 }}>
                                         <img
                                             src={clientLogo}
-                                            alt={organization.name}
+                                            alt={organizationName}
                                         />
                                     </div>
                                 )}
@@ -277,7 +274,7 @@ const SenderAgreement: React.FC = () => {
                                     type="file"
                                     className="hidden"
                                 />
-                                {organization && <p>{organization.name}</p>}
+                                {organizationName.length > 0 && <p>{organizationName}</p>}
                             </Stack>
                         </Center>
                     </Grid.Col>

@@ -18,7 +18,7 @@ import {
 import { Document, Page } from 'react-pdf/dist/esm/entry.webpack5';
 import classNames from 'classnames';
 import SignerInput from '../form-elements/SignerInput';
-import SignerComments from './SignerCommments';
+import SignerComments from './signer-comments';
 import { getFormatDateFromIso } from '../../../../helpers/Utils';
 
 const GRID_TOTAL = 16;

@@ -25,22 +25,6 @@ export interface UserSettingsWithImage extends UserSettingsFormType {
 }
 
 
-export type Organization = {
-    id: number;
-    name: string;
-    description: string;
-    address: string;
-    city: string;
-    state: string;
-    zipcode: string;
-    country: string;
-    phone: string;
-    email: string;
-    website: string;
-    created_at: string;
-    updated_at: string;
-}
-
 export interface Address {
     address1: string;
     address2: string;
@@ -89,6 +73,24 @@ export interface OrganizationContactInfo {
     secondaryContact?: Contact;
     sameBillingContact: boolean;
     billingContact?: Contact;
+}
+
+export type Organization = {
+    id: number;
+    name: string;
+    description: string;
+    website: string;
+    companyAddressSame: boolean;
+    companyAddress: Address | null;
+    billingAddress: Address | null;
+    primaryContact: Contact | null;
+    showSecondaryContact: boolean;
+    secondaryContact: Contact | null;
+    sameBillingContact: boolean;
+    billingContact: Contact | null;
+    stepsCompleted: number;
+    created_at: string;
+    updated_at: string;
 }
 
 export type AuthInitialStateType = {

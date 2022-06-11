@@ -1,4 +1,4 @@
-import { Card, Center } from '@mantine/core';
+import { Card, Center, Loader } from '@mantine/core';
 import React from 'react';
 import { useDispatch } from 'react-redux';
 import { useLocation } from 'react-router-dom';
@@ -7,6 +7,7 @@ import { Colxx, Separator } from '../../components/common/CustomBootstrap';
 import Breadcrumb from '../../containers/navs/Breadcrumb';
 import { AuthHelper } from '../../helpers/AuthHelper';
 import { AppDispatch } from '../../redux';
+import { Organization } from '../../types/AuthTypes';
 import BusinessDetails from './business-details';
 import BusinessProfileStepperForm from './business-profile-stepper-form';
 
@@ -17,7 +18,22 @@ const BusinessProfile: React.FC = () => {
         () => new AuthHelper(dispatchFn),
         [dispatchFn],
     );
-    const [stepperForm] = React.useState(true);
+    const [stepperForm, setStepperForm] = React.useState(true);
+    const [businessProfile, setBusinessProfile] = React.useState<Organization>();
+    const [loading, setLoading] = React.useState(true);
+    const [error, setError] = React.useState(false);
+
+    React.useEffect(() => {
+        authHelper.getOrganization().then(org => {
+            setBusinessProfile(org);
+            setLoading(false);
+            setStepperForm(org.stepsCompleted < 3);
+        }).catch(err => {
+            setLoading(false);
+            setError(true);
+            console.error(err);    
+        });
+    }, [authHelper]);
 
     return (
         <>
@@ -31,10 +47,16 @@ const BusinessProfile: React.FC = () => {
                 </Colxx>
             </Row>
             <Center>
-                {stepperForm && <Card style={{width: '100%'}} shadow={'md'}>
-                    <BusinessProfileStepperForm authHelper={authHelper} />
+                {!!businessProfile && stepperForm && !error && !loading && <Card style={{width: '100%'}} shadow={'md'}>
+                    <BusinessProfileStepperForm organization={businessProfile} authHelper={authHelper} />
                 </Card>}
-                {!stepperForm && <BusinessDetails authHelper={authHelper} />}
+                {!!businessProfile && !stepperForm && !error && !loading && <BusinessDetails authHelper={authHelper} />}
+                {loading && <Center style={{height: 300}}>
+                    <Loader size={'lg'} />    
+                </Center>}
+                {!loading && (error || !businessProfile) && <h3 className='text-muted text-center'>
+                    Cannot fetch business profile at the moment try again later.
+                </h3>}
             </Center>
         </>
     );

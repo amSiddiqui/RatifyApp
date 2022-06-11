@@ -2,9 +2,11 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import { Checkbox, Collapse, Group, SimpleGrid, Stack, TextInput } from '@mantine/core';
 import React from 'react';
 import { useForm } from 'react-hook-form';
+import { toast } from 'react-toastify';
 import { Button } from 'reactstrap';
 import * as Yup from 'yup';
-import { OrganizationContactInfo } from '../../types/AuthTypes';
+import { AuthHelper } from '../../helpers/AuthHelper';
+import { Organization, OrganizationContactInfo } from '../../types/AuthTypes';
 
 const phoneRegex = /^[+]?[(]?[0-9]{3}[)]?[-\s.]?[0-9]{3}[-\s.]?[0-9]{4,6}$/;
 
@@ -18,7 +20,12 @@ const contactSchema = Yup.object().shape({
     phone: Yup.string().matches(phoneRegex, {message: 'Please provide a valid phone number', excludeEmptyString: true}),
 });
 
-const BusinessContactForm:React.FC<{prevStep: () => void, nextStep: () => void}> = ({nextStep, prevStep}) => {
+const BusinessContactForm:React.FC<{
+    prevStep: () => void, 
+    nextStep: () => void, 
+    authHelper: AuthHelper,
+    organization: Organization,
+}> = ({nextStep, prevStep, authHelper, organization}) => {
 
     const schema = Yup.object().shape({
         primaryContact: contactSchema,
@@ -41,15 +48,27 @@ const BusinessContactForm:React.FC<{prevStep: () => void, nextStep: () => void}>
         watch,
         setValue,
     } = useForm<OrganizationContactInfo>({
-        resolver: yupResolver(schema)
+        resolver: yupResolver(schema),
+        defaultValues: {
+            showSecondaryContact: organization.showSecondaryContact,
+            sameBillingContact: organization.sameBillingContact,
+            primaryContact: organization.primaryContact === null ? undefined: organization.primaryContact,
+            secondaryContact: organization.secondaryContact === null ? undefined: organization.secondaryContact,
+            billingContact: organization.billingContact === null ? undefined: organization.billingContact,
+        }
     });
 
     const showSecondaryContact = watch('showSecondaryContact');
     const sameBillingContact = watch('sameBillingContact');
 
     const onSubmit = (data: OrganizationContactInfo) => {
-        console.log(data);
-        console.log('Submitted');
+        authHelper.updateOrganizationContact(data).then(() => {
+            toast.success('Business contacts saved!');
+            nextStep();
+        }).catch(err => {
+            console.log(err);
+            toast.error('Something went wrong, try again later!');
+        })
     }
 
     return <>

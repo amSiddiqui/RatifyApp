@@ -1,5 +1,5 @@
 import React from 'react';
-import { AgreementSignNav } from './AgreementSign';
+import { AgreementSignNav } from './agreement-sign';
 
 const AgreementGreetings:React.FC = () => {
     return (

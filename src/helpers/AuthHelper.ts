@@ -6,6 +6,8 @@ import {
     UserType,
     Organization,
     UserSettingsWithImage,
+    OrganizationBasicInfo,
+    OrganizationContactInfo,
 } from '../types/AuthTypes';
 import { authActions } from '../redux/auth-slice';
 import { LoginDataType } from '../types/AuthTypes';
@@ -74,7 +76,7 @@ export class AuthHelper extends ApiHelper {
         );
     }
 
-    async getUserOrganization() {
+    async getOrganization() {
         let token = await this.getToken();
         if (token !== null) {
             let response: AxiosResponse<Organization> = await axios.get(
@@ -85,6 +87,30 @@ export class AuthHelper extends ApiHelper {
         }
         throw new NoTokenError('No token');
     }
+    
+    async getOrganizationName() {
+        let response: AxiosResponse<string> = await axios.get(
+            `/auth/user/organization/name/`,
+            { headers: { Authorization: `Bearer ${await this.getToken()}` } },
+        )
+        return response.data;
+    }
+
+    async updateOrganizationBasicInfo(data: OrganizationBasicInfo) {
+        await axios.put(
+            `/auth/user/organization/basic/`,
+            data,
+            { headers: { Authorization: `Bearer ${await this.getToken()}` } },
+        );
+    }
+
+    async updateOrganizationContact(data: OrganizationContactInfo) {
+        await axios.put(
+            `/auth/user/organization/contact/`,
+            data,
+            { headers: { Authorization: `Bearer ${await this.getToken()}` } },
+        );
+    }
 
     async getOrganizationLogo() {
         let response: AxiosResponse<string> = await axios.get(
@@ -92,14 +118,6 @@ export class AuthHelper extends ApiHelper {
             { headers: { Authorization: `Bearer ${await this.getToken()}` } },
         );
         return response.data;
-    }
-
-    async updateOrganization(organization: Organization) {
-        await axios.put(
-            `/auth/user/organization/`,
-            organization,
-            { headers: { Authorization: `Bearer ${await this.getToken()}` } },
-        );
     }
 
     async updateOrganizationLogo(logo: string) {

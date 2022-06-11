@@ -1,3 +1,3 @@
-import AgreementSign from "./AgreementSign";
+import AgreementSign from "./agreement-sign";
 
 export default AgreementSign;
