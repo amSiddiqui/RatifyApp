@@ -52,7 +52,7 @@ const BusinessProfile: React.FC = () => {
                         setStepperForm(false);
                     }} organization={businessProfile} authHelper={authHelper} />
                 </Card>}
-                {!!businessProfile && !stepperForm && !error && !loading && <BusinessDetails authHelper={authHelper} />}
+                {!!businessProfile && !stepperForm && !error && !loading && <BusinessDetails authHelper={authHelper} organization={businessProfile} />}
                 {loading && <Center style={{height: 300}}>
                     <Loader size={'lg'} />    
                 </Center>}

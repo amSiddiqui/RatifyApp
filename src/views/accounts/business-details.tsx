@@ -2,6 +2,7 @@ import { Card, Center, Grid, Stack, TextInput } from '@mantine/core';
 import React from 'react';
 import { MdEdit } from 'react-icons/md';
 import { AuthHelper } from '../../helpers/AuthHelper';
+import { BusinessFunction, LegalEntity, Organization } from '../../types/AuthTypes';
 import BusinessLogo from './business-logo';
 
 const EditButton: React.FC = () => {
@@ -14,9 +15,24 @@ const EditButton: React.FC = () => {
     );
 };
 
-const BusinessDetails: React.FC<{ authHelper: AuthHelper }> = ({
+const BusinessDetails: React.FC<{ authHelper: AuthHelper, organization: Organization }> = ({
     authHelper,
+    organization: org
 }) => {
+
+    const [legalEntities, setLegalEntities] = React.useState<LegalEntity[]>([]);
+    const [businessFunctions, setBusinessFunctions] = React.useState<BusinessFunction[]>([]);
+
+
+    React.useEffect(() => {
+        authHelper.getOrganizationLegalEntities().then(data => {
+            setLegalEntities(data.legalEntity);
+            setBusinessFunctions(data.businessFunction);
+        }).catch(err => {
+            console.log(err);
+        })
+    }, [authHelper]);
+
     return (
         <Stack className="w-full">
             <Grid columns={12}>
@@ -25,7 +41,7 @@ const BusinessDetails: React.FC<{ authHelper: AuthHelper }> = ({
                     <Center className="h-full">
                         <TextInput
                             size="xl"
-                            value={'Company Name Placeholder'}
+                            defaultValue={org.name}
                             variant="unstyled"
                         />
                     </Center>
@@ -44,7 +60,7 @@ const BusinessDetails: React.FC<{ authHelper: AuthHelper }> = ({
                                     <p className="text-muted">Website</p>
                                 </Grid.Col>
                                 <Grid.Col span={9}>
-                                    <p>www.example.com</p>
+                                    <p>{org.website}</p>
                                 </Grid.Col>
                             </Grid>
                             <Grid columns={12}>
@@ -54,8 +70,9 @@ const BusinessDetails: React.FC<{ authHelper: AuthHelper }> = ({
                                     </p>
                                 </Grid.Col>
                                 <Grid.Col span={9}>
-                                    <p>Address line 1</p>
-                                    <p>Address line 2</p>
+                                    <p>{org.companyAddressSame ?  org.billingAddress?.address1 : org.companyAddress?.address1}</p>
+                                    <p>{org.companyAddressSame ?  org.billingAddress?.address2 : org.companyAddress?.address2}</p>
+                                    <p>{org.companyAddressSame ?  org.billingAddress?.city : org.companyAddress?.city}, {org.companyAddressSame ?  org.billingAddress?.state : org.companyAddress?.state}</p>
                                 </Grid.Col>
                             </Grid>
                             <Grid columns={12}>
@@ -65,7 +82,7 @@ const BusinessDetails: React.FC<{ authHelper: AuthHelper }> = ({
                                     </p>
                                 </Grid.Col>
                                 <Grid.Col span={9}>
-                                    <p>ABC 123</p>
+                                    <p>{org.companyAddressSame ?  org.billingAddress?.zipcode : org.companyAddress?.zipcode}</p>
                                 </Grid.Col>
                             </Grid>
                             <Grid columns={12}>
@@ -73,7 +90,7 @@ const BusinessDetails: React.FC<{ authHelper: AuthHelper }> = ({
                                     <p className="text-muted">Country</p>
                                 </Grid.Col>
                                 <Grid.Col span={9}>
-                                    <p>UK</p>
+                                    <p>{org.companyAddressSame ?  org.billingAddress?.country : org.companyAddress?.country}</p>
                                 </Grid.Col>
                             </Grid>
                         </Stack>
@@ -90,8 +107,9 @@ const BusinessDetails: React.FC<{ authHelper: AuthHelper }> = ({
                                     </p>
                                 </Grid.Col>
                                 <Grid.Col span={9}>
-                                    <p>Address line 1</p>
-                                    <p>Address line 2</p>
+                                    <p>{org.billingAddress?.address1}</p>
+                                    <p>{org.billingAddress?.address2}</p>
+                                    <p>{org.billingAddress?.city}, {org.billingAddress?.state}</p>
                                 </Grid.Col>
                             </Grid>
                             <Grid columns={12}>
@@ -101,7 +119,7 @@ const BusinessDetails: React.FC<{ authHelper: AuthHelper }> = ({
                                     </p>
                                 </Grid.Col>
                                 <Grid.Col span={9}>
-                                    <p>ABC 123</p>
+                                    <p>{org.billingAddress?.zipcode}</p>
                                 </Grid.Col>
                             </Grid>
                             <Grid columns={12}>
@@ -109,7 +127,7 @@ const BusinessDetails: React.FC<{ authHelper: AuthHelper }> = ({
                                     <p className="text-muted">Country</p>
                                 </Grid.Col>
                                 <Grid.Col span={9}>
-                                    <p>UK</p>
+                                    <p>{org.billingAddress?.country}</p>
                                 </Grid.Col>
                             </Grid>
                         </Stack>
@@ -124,7 +142,7 @@ const BusinessDetails: React.FC<{ authHelper: AuthHelper }> = ({
                             <p className="text-muted">Primary Contact</p>
                         </Grid.Col>
                         <Grid.Col span={2}>
-                            <p>John Smith</p>
+                            <p>{org.primaryContact?.name}</p>
                         </Grid.Col>
                         <Grid.Col span={2}>
                             <p>
@@ -134,7 +152,7 @@ const BusinessDetails: React.FC<{ authHelper: AuthHelper }> = ({
                                         style={{ top: 2 }}
                                     />
                                 </span>
-                                email@example.com
+                                {org.primaryContact?.email}
                             </p>
                         </Grid.Col>
                         <Grid.Col span={4}>
@@ -145,46 +163,48 @@ const BusinessDetails: React.FC<{ authHelper: AuthHelper }> = ({
                                         style={{ top: 1 }}
                                     />
                                 </span>
-                                +44 123 456 789
+                                {org.primaryContact?.phone}
                             </p>
                         </Grid.Col>
                     </Grid>
-                    <Grid columns={12}>
-                        <Grid.Col span={2}>
-                            <p className="text-muted">Secondary Contact</p>
-                        </Grid.Col>
-                        <Grid.Col span={2}>
-                            <p>John Smith</p>
-                        </Grid.Col>
-                        <Grid.Col span={2}>
-                            <p>
-                                <span>
-                                    <i
-                                        className="simple-icon-envelope mr-1 relative"
-                                        style={{ top: 2 }}
-                                    />
-                                </span>
-                                email@example.com
-                            </p>
-                        </Grid.Col>
-                        <Grid.Col span={4}>
-                            <p>
-                                <span>
-                                    <i
-                                        className="simple-icon-phone mr-1 relative"
-                                        style={{ top: 1 }}
-                                    />
-                                </span>
-                                +44 123 456 789
-                            </p>
-                        </Grid.Col>
-                    </Grid>
+                    {org.showSecondaryContact && (
+                        <Grid columns={12}>
+                            <Grid.Col span={2}>
+                                <p className="text-muted">Secondary Contact</p>
+                            </Grid.Col>
+                            <Grid.Col span={2}>
+                                <p>{org.secondaryContact?.name}</p>
+                            </Grid.Col>
+                            <Grid.Col span={2}>
+                                <p>
+                                    <span>
+                                        <i
+                                            className="simple-icon-envelope mr-1 relative"
+                                            style={{ top: 2 }}
+                                        />
+                                    </span>
+                                    {org.secondaryContact?.email}
+                                </p>
+                            </Grid.Col>
+                            <Grid.Col span={4}>
+                                <p>
+                                    <span>
+                                        <i
+                                            className="simple-icon-phone mr-1 relative"
+                                            style={{ top: 1 }}
+                                        />
+                                    </span>
+                                    {org.secondaryContact?.phone}
+                                </p>
+                            </Grid.Col>
+                        </Grid>
+                    )}
                     <Grid columns={12}>
                         <Grid.Col span={2}>
                             <p className="text-muted">Billing Contact</p>
                         </Grid.Col>
                         <Grid.Col span={2}>
-                            <p>John Smith</p>
+                            <p>{org.sameBillingContact ? org.primaryContact?.name : org.billingContact?.name}</p>
                         </Grid.Col>
                         <Grid.Col span={2}>
                             <p>
@@ -194,7 +214,7 @@ const BusinessDetails: React.FC<{ authHelper: AuthHelper }> = ({
                                         style={{ top: 2 }}
                                     />
                                 </span>
-                                email@example.com
+                                {org.sameBillingContact ? org.primaryContact?.email : org.billingContact?.email}
                             </p>
                         </Grid.Col>
                         <Grid.Col span={4}>
@@ -205,7 +225,7 @@ const BusinessDetails: React.FC<{ authHelper: AuthHelper }> = ({
                                         style={{ top: 1 }}
                                     />
                                 </span>
-                                +44 123 456 789
+                                {org.sameBillingContact ? org.primaryContact?.phone : org.billingContact?.phone}
                             </p>
                         </Grid.Col>
                     </Grid>
@@ -219,9 +239,9 @@ const BusinessDetails: React.FC<{ authHelper: AuthHelper }> = ({
                     </Grid.Col>
                     <Grid.Col span={10}>
                         <Stack spacing="xs">
-                            <p>Company Hotel</p>
-                            <p>Company Credit Card PLC</p>
-                            <p>Company Resorts PVT</p>
+                            {legalEntities.map((le) => (
+                            <p key={le.id}>{le.name} {le.description.length > 0 ? ':' : ''} <span className='text-xs text-muted'>{le.description}</span></p>
+                            ))}
                         </Stack>
                     </Grid.Col>
                 </Grid>
@@ -234,22 +254,16 @@ const BusinessDetails: React.FC<{ authHelper: AuthHelper }> = ({
                     </Grid.Col>
                     <Grid.Col span={2}>
                         <Stack>
-                            <p>Legal</p>
-                            <p>Human Resources</p>
-                            <p>Finance</p>
-                            <p>Technology</p>
-                            <p>Business Development</p>
-                            <p>Managers & Acquisitions</p>
+                            {businessFunctions.map((bf) => (
+                                <p key={bf.id}>{bf.label}</p>
+                            ))}
                         </Stack>
                     </Grid.Col>
                     <Grid.Col span={8}>
                         <Stack>
-                            <p>Company Group</p>
-                            <p>Company Group</p>
-                            <p>Company Group</p>
-                            <p>Company Group</p>
-                            <p>Company Group</p>
-                            <p>Company Group</p>
+                            {businessFunctions.map((bf) => (
+                                <p key={bf.id}>{bf.entity}</p>
+                            ))}
                         </Stack>
                     </Grid.Col>
                 </Grid>
