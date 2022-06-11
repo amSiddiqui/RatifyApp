@@ -3,6 +3,9 @@ import { Button } from 'reactstrap';
 import React from 'react';
 import { MdAdd } from 'react-icons/md';
 import { useMediaQuery } from '@mantine/hooks';
+import { BusinessFunction, LegalEntity } from '../../types/AuthTypes';
+import { AuthHelper } from '../../helpers/AuthHelper';
+import { toast } from 'react-toastify';
 
 const functionalType = [
     'Legal',
@@ -13,15 +16,9 @@ const functionalType = [
     'Managers & Acquisition',
 ]
 
-const BusinessLegalEntities:React.FC<{ prevStep: () => void }> = ({ prevStep }) => {
-    const [legalEntities, setLegalEntities] = React.useState<Array<{id: number, name: string, description: string }>>([
-        {id: 1, name: 'Business Name', description: ''}
-    ]);
-    const [businessFunctions, setBusinessFunctions] = React.useState<Array<{
-        id: number,
-        label: string,
-        entity: string
-    }>>([]);
+const BusinessLegalEntities:React.FC<{ prevStep: () => void, defaultLegalEntity?:LegalEntity, authHelper: AuthHelper, onComplete: () => void }> = ({ prevStep, defaultLegalEntity, authHelper, onComplete }) => {
+    const [legalEntities, setLegalEntities] = React.useState<LegalEntity[]>(defaultLegalEntity ? [defaultLegalEntity] : []);
+    const [businessFunctions, setBusinessFunctions] = React.useState<BusinessFunction[]>([]);
 
     const [showError, setShowError] = React.useState(false);
 
@@ -29,7 +26,24 @@ const BusinessLegalEntities:React.FC<{ prevStep: () => void }> = ({ prevStep }) 
 
     const onSubmit = () => {
         setShowError(true);
+        authHelper.updateOrganizationLegalEntities({legalEntity: legalEntities, businessFunction: businessFunctions}).then(() => {
+            toast.success('Legal entities saved');
+            onComplete();
+        }).catch(err => {
+            toast.error('Something went wrong try again later!');
+        });
     }
+
+    React.useEffect(() => {
+        authHelper.getOrganizationLegalEntities().then((data) => {
+            if (data.legalEntity.length > 0) {
+                setLegalEntities(data.legalEntity);
+            }
+            setBusinessFunctions(data.businessFunction);
+        }).catch(err => {
+            console.log(err);
+        });
+    }, [authHelper]);
 
     return <>
         <div className='mt-4'>
@@ -138,7 +152,7 @@ const BusinessLegalEntities:React.FC<{ prevStep: () => void }> = ({ prevStep }) 
             </Grid>
             <Group position='right' className='mt-4'>
                 <span onClick={prevStep}>
-                    <Button color='light'>Back</Button>
+                    <Button type='button' color='light'>Back</Button>
                 </span>
                 <span onClick={onSubmit}>
                     <Button color='primary'>Submit</Button>

@@ -11,7 +11,7 @@ import React from 'react';
 import { useForm } from 'react-hook-form';
 import { AuthHelper } from '../../helpers/AuthHelper';
 import * as Yup from 'yup';
-import { Organization, OrganizationBasicInfo } from '../../types/AuthTypes';
+import { LegalEntity, Organization, OrganizationBasicInfo } from '../../types/AuthTypes';
 import { Button } from 'reactstrap';
 import { toast } from 'react-toastify';
 
@@ -28,7 +28,8 @@ const BusinessDetailsForm: React.FC<{
     authHelper: AuthHelper;
     onNextStep: () => void;
     organization: Organization;
-}> = ({ authHelper, onNextStep, organization }) => {
+    onDefaultLegalEntity: (legalEntity: LegalEntity) => void;
+}> = ({ authHelper, onNextStep, organization, onDefaultLegalEntity }) => {
 
     const schema = Yup.object().shape({
         name: Yup.string().required('Please enter a business name'),
@@ -73,6 +74,14 @@ const BusinessDetailsForm: React.FC<{
         authHelper.updateOrganizationBasicInfo(values).then(() => {
             onNextStep();
             toast.success('Business details saved successfully');
+            // generate random id
+            const id = Math.floor(Math.random() * 1000000);
+            const legalEntity: LegalEntity = {
+                id,
+                name: values.name,
+                description: values.description,
+            }
+            onDefaultLegalEntity(legalEntity);
         }).catch(err => {
             console.log(err);
             toast.error('Something went wrong, try again later');

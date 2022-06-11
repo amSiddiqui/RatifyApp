@@ -8,6 +8,8 @@ import {
     UserSettingsWithImage,
     OrganizationBasicInfo,
     OrganizationContactInfo,
+    LegalEntity,
+    BusinessFunction,
 } from '../types/AuthTypes';
 import { authActions } from '../redux/auth-slice';
 import { LoginDataType } from '../types/AuthTypes';
@@ -86,6 +88,22 @@ export class AuthHelper extends ApiHelper {
             return response.data;
         }
         throw new NoTokenError('No token');
+    }
+
+    async getOrganizationLegalEntities() {
+        let response: AxiosResponse<{legalEntity: LegalEntity[], businessFunction: BusinessFunction[]}> = await axios.get(
+            `/auth/user/organization/entity/`,
+            { headers: { Authorization: `Bearer ${await this.getToken()}` } },
+        );
+        return response.data;
+    }
+
+    async updateOrganizationLegalEntities(data: {legalEntity: LegalEntity[], businessFunction: BusinessFunction[]}) {
+        await axios.put(
+            `/auth/user/organization/entity/`,
+            data,
+            { headers: { Authorization: `Bearer ${await this.getToken()}` } },
+        );
     }
     
     async getOrganizationName() {

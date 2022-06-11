@@ -48,7 +48,9 @@ const BusinessProfile: React.FC = () => {
             </Row>
             <Center>
                 {!!businessProfile && stepperForm && !error && !loading && <Card style={{width: '100%'}} shadow={'md'}>
-                    <BusinessProfileStepperForm organization={businessProfile} authHelper={authHelper} />
+                    <BusinessProfileStepperForm onComplete={() => {
+                        setStepperForm(false);
+                    }} organization={businessProfile} authHelper={authHelper} />
                 </Card>}
                 {!!businessProfile && !stepperForm && !error && !loading && <BusinessDetails authHelper={authHelper} />}
                 {loading && <Center style={{height: 300}}>
