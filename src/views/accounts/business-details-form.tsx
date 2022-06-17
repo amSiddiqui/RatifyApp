@@ -11,9 +11,10 @@ import React from 'react';
 import { useForm } from 'react-hook-form';
 import { AuthHelper } from '../../helpers/AuthHelper';
 import * as Yup from 'yup';
-import { LegalEntity, Organization, OrganizationBasicInfo } from '../../types/AuthTypes';
+import { Address, LegalEntity, Organization, OrganizationBasicInfo } from '../../types/AuthTypes';
 import { Button } from 'reactstrap';
 import { toast } from 'react-toastify';
+import classNames from 'classnames';
 
 const addressSchema = Yup.object().shape({
     address1: Yup.string().required('Please enter an address'),
@@ -24,12 +25,24 @@ const addressSchema = Yup.object().shape({
     country: Yup.string().required('Please enter a country'),
 });
 
+const getEmptyAddress = () => {
+    return {
+        address1: '',
+        address2: '',
+        city: '',
+        state: '',
+        zipcode: '',
+        country: '',
+    } as  Address;
+}
+
 const BusinessDetailsForm: React.FC<{
     authHelper: AuthHelper;
-    onNextStep: () => void;
+    onNextStep?: (org?:OrganizationBasicInfo) => void;
     organization: Organization;
-    onDefaultLegalEntity: (legalEntity: LegalEntity) => void;
-}> = ({ authHelper, onNextStep, organization, onDefaultLegalEntity }) => {
+    onDefaultLegalEntity?: (legalEntity: LegalEntity) => void;
+    size: 'xs' | 'md';
+}> = ({ authHelper, onNextStep, organization, onDefaultLegalEntity, size }) => {
 
     const schema = Yup.object().shape({
         name: Yup.string().required('Please enter a business name'),
@@ -49,6 +62,7 @@ const BusinessDetailsForm: React.FC<{
         handleSubmit,
         formState: { errors },
         setValue,
+        setError,
         watch,
     } = useForm<OrganizationBasicInfo>({
         resolver: yupResolver(schema),
@@ -59,11 +73,11 @@ const BusinessDetailsForm: React.FC<{
             companyAddressSame: organization.companyAddressSame,
             billingAddress:
                 organization.billingAddress === null
-                    ? undefined
+                    ? getEmptyAddress()
                     : organization.billingAddress,
             companyAddress:
                 organization.companyAddress === null
-                    ? undefined
+                    ? getEmptyAddress()
                     : organization.companyAddress,
         },
     });
@@ -72,7 +86,9 @@ const BusinessDetailsForm: React.FC<{
 
     const onSubmit = (values: OrganizationBasicInfo) => {
         authHelper.updateOrganizationBasicInfo(values).then(() => {
-            onNextStep();
+            if (!!onNextStep) {
+                onNextStep(values);
+            }
             toast.success('Business details saved successfully');
             // generate random id
             const id = Math.floor(Math.random() * 1000000);
@@ -81,7 +97,9 @@ const BusinessDetailsForm: React.FC<{
                 name: values.name,
                 description: values.description,
             }
-            onDefaultLegalEntity(legalEntity);
+            if (!!onDefaultLegalEntity) {
+                onDefaultLegalEntity(legalEntity);
+            }
         }).catch(err => {
             console.log(err);
             toast.error('Something went wrong, try again later');
@@ -90,19 +108,21 @@ const BusinessDetailsForm: React.FC<{
 
     return (
         <>
-            <form className="mt-4" onSubmit={handleSubmit(onSubmit)}>
+            <form className={classNames({ 'mt-4': size === 'md' })} onSubmit={handleSubmit(onSubmit)}>
                 <Stack>
                     <SimpleGrid
                         cols={2}
                         breakpoints={[{ maxWidth: 600, cols: 1 }]}>
                         <Stack className="p-4">
                             <TextInput
+                                size={size}
                                 placeholder="Business Name"
                                 label="Business Name"
                                 {...register('name')}
                                 error={errors.name ? errors.name.message : ''}
                             />
                             <TextInput
+                                size={size}
                                 {...register('website')}
                                 error={
                                     errors.website ? errors.website.message : ''
@@ -113,6 +133,7 @@ const BusinessDetailsForm: React.FC<{
                         </Stack>
                         <Stack className="p-4">
                             <Textarea
+                                size={size}
                                 {...register('description')}
                                 error={
                                     errors.description
@@ -129,11 +150,12 @@ const BusinessDetailsForm: React.FC<{
                         cols={2}
                         breakpoints={[{ maxWidth: 600, cols: 1 }]}>
                         <Stack className="p-4">
-                            <h4 className="font-bold my-2">
+                            <h4 className={classNames('font-bold', {'text-lg': size==='xs', 'text-xl my-2': size === 'md' })}>
                                 Billing Address{' '}
                                 <span className="text-danger">*</span>
                             </h4>
                             <TextInput
+                                size={size}
                                 {...register('billingAddress.address1')}
                                 error={
                                     errors.billingAddress?.address1
@@ -145,6 +167,7 @@ const BusinessDetailsForm: React.FC<{
                             />
 
                             <TextInput
+                                size={size}
                                 {...register('billingAddress.address2')}
                                 error={
                                     errors.billingAddress?.address2
@@ -157,6 +180,7 @@ const BusinessDetailsForm: React.FC<{
 
                             <SimpleGrid cols={2}>
                                 <TextInput
+                                    size={size}
                                     {...register('billingAddress.country')}
                                     error={
                                         errors.billingAddress?.country
@@ -169,6 +193,7 @@ const BusinessDetailsForm: React.FC<{
                                 />
 
                                 <TextInput
+                                    size={size}
                                     {...register('billingAddress.zipcode')}
                                     error={
                                         errors.billingAddress?.zipcode
@@ -177,12 +202,13 @@ const BusinessDetailsForm: React.FC<{
                                             : ''
                                     }
                                     placeholder="Zip"
-                                    label="Zip"
+                                    label="Zip Code / Postcode"
                                 />
                             </SimpleGrid>
 
                             <SimpleGrid cols={2}>
                                 <TextInput
+                                    size={size}
                                     {...register('billingAddress.city')}
                                     error={
                                         errors.billingAddress?.city
@@ -194,6 +220,7 @@ const BusinessDetailsForm: React.FC<{
                                 />
 
                                 <TextInput
+                                    size={size}
                                     {...register('billingAddress.state')}
                                     error={
                                         errors.billingAddress?.state
@@ -208,22 +235,31 @@ const BusinessDetailsForm: React.FC<{
                         </Stack>
                         <Stack className="p-4">
                             <Group position="apart">
-                                <h4 className="font-bold my-2">
-                                    Company Address
+                                <h4 className={classNames('font-bold', {'text-lg': size==='xs', 'text-xl my-2': size === 'md' })}>
+                                    Registered Address
                                 </h4>
                                 <Checkbox
+                                    size={size}
                                     defaultChecked={sameAddress}
                                     onChange={(event) => {
                                         setValue(
                                             'companyAddressSame',
                                             event.target.checked,
                                         );
+                                        if (event.target.checked) {
+                                            setError('companyAddress.address1', {type: 'required', message: ''});
+                                            setError('companyAddress.address2', {type: 'required', message: ''});
+                                            setError('companyAddress.city', {type: 'required', message: ''});
+                                            setError('companyAddress.state', {type: 'required', message: ''});
+                                            setError('companyAddress.country', {type: 'required', message: ''});
+                                            setError('companyAddress.zipcode', {type: 'required', message: ''});
+                                        }
                                     }}
-                                    label="Same billing address"
-                                    size="md"
+                                    label="Same as billing address"
                                 />
                             </Group>
                             <TextInput
+                                size={size}
                                 disabled={sameAddress}
                                 {...register('companyAddress.address1')}
                                 error={
@@ -236,6 +272,7 @@ const BusinessDetailsForm: React.FC<{
                             />
 
                             <TextInput
+                                size={size}
                                 disabled={sameAddress}
                                 {...register('companyAddress.address2')}
                                 error={
@@ -249,6 +286,7 @@ const BusinessDetailsForm: React.FC<{
 
                             <SimpleGrid cols={2}>
                                 <TextInput
+                                    size={size}
                                     disabled={sameAddress}
                                     {...register('companyAddress.country')}
                                     error={
@@ -262,6 +300,7 @@ const BusinessDetailsForm: React.FC<{
                                 />
 
                                 <TextInput
+                                    size={size}
                                     {...register('companyAddress.zipcode')}
                                     disabled={sameAddress}
                                     error={
@@ -270,13 +309,14 @@ const BusinessDetailsForm: React.FC<{
                                                   .message
                                             : ''
                                     }
-                                    placeholder="Zip"
-                                    label="Zip"
+                                    placeholder="Zip code / Postcode"
+                                    label="Zip code / Postcode"
                                 />
                             </SimpleGrid>
 
                             <SimpleGrid cols={2}>
                                 <TextInput
+                                    size={size}
                                     {...register('companyAddress.city')}
                                     disabled={sameAddress}
                                     error={
@@ -289,6 +329,7 @@ const BusinessDetailsForm: React.FC<{
                                 />
 
                                 <TextInput
+                                    size={size}
                                     {...register('companyAddress.state')}
                                     disabled={sameAddress}
                                     error={
@@ -306,8 +347,8 @@ const BusinessDetailsForm: React.FC<{
                 </Stack>
 
                 <Group position="right" className="mt-4">
-                    <Button type="submit" color="primary">
-                        Save and continue
+                    <Button size={size} type="submit" color="primary">
+                        {size === 'xs' ? 'Save' : 'Save and Continue'}
                     </Button>
                 </Group>
             </form>

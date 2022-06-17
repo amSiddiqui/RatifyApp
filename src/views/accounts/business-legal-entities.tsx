@@ -7,7 +7,7 @@ import { BusinessFunction, LegalEntity } from '../../types/AuthTypes';
 import { AuthHelper } from '../../helpers/AuthHelper';
 import { toast } from 'react-toastify';
 
-const functionalType = [
+export const AutoCompleteFunctionalData = [
     'Legal',
     'Human Resources',
     'Finance',
@@ -74,7 +74,7 @@ const BusinessLegalEntities:React.FC<{ prevStep: () => void, defaultLegalEntity?
                                             const newLegalEntities = [...legalEntities];
                                             newLegalEntities[index].description = event.currentTarget.value;
                                             setLegalEntities(newLegalEntities);
-                                        }} placeholder='Description' value={legalEntity.description} />
+                                    }} placeholder='Description' value={legalEntity.description} />
                                         <Divider />
                                     </Stack>
                                 </List.Item>
@@ -105,7 +105,7 @@ const BusinessLegalEntities:React.FC<{ prevStep: () => void, defaultLegalEntity?
                                     <SimpleGrid cols={2}>
                                         <Autocomplete error={
                                             showError && func.label === '' ? 'Please provide a business function' : ''
-                                        } data={functionalType} value={func.label} onChange={(value) => {
+                                        } data={AutoCompleteFunctionalData} value={func.label} onChange={(value) => {
                                             const newBF = [...businessFunctions];
                                             newBF[index].label = value;
                                             setBusinessFunctions(newBF);

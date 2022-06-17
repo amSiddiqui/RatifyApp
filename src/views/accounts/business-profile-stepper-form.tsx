@@ -28,12 +28,12 @@ const BusinessProfileStepperForm: React.FC<{ authHelper: AuthHelper, organizatio
         <Space h='lg'/>
         <Stepper size='sm' active={active} onStepClick={setActive} breakpoint='sm'>
             <Stepper.Step allowStepSelect={active > 0} label='Business Details' description='Provide business details' >
-                <BusinessDetailsForm onDefaultLegalEntity={(le) => {
+                <BusinessDetailsForm size='md' onDefaultLegalEntity={(le) => {
                     setDefaultLegalEntity(le);
                 }} organization={organization} onNextStep={nextStep} authHelper={authHelper} />
             </Stepper.Step>
             <Stepper.Step allowStepSelect={active > 1} label='Contacts' description='Provide business contacts' >
-                <BusinessContactForm organization={organization} authHelper={authHelper} prevStep={prevStep} nextStep={nextStep} />
+                <BusinessContactForm size='md' organization={organization} authHelper={authHelper} prevStep={prevStep} nextStep={nextStep} />
             </Stepper.Step>
             <Stepper.Step allowStepSelect={active > 2} label='Legal Entities' description='Add legal entities' >
                 <BusinessLegalEntities onComplete={onComplete} authHelper={authHelper} defaultLegalEntity={defaultLegalEntity} prevStep={prevStep} />

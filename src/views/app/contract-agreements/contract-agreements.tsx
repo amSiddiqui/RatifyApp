@@ -14,7 +14,7 @@ import { AppDispatch } from '../../../redux';
 import { useDispatch } from 'react-redux';
 import { toast } from 'react-toastify';
 import { Button } from 'reactstrap';
-import { Agreement, AgreementTemplate } from '../../../types/ContractTypes';
+import { AgreementTemplate } from '../../../types/ContractTypes';
 import { useDisclosure } from '@mantine/hooks';
 
 const ContractAgreements: React.FC = () => {
@@ -34,7 +34,6 @@ const ContractAgreements: React.FC = () => {
     const [uploadError, setUploadError] = React.useState('');
     const [progress, setProgress] = React.useState(0);
     const [newContractId, setNewContractId] = React.useState(-1);
-    const [drafts, setDrafts] = React.useState<Agreement[]>([]);
     const [templates, setTemplates] = React.useState<AgreementTemplate[]>([]);
     const [selectedTemplate, setSelectedTemplate] = React.useState<AgreementTemplate | null>(null);
     const [openTemplateConfirm, templateConfirmHandlers] = useDisclosure(false);
@@ -89,16 +88,6 @@ const ContractAgreements: React.FC = () => {
 
     React.useEffect(() => {
         contractHelper
-            .getDrafts()
-            .then((data) => {
-                setDrafts(data);
-            })
-            .catch((err) => {
-                console.log(err);
-                toast.error('Cannot fetch drafts. Try Again Later!');
-            });
-
-        contractHelper
             .getAgreementTemplates().then(data => {
                 setTemplates(data);
             })
@@ -142,10 +131,10 @@ const ContractAgreements: React.FC = () => {
                     <span className='relative' style={{top: '-2px'}}> {!openedTemplates && <i className="simple-icon-arrow-right"></i>} {openedTemplates && <i className="simple-icon-arrow-down"></i>} </span>
                     <h1 className="text-2xl mb-0">Select from saved templates</h1>
                 </div>
-                {drafts.length === 0 && (
+                {templates.length === 0 && (
                     <p>No templates found</p>
                 )}
-                {drafts.length > 0 && (
+                {templates.length > 0 && (
                     <p>
                         {templates.length}{' '}
                         {templates.length > 1

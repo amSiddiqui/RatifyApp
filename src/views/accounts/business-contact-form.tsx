@@ -1,12 +1,13 @@
 import { yupResolver } from '@hookform/resolvers/yup';
 import { Checkbox, Collapse, Group, SimpleGrid, Stack, TextInput } from '@mantine/core';
+import classNames from 'classnames';
 import React from 'react';
 import { useForm } from 'react-hook-form';
 import { toast } from 'react-toastify';
 import { Button } from 'reactstrap';
 import * as Yup from 'yup';
 import { AuthHelper } from '../../helpers/AuthHelper';
-import { Organization, OrganizationContactInfo } from '../../types/AuthTypes';
+import { Contact, Organization, OrganizationContactInfo } from '../../types/AuthTypes';
 
 const phoneRegex = /^[+]?[(]?[0-9]{3}[)]?[-\s.]?[0-9]{3}[-\s.]?[0-9]{4,6}$/;
 
@@ -20,12 +21,21 @@ const contactSchema = Yup.object().shape({
     phone: Yup.string().matches(phoneRegex, {message: 'Please provide a valid phone number', excludeEmptyString: true}),
 });
 
+const getEmptyContact = () => {
+    return {
+        name: '',
+        email: '',
+        phone: '',
+    } as Contact;
+}
+
 const BusinessContactForm:React.FC<{
-    prevStep: () => void, 
-    nextStep: () => void, 
+    prevStep?: () => void, 
+    nextStep?: (contactInfo?:OrganizationContactInfo) => void, 
     authHelper: AuthHelper,
     organization: Organization,
-}> = ({nextStep, prevStep, authHelper, organization}) => {
+    size: 'xs' | 'md'
+}> = ({nextStep, prevStep, authHelper, organization, size}) => {
 
     const schema = Yup.object().shape({
         primaryContact: contactSchema,
@@ -47,14 +57,15 @@ const BusinessContactForm:React.FC<{
         formState: { errors },
         watch,
         setValue,
+        setError,
     } = useForm<OrganizationContactInfo>({
         resolver: yupResolver(schema),
         defaultValues: {
             showSecondaryContact: organization.showSecondaryContact,
             sameBillingContact: organization.sameBillingContact,
-            primaryContact: organization.primaryContact === null ? undefined: organization.primaryContact,
-            secondaryContact: organization.secondaryContact === null ? undefined: organization.secondaryContact,
-            billingContact: organization.billingContact === null ? undefined: organization.billingContact,
+            primaryContact: organization.primaryContact === null ? getEmptyContact(): organization.primaryContact,
+            secondaryContact: organization.secondaryContact === null ? getEmptyContact(): organization.secondaryContact,
+            billingContact: organization.billingContact === null ? getEmptyContact(): organization.billingContact,
         }
     });
 
@@ -64,7 +75,9 @@ const BusinessContactForm:React.FC<{
     const onSubmit = (data: OrganizationContactInfo) => {
         authHelper.updateOrganizationContact(data).then(() => {
             toast.success('Business contacts saved!');
-            nextStep();
+            if (!!nextStep) {
+                nextStep(data);
+            }
         }).catch(err => {
             console.log(err);
             toast.error('Something went wrong, try again later!');
@@ -72,65 +85,71 @@ const BusinessContactForm:React.FC<{
     }
 
     return <>
-        <form onSubmit={handleSubmit(onSubmit)} className='mt-4'>
+        <form onSubmit={handleSubmit(onSubmit)} className={size === 'xs' ? '' : 'mt-4'}>
             <Stack>
                 <SimpleGrid cols={2} breakpoints={[
                     { maxWidth: 600, cols: 1 },
                 ]}>
                     <Stack className='p-4'>
-                        <h4 className='font-bold'>Primary Contact <span className='text-danger'>*</span></h4>
-                        <TextInput {...register('primaryContact.name')} error={
+                        <h4 className={classNames('font-bold', {'text-lg': size==='xs', 'text-xl': size === 'md' })}>Primary Contact <span className='text-danger'>*</span></h4>
+                        <TextInput size={size} {...register('primaryContact.name')} error={
                             errors.primaryContact?.name ? errors.primaryContact.name.message : ''
                         } label='Name' placeholder='Name' icon={<i className='simple-icon-user' />} />
                         <SimpleGrid cols={2} breakpoints={[
                             { maxWidth: 600, cols: 1 },
                         ]}>
-                            <TextInput type='email' {...register('primaryContact.email')} error={
+                            <TextInput size={size} type='email' {...register('primaryContact.email')} error={
                                 errors.primaryContact?.email ? errors.primaryContact.email.message : ''
                             } label='Email' placeholder='Email' icon={<i className='simple-icon-envelope' />} />
-                            <TextInput label='Phone' {...register('primaryContact.phone')} error={
+                            <TextInput size={size} label='Phone' {...register('primaryContact.phone')} error={
                                 errors.primaryContact?.phone ? errors.primaryContact.phone.message : ''
                             } placeholder='Phone' icon={<i className='simple-icon-phone' />} />
                         </SimpleGrid>
-                        <h4 className='font-bold mt-4'>Billing Contact <span className='text-danger'>*</span></h4>
-                        <Checkbox defaultChecked={sameBillingContact} onChange={(event) => {
+                        <h4 className={classNames('font-bold', {'text-lg': size==='xs', 'text-xl': size === 'md' })}>Billing Contact <span className='text-danger'>*</span></h4>
+                        <Checkbox size={size} defaultChecked={sameBillingContact} onChange={(event) => {
                             setValue('sameBillingContact', event.target.checked);
-                        }} label='Same as primary contact' size='md' />
-                        <TextInput disabled={sameBillingContact} {...register('billingContact.name')} error={
+                            if (event.target.checked) {
+                                setError('billingContact.email', {type: 'required', message: ''});
+                                setError('billingContact.email', {type: 'email', message: ''});
+                                setError('billingContact.name', {type: 'required', message: ''});
+                                setError('billingContact.phone', {type: 'matches', message: ''});
+                            }
+                        }} label='Same as primary contact' />
+                        <TextInput size={size} disabled={sameBillingContact} {...register('billingContact.name')} error={
                             errors.billingContact?.name ? errors.billingContact.name.message : ''
                         } label='Name' placeholder='Name' icon={<i className='simple-icon-user' />} />
                         <SimpleGrid cols={2} breakpoints={[
                             { maxWidth: 600, cols: 1 },
                         ]}>
-                            <TextInput disabled={sameBillingContact} {...register('billingContact.email')} error={
+                            <TextInput size={size} disabled={sameBillingContact} {...register('billingContact.email')} error={
                                 errors.billingContact?.email ? errors.billingContact.email.message : ''
                             } label='Email' placeholder='Email' icon={<i className='simple-icon-envelope' />} />
-                            <TextInput disabled={sameBillingContact} {...register('billingContact.phone')} error={
+                            <TextInput size={size} disabled={sameBillingContact} {...register('billingContact.phone')} error={
                                 errors.billingContact?.phone ? errors.billingContact.phone.message : ''
                             } label='Phone' placeholder='Phone' icon={<i className='simple-icon-phone' />} />
                         </SimpleGrid>
                     </Stack>
                     <Stack className='p-4'>
                         <Group>
-                            <Checkbox defaultChecked={showSecondaryContact} onChange={(event) => {
+                            <Checkbox size={size} defaultChecked={showSecondaryContact} onChange={(event) => {
                                 setValue('showSecondaryContact', event.target.checked);
-                            }} className='relative' style={{top: 5}} />
-                            <h4 className='font-bold mt-2'>
+                            }} />
+                            <h4 className={classNames('font-bold', {'text-lg': size==='xs', 'text-xl': size === 'md' })}>
                                 {showSecondaryContact ? 'Secondary Contact' : 'Add Secondary Contact'}
                             </h4>
                         </Group>
                         <Collapse in={showSecondaryContact}>
                             <Stack>
-                                <TextInput disabled={!showSecondaryContact} {...register('secondaryContact.name')} error={
+                                <TextInput size={size} disabled={!showSecondaryContact} {...register('secondaryContact.name')} error={
                                     errors.secondaryContact?.name ? errors.secondaryContact.name.message : ''
                                 } label='Name' placeholder='Name' icon={<i className='simple-icon-user' />} />
                                 <SimpleGrid cols={2} breakpoints={[
                                     { maxWidth: 600, cols: 1 },
                                 ]}>
-                                    <TextInput disabled={!showSecondaryContact} {...register('secondaryContact.email')} error={
+                                    <TextInput size={size} disabled={!showSecondaryContact} {...register('secondaryContact.email')} error={
                                         errors.secondaryContact?.email ? errors.secondaryContact.email.message : ''
                                     } label='Email' placeholder='Email' icon={<i className='simple-icon-envelope' />} />
-                                    <TextInput disabled={!showSecondaryContact} {...register('secondaryContact.phone')} error={
+                                    <TextInput size={size} disabled={!showSecondaryContact} {...register('secondaryContact.phone')} error={
                                         errors.secondaryContact?.phone ? errors.secondaryContact.phone.message : ''
                                     } label='Phone' placeholder='Phone' icon={<i className='simple-icon-phone' />} />
                                 </SimpleGrid>
@@ -140,10 +159,12 @@ const BusinessContactForm:React.FC<{
                     </Stack>
                 </SimpleGrid>
             </Stack>
-            <Group position='right'>
-                <span onClick={() => {prevStep()}}><Button type='button' color='light'>Back</Button></span>
-                <Button color='primary'>Save and continue</Button>
-            </Group>
+                <Group position='right'>
+                    {!!prevStep &&
+                    <span onClick={() => {prevStep()}}><Button type='button' color='light'>Back</Button></span>
+                    }
+                    <Button size={size} color='primary'>{size === 'xs' ? 'Save' : 'Save and continue'}</Button>
+                </Group>
         </form>
     </>;
 }

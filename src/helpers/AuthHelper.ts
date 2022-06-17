@@ -98,6 +98,14 @@ export class AuthHelper extends ApiHelper {
         return response.data;
     }
 
+    async updateOrganizationName(data: {name: string, description: string} ) {
+        await axios.put(
+            `/auth/user/organization/name/`,
+            data,
+            { headers: { Authorization: `Bearer ${await this.getToken()}` } },
+        );
+    }
+
     async updateOrganizationLegalEntities(data: {legalEntity: LegalEntity[], businessFunction: BusinessFunction[]}) {
         await axios.put(
             `/auth/user/organization/entity/`,
