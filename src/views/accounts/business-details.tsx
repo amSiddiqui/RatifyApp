@@ -384,7 +384,7 @@ const BusinessDetails: React.FC<{
                                     </p>
                                 </Grid.Col>
                                 <Grid.Col xs={9} md={10}>
-                                    <Group>
+                                    <Group spacing='xl'>
                                         <p>{org.primaryContact?.name}</p>
                                         <p>
                                             <span>

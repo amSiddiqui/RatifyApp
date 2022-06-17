@@ -1,5 +1,5 @@
 import { yupResolver } from '@hookform/resolvers/yup';
-import { Checkbox, Collapse, Group, SimpleGrid, Stack, TextInput } from '@mantine/core';
+import { Checkbox, Collapse, Group, SimpleGrid, Space, Stack, TextInput } from '@mantine/core';
 import classNames from 'classnames';
 import React from 'react';
 import { useForm } from 'react-hook-form';
@@ -87,10 +87,10 @@ const BusinessContactForm:React.FC<{
     return <>
         <form onSubmit={handleSubmit(onSubmit)} className={size === 'xs' ? '' : 'mt-4'}>
             <Stack>
-                <SimpleGrid cols={2} breakpoints={[
+                <SimpleGrid spacing={'xl'} cols={2} breakpoints={[
                     { maxWidth: 600, cols: 1 },
                 ]}>
-                    <Stack className='p-4'>
+                    <Stack className='p-4' spacing='lg'>
                         <h4 className={classNames('font-bold', {'text-lg': size==='xs', 'text-xl': size === 'md' })}>Primary Contact <span className='text-danger'>*</span></h4>
                         <TextInput size={size} {...register('primaryContact.name')} error={
                             errors.primaryContact?.name ? errors.primaryContact.name.message : ''
@@ -105,6 +105,7 @@ const BusinessContactForm:React.FC<{
                                 errors.primaryContact?.phone ? errors.primaryContact.phone.message : ''
                             } placeholder='Phone' icon={<i className='simple-icon-phone' />} />
                         </SimpleGrid>
+                        <Space h='lg' />
                         <h4 className={classNames('font-bold', {'text-lg': size==='xs', 'text-xl': size === 'md' })}>Billing Contact <span className='text-danger'>*</span></h4>
                         <Checkbox size={size} defaultChecked={sameBillingContact} onChange={(event) => {
                             setValue('sameBillingContact', event.target.checked);
@@ -129,7 +130,7 @@ const BusinessContactForm:React.FC<{
                             } label='Phone' placeholder='Phone' icon={<i className='simple-icon-phone' />} />
                         </SimpleGrid>
                     </Stack>
-                    <Stack className='p-4'>
+                    <Stack spacing='lg' className='p-4'>
                         <Group>
                             <Checkbox size={size} defaultChecked={showSecondaryContact} onChange={(event) => {
                                 setValue('showSecondaryContact', event.target.checked);

@@ -111,6 +111,7 @@ const BusinessDetailsForm: React.FC<{
             <form className={classNames({ 'mt-4': size === 'md' })} onSubmit={handleSubmit(onSubmit)}>
                 <Stack>
                     <SimpleGrid
+                        spacing={'xl'}
                         cols={2}
                         breakpoints={[{ maxWidth: 600, cols: 1 }]}>
                         <Stack className="p-4">
@@ -148,6 +149,7 @@ const BusinessDetailsForm: React.FC<{
 
                     <SimpleGrid
                         cols={2}
+                        spacing='xl'
                         breakpoints={[{ maxWidth: 600, cols: 1 }]}>
                         <Stack className="p-4">
                             <h4 className={classNames('font-bold', {'text-lg': size==='xs', 'text-xl my-2': size === 'md' })}>

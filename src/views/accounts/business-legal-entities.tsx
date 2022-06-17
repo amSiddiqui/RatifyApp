@@ -155,6 +155,9 @@ const BusinessLegalEntities:React.FC<{ prevStep: () => void, defaultLegalEntity?
                     <Button type='button' color='light'>Back</Button>
                 </span>
                 <span onClick={onSubmit}>
+                    <Button type='button' color='light'>Skip</Button>
+                </span>
+                <span onClick={onSubmit}>
                     <Button color='primary'>Submit</Button>
                 </span>
             </Group>
