@@ -8,7 +8,7 @@ import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import './contract-agreements.css';
 import CATopBar from './topbar';
 import DocumentCarousel from './document_carousel';
-import { Modal, Progress, Divider, Group, Center, Stack, Collapse } from '@mantine/core';
+import { Modal, Progress, Divider, Group, Center, Stack, Collapse, TextInput } from '@mantine/core';
 import { ContractHelper } from '../../../helpers/ContractHelper';
 import { AppDispatch } from '../../../redux';
 import { useDispatch } from 'react-redux';
@@ -16,6 +16,7 @@ import { toast } from 'react-toastify';
 import { Button } from 'reactstrap';
 import { AgreementTemplate } from '../../../types/ContractTypes';
 import { useDisclosure } from '@mantine/hooks';
+import { MdClose } from 'react-icons/md';
 
 const ContractAgreements: React.FC = () => {
     const match = useLocation();
@@ -38,6 +39,7 @@ const ContractAgreements: React.FC = () => {
     const [selectedTemplate, setSelectedTemplate] = React.useState<AgreementTemplate | null>(null);
     const [openTemplateConfirm, templateConfirmHandlers] = useDisclosure(false);
     const [openedTemplates, handlersTemplates] = useDisclosure(true);
+    const [searchTerm, setSearchTerm] = React.useState('');
 
     const uploadProgress = React.useCallback((progressEvent: any) => {
         setProgress(progressEvent.loaded / progressEvent.total);
@@ -126,26 +128,33 @@ const ContractAgreements: React.FC = () => {
             />
             
 
-            <div onClick={() => {handlersTemplates.toggle()}} className="flex justify-between items-center mb-2 cursor-pointer">
-                <div>
-                    <span className='relative' style={{top: '-2px'}}> {!openedTemplates && <i className="simple-icon-arrow-right"></i>} {openedTemplates && <i className="simple-icon-arrow-down"></i>} </span>
+            <Group position='apart' className="mb-2 cursor-pointer">
+                <Group onClick={() => {handlersTemplates.toggle()}}  spacing={'xs'}>
+                    <span className='relative' style={{top: '-3px'}}> {!openedTemplates && <i className="simple-icon-arrow-right"></i>} {openedTemplates && <i className="simple-icon-arrow-down"></i>} </span>
                     <h1 className="text-2xl mb-0">Select from saved templates</h1>
-                </div>
-                {templates.length === 0 && (
-                    <p>No templates found</p>
-                )}
-                {templates.length > 0 && (
-                    <p>
-                        {templates.length}{' '}
-                        {templates.length > 1
-                            ? 'templates'
-                            : 'template'}{' '}
-                        found
-                    </p>
-                )}
-            </div>
+                </Group>
+                <Group>
+                    {templates.length === 0 && (
+                        <p>No templates found</p>
+                    )}
+                    {templates.length > 0 && (
+                        <p>
+                            {templates.filter(d => d.name.toLowerCase().search(searchTerm.toLocaleLowerCase()) !== -1).length}{' '}
+                            {templates.filter(d => d.name.toLowerCase().search(searchTerm.toLocaleLowerCase()) !== -1).length > 1
+                                ? 'templates'
+                                : 'template'}{' '}
+                            found
+                        </p>
+                    )}
+                    {openedTemplates && <TextInput value={searchTerm} onChange={(event) => {
+                        setSearchTerm(event.target.value.trim());
+                    }} placeholder='Search' radius={'xl'} style={{width: 200}} rightSection={searchTerm.length > 0 ? <span onClick={() => {
+                        setSearchTerm('');
+                    }} className='text-danger'><MdClose /></span> : ''} icon={<i className='simple-icon-magnifier' />}  />}
+                </Group>
+            </Group>
             <Collapse in={openedTemplates}>
-                <DocumentCarousel docs={templates.map(d => ({
+                <DocumentCarousel docs={templates.filter(d => d.name.toLowerCase().search(searchTerm.toLocaleLowerCase()) !== -1).map(d => ({
                     id: d.id,
                     doc_id: d.documents[0],
                     name: d.name,
