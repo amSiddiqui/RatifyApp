@@ -2,7 +2,7 @@ import React from 'react';
 import { Row, Card, CardBody, Button, Alert } from 'reactstrap';
 import { Colxx, Separator } from '../../components/common/CustomBootstrap';
 import Breadcrumb from '../../containers/navs/Breadcrumb';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { useIntl } from 'react-intl';
 import {
     Center,
@@ -23,6 +23,7 @@ import { passwordValidation } from '../../helpers/Utils';
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import {
+    OrganizationNameResponse,
     UserSettingsFormType,
     UserSettingsWithImage,
     UserType,
@@ -67,6 +68,10 @@ const ProfileSettings: React.FC = () => {
     const [userVerified, setUserVerified] = React.useState(
         auth.user ? auth.user.verified : false,
     );
+    
+    const navigate = useNavigate();
+
+    const [organization, setOrganization] = React.useState<OrganizationNameResponse>();
 
     const schema = Yup.object().shape({
         changePassword: Yup.boolean(),
@@ -200,6 +205,13 @@ const ProfileSettings: React.FC = () => {
                 toast.error('Cannot user at the moment. Try again later!');
                 console.log(err);
             });
+
+        authHelper
+            .getOrganizationName().then(resp => {
+                setOrganization(resp);
+            }).catch(err => {
+                console.log(err);
+            });
     }, [authHelper]);
 
     return (
@@ -216,63 +228,75 @@ const ProfileSettings: React.FC = () => {
             <Center>
                 <Stack>
                     <Center>
-                        {auth.user && !userVerified && (
-                            <>
-                                {!verificationSent && (
-                                    <Alert
-                                        color="danger"
-                                        style={{ width: 450 }}>
-                                        <Stack>
-                                            <p>
-                                                Please verify your account using
-                                                the link provided in the email.
-                                                If you have not received the
-                                                email, request for a new email
-                                            </p>
-                                            {getDateDiff(lastVerificationSent) >
-                                            WAIT_BEFORE_RESENT_EMAIL_IN_SECONDS ? (
-                                                <span
-                                                    onClick={() => {
-                                                        authHelper
-                                                            .sendVerificationLink()
-                                                            .then(() => {
-                                                                setVerificationSent(
-                                                                    true,
-                                                                );
-                                                            })
-                                                            .catch((err) => {
-                                                                toast.error(
-                                                                    'Cannot send a verification email. Try again later!',
-                                                                );
-                                                            });
-                                                    }}>
-                                                    <Button
-                                                        color="primary"
-                                                        size="xs">
-                                                        Resend Verification
-                                                    </Button>
-                                                </span>
-                                            ) : (
-                                                <p className="text-muted">
-                                                    Wait 10 minutes before
-                                                    creating a new link.
+                        <Stack>
+                            {auth.user && !userVerified && (
+                                <>
+                                    {!verificationSent && (
+                                        <Alert
+                                            color="danger"
+                                            style={{ width: 450 }}>
+                                            <Stack>
+                                                <p>
+                                                    Please verify your account using
+                                                    the link provided in the email.
+                                                    If you have not received the
+                                                    email, request for a new email
                                                 </p>
-                                            )}
-                                        </Stack>
-                                    </Alert>
-                                )}
-                                {verificationSent && (
-                                    <Alert
-                                        color="success"
-                                        style={{ width: 450 }}>
-                                        <p>
-                                            Verification email sent. Please
-                                            check your email.
-                                        </p>
-                                    </Alert>
-                                )}
-                            </>
-                        )}
+                                                {getDateDiff(lastVerificationSent) >
+                                                WAIT_BEFORE_RESENT_EMAIL_IN_SECONDS ? (
+                                                    <span
+                                                        onClick={() => {
+                                                            authHelper
+                                                                .sendVerificationLink()
+                                                                .then(() => {
+                                                                    setVerificationSent(
+                                                                        true,
+                                                                    );
+                                                                })
+                                                                .catch((err) => {
+                                                                    toast.error(
+                                                                        'Cannot send a verification email. Try again later!',
+                                                                    );
+                                                                });
+                                                        }}>
+                                                        <Button
+                                                            color="primary"
+                                                            size="xs">
+                                                            Resend Verification
+                                                        </Button>
+                                                    </span>
+                                                ) : (
+                                                    <p className="text-muted">
+                                                        Wait 10 minutes before
+                                                        creating a new link.
+                                                    </p>
+                                                )}
+                                            </Stack>
+                                        </Alert>
+                                    )}
+                                    {verificationSent && (
+                                        <Alert
+                                            color="success"
+                                            style={{ width: 450 }}>
+                                            <p>
+                                                Verification email sent. Please
+                                                check your email.
+                                            </p>
+                                        </Alert>
+                                    )}
+                                </>
+                            )}
+                            {organization && organization.stepsCompleted < 3 && (
+                                <Alert color='warning' style={{ width: 450 }}>
+                                    <Stack>
+                                        <p>Business profile incomplete. Please click the button below to complete your business profile.</p>
+                                        <span onClick={() => {
+                                            navigate('/account/business-profile');
+                                        }}><Button size='xs' color='primary'>Business Profile</Button></span>
+                                    </Stack>
+                                </Alert>
+                            )}
+                        </Stack>
                     </Center>
                     <Card>
                         <CardBody>

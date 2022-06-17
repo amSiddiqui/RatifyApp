@@ -154,7 +154,6 @@ const BusinessContactForm:React.FC<{
                                         errors.secondaryContact?.phone ? errors.secondaryContact.phone.message : ''
                                     } label='Phone' placeholder='Phone' icon={<i className='simple-icon-phone' />} />
                                 </SimpleGrid>
-
                             </Stack>
                         </Collapse>
                     </Stack>

@@ -215,7 +215,7 @@ const SenderAgreement: React.FC = () => {
         authHelper
             .getOrganizationName()
             .then((data) => {
-                setOrganizationName(data);
+                setOrganizationName(data.name);
             })
             .catch((err) => {
                 console.log(err);

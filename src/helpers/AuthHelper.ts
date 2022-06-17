@@ -10,6 +10,7 @@ import {
     OrganizationContactInfo,
     LegalEntity,
     BusinessFunction,
+    OrganizationNameResponse,
 } from '../types/AuthTypes';
 import { authActions } from '../redux/auth-slice';
 import { LoginDataType } from '../types/AuthTypes';
@@ -115,7 +116,7 @@ export class AuthHelper extends ApiHelper {
     }
     
     async getOrganizationName() {
-        let response: AxiosResponse<string> = await axios.get(
+        let response: AxiosResponse<OrganizationNameResponse> = await axios.get(
             `/auth/user/organization/name/`,
             { headers: { Authorization: `Bearer ${await this.getToken()}` } },
         )

@@ -93,6 +93,12 @@ export type Organization = {
     updated_at: string;
 }
 
+export type OrganizationNameResponse = {
+    name: string;
+    description: string;
+    stepsCompleted: number;
+}
+
 export type AuthInitialStateType = {
     isAuthenticated: boolean;
     user: UserType | null;
