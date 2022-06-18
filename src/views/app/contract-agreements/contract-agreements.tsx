@@ -8,15 +8,17 @@ import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import './contract-agreements.css';
 import CATopBar from './topbar';
 import DocumentCarousel from './document_carousel';
-import { Modal, Progress, Divider, Group, Center, Stack, Collapse, TextInput } from '@mantine/core';
+import { Modal, Progress, Divider, Tooltip, Group, Center, Stack, Collapse, TextInput } from '@mantine/core';
 import { ContractHelper } from '../../../helpers/ContractHelper';
-import { AppDispatch } from '../../../redux';
-import { useDispatch } from 'react-redux';
+import { AppDispatch, RootState } from '../../../redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { toast } from 'react-toastify';
 import { Button } from 'reactstrap';
 import { AgreementTemplate } from '../../../types/ContractTypes';
 import { useDisclosure } from '@mantine/hooks';
 import { MdClose } from 'react-icons/md';
+import { OrganizationNameResponse } from '../../../types/AuthTypes';
+import { AuthHelper } from '../../../helpers/AuthHelper';
 
 const ContractAgreements: React.FC = () => {
     const match = useLocation();
@@ -31,15 +33,24 @@ const ContractAgreements: React.FC = () => {
         () => new ContractHelper(dispatchFn),
         [dispatchFn],
     );
+    const authHelper = React.useMemo(
+        () => new AuthHelper(dispatchFn),
+        [dispatchFn],
+    );
     const [uploading, setUploading] = React.useState(false);
     const [uploadError, setUploadError] = React.useState('');
     const [progress, setProgress] = React.useState(0);
     const [newContractId, setNewContractId] = React.useState(-1);
     const [templates, setTemplates] = React.useState<AgreementTemplate[]>([]);
+    const [templateCategories, setTemplateCategories] = React.useState<string[]>([]);
     const [selectedTemplate, setSelectedTemplate] = React.useState<AgreementTemplate | null>(null);
     const [openTemplateConfirm, templateConfirmHandlers] = useDisclosure(false);
     const [openedTemplates, handlersTemplates] = useDisclosure(true);
     const [searchTerm, setSearchTerm] = React.useState('');
+    const auth = useSelector((root: RootState) => root.auth);
+    const [organization, setOrganization] = React.useState<OrganizationNameResponse>();
+    const [showUnverifiedModal, setShowUnverifiedModal] = React.useState(false);
+    
 
     const uploadProgress = React.useCallback((progressEvent: any) => {
         setProgress(progressEvent.loaded / progressEvent.total);
@@ -47,6 +58,15 @@ const ContractAgreements: React.FC = () => {
 
     const onDocSelect = React.useCallback(
         (files: File[]) => {
+            if (!organization || !auth.user) {
+                toast.error('Something went wrong! Please try again later.');
+                return;
+            }
+            if (!auth.user.verified || organization.stepsCompleted < 3) {
+                setShowUnverifiedModal(true);
+                return;
+            }
+            
             setUploading(true);
             setUploadError('');
             setShowPdfConfirm(true);
@@ -73,7 +93,7 @@ const ContractAgreements: React.FC = () => {
                     setProgress(0);
                 });
         },
-        [uploadProgress, contractHelper],
+        [uploadProgress, contractHelper, organization, auth],
     );
     const onAgreementCreateFromTemplate = React.useCallback(() => {
         if (selectedTemplate) {
@@ -92,12 +112,23 @@ const ContractAgreements: React.FC = () => {
         contractHelper
             .getAgreementTemplates().then(data => {
                 setTemplates(data);
+                const categories = new Set(data.map(t => t.category));
+                setTemplateCategories(Array.from(categories));
             })
             .catch(err => {
                 console.log(err);
                 toast.error('Cannot fetch templates. Try Again Later!');
             });
     }, [contractHelper]);
+
+    React.useEffect(() => {
+        authHelper
+            .getOrganizationName().then(resp => {
+                setOrganization(resp);
+            }).catch(err => {
+                console.log(err);
+            });
+    }, [authHelper]);
 
     React.useEffect(() => {
         const error_code = params.get('error');
@@ -154,19 +185,30 @@ const ContractAgreements: React.FC = () => {
                 </Group>
             </Group>
             <Collapse in={openedTemplates}>
-                <DocumentCarousel docs={templates.filter(d => d.name.toLowerCase().search(searchTerm.toLocaleLowerCase()) !== -1).map(d => ({
-                    id: d.id,
-                    doc_id: d.documents[0],
-                    name: d.name,
-                }))} intl={intl} onClick={(id, blank) => {
-                    // get template using id from templates
-                    const ts = templates.filter(t => t.id === id);
-                    if (ts.length > 0) {
-                        const tp = ts[0];
-                        setSelectedTemplate(tp);
-                        templateConfirmHandlers.open();
-                    }
-                }} />
+                <Stack>
+                    {templateCategories.map((category, index) => {
+                        const cat = category === '' ? 'Default' : category;
+                        console.log(cat);
+                        console.log({templates});
+                        return (<>
+                        <Stack key={cat} spacing={'xs'}>
+                            <Tooltip label='Template Category' className='w-fit'><h5 className='font-bold w-fit capitalize'>{index + 1}. {cat}</h5></Tooltip>
+                            <DocumentCarousel docs={templates.filter(d => d.name.toLowerCase().search(searchTerm.toLocaleLowerCase()) !== -1 && d.category === category).map(d => ({
+                                id: d.id,
+                                doc_id: d.documents[0],
+                                name: d.name,
+                            }))} intl={intl} onClick={(id, blank) => {
+                                // get template using id from templates
+                                const ts = templates.filter(t => t.id === id);
+                                if (ts.length > 0) {
+                                    const tp = ts[0];
+                                    setSelectedTemplate(tp);
+                                    templateConfirmHandlers.open();
+                                }
+                            }} />
+                        </Stack>
+                    </>)})}
+                </Stack>
             </Collapse>
             
             <Modal
@@ -264,6 +306,23 @@ const ContractAgreements: React.FC = () => {
                         <span onClick={onAgreementCreateFromTemplate}><Button color='success'>Create</Button></span>
                     </Group>
                 </Stack>
+            </Modal>
+            <Modal
+                opened={showUnverifiedModal}
+                onClose={() => setShowUnverifiedModal(false)}
+                centered
+            >
+                {(auth.user && organization) && 
+                <>
+                    {!auth.user.verified && <Stack className='text-center'>
+                        <h5>Please verify your email first before creating a document.</h5>
+                        <span onClick={() => {navigate(`/account/profile-settings`)}}><Button color='primary'>Profile Settings</Button></span>
+                    </Stack>}
+                    {auth.user.verified && organization.stepsCompleted < 3 && <Stack className='text-center'>
+                        <h5>Please complete the business profile before continuing!</h5>
+                        <span onClick={() => {navigate(`/account/business-profile`)}}><Button color='primary'>Business Profile</Button></span>
+                    </Stack>}
+                </>}
             </Modal>
         </>
     );
