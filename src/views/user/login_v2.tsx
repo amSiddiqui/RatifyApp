@@ -42,21 +42,23 @@ const Login: React.FC = () => {
         password: Yup.string().required(
             intl.formatMessage({ id: 'auth.password.required' }),
         ),
+        rememberMe: Yup.bool().optional(),
     });
 
     const {
         register,
         handleSubmit,
         formState: { errors },
-    } = useForm<{ email: string; password: string }>({
+    } = useForm<{ email: string; password: string, rememberMe: boolean }>({
         resolver: yupResolver(schema),
         defaultValues: {
             email: '',
             password: '',
+            rememberMe: false,
         },
     });
 
-    const onLoginSubmit = (data: { email: string; password: string }) => {
+    const onLoginSubmit = (data: { email: string; password: string, rememberMe: boolean }) => {
         setSending(true);
         setError(false);
         authHelper
@@ -119,7 +121,7 @@ const Login: React.FC = () => {
                                 placeholder="*********"
                             />
                             <Group position="apart">
-                                <Checkbox label="Remember Me" />
+                                <Checkbox {...register('rememberMe')} label="Remember Me" />
                                 <p className="text-blue-500 hover:text-blue-700 cursor-pointer underline">
                                     Forgot Password?
                                 </p>

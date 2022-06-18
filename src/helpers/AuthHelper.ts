@@ -18,7 +18,7 @@ import { ApiHelper } from './ApiHelper';
 import { NoTokenError } from '../types/ErrorTypes';
 
 export class AuthHelper extends ApiHelper {
-    async loginRequest({ email, password }: LoginDataType) {
+    async loginRequest({ email, password, rememberMe }: LoginDataType) {
         this.dispatchFn(authActions.setLoading());
         try {
             let response: AxiosResponse<TokenType> = await axios.post(

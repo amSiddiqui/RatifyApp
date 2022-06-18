@@ -95,7 +95,7 @@ const Login = () => {
 
                         <Formik
                             onSubmit={onUserLogin}
-                            initialValues={{ email, password }}
+                            initialValues={{ email, password, rememberMe: false }}
                         >
                             {({ errors, touched }) => (
                                 <Form className="av-tooltip tooltip-label-bottom">

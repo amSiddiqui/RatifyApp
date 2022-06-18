@@ -111,6 +111,7 @@ export type AuthInitialStateType = {
 export type LoginDataType = {
     email: string;
     password: string;
+    rememberMe: boolean;
 };
 
 export type SignUpDataType = {
