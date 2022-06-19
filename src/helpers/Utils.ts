@@ -185,3 +185,18 @@ export const passwordValidation = (value:string | undefined) => {
     }
     return true;
 };
+
+export const secondsToHourMinutesSeconds = (seconds: number) => {
+    const hours = Math.floor(seconds / 3600);
+    const minutes = Math.floor((seconds % 3600) / 60);
+    const secondsLeft = Math.floor(seconds % 60);
+    let finalString = '';
+    if (hours > 0) {
+        finalString += `${hours}h `;
+    }
+    if (minutes > 0) {
+        finalString += `${minutes}m `;
+    }
+    finalString += `${secondsLeft}s`;
+    return finalString;
+}

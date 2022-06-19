@@ -21,6 +21,8 @@ import * as Yup from 'yup';
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import AuthMessage from './auth_message';
+import { DateTime } from 'luxon';
+import { secondsToHourMinutesSeconds } from '../../helpers/Utils';
 
 const Login: React.FC = () => {
     const loading = useSelector((root: RootState) => root.auth.loading);
@@ -31,7 +33,9 @@ const Login: React.FC = () => {
         [dispatchFn],
     );
     const [error, setError] = React.useState(false);
+    const [errorMessage, setErrorMessage] = React.useState('');
     const [sending, setSending] = React.useState(false);
+    const [suspendedSec, setSuspendedSec] = React.useState(-1);
     const isSmall = useMediaQuery('(max-width: 599px)');
     const navigate = useNavigate();
 
@@ -67,11 +71,37 @@ const Login: React.FC = () => {
                 setSending(false);
                 navigate('/');
             })
-            .catch(() => {
+            .catch((err) => {
+                // check if err is 401
                 setSending(false);
                 setError(true);
+                setSuspendedSec(-1);
+                if (err.response && err.response.status === 401) {
+                    const status = err.response.data.status;
+                    if (status === 'suspended') {
+                        const suspendedTillStr = err.response.data.suspendedTill;
+                        const suspendedTillDate = DateTime.fromISO(suspendedTillStr);
+                        const now = DateTime.utc();
+                        const diff = suspendedTillDate.diff(now, 'seconds').seconds;
+                        setSuspendedSec(diff);
+                    }  else if (status === 'unauthorized') {
+                        const retries = err.response.data.retries;
+                        if (retries === 2) {
+                            setErrorMessage('Invalid email or password. 2 attempts remaining.');
+                        } else if (retries === 1) {
+                            setErrorMessage('Invalid email or password. 1 attempt remaining.');
+                        } else {
+                            setErrorMessage('Invalid email or password.');
+                        }
+                    } else {
+                        setErrorMessage('Something went wrong. Try again later!');
+                    }
+
+                } else {
+                }
             });
     };
+
 
     return (
         <SimpleGrid
@@ -92,9 +122,9 @@ const Login: React.FC = () => {
                             )}
                             {!(sending || loading) && error && (
                                 <p className="text-red-500 text-lg text-center">
-                                    {intl.formatMessage({
-                                        id: 'auth.login.error',
-                                    })}
+                                    {suspendedSec === -1 && errorMessage}
+                                    {suspendedSec === 0 && ''}
+                                    {suspendedSec > 0 && `Account suspended for ${secondsToHourMinutesSeconds(suspendedSec)}`}
                                 </p>
                             )}
                             <TextInput
