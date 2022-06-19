@@ -10,7 +10,7 @@ import {
 } from '@mantine/core';
 import { ChangeHandler } from 'react-hook-form';
 
-function PasswordRequirement({
+export function PasswordRequirement({
     meets,
     label,
 }: {
@@ -51,12 +51,14 @@ const PasswordStrength = forwardRef(({
     onBlur,
     name,
     label,
+    error,
     size,
     placeholder,
 }: {
     onChange: ChangeHandler;
     onBlur: ChangeHandler;
     name: string;
+    error?: string;
     label: string;
     size: MantineSize;
     placeholder: string;

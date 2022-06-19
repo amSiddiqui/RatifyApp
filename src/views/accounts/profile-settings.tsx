@@ -31,6 +31,7 @@ import {
 import { authActions } from '../../redux/auth-slice';
 import { DateTime } from 'luxon';
 import PasswordStrength from '../user/password-strength';
+import PasswordConfirm from '../user/password-confirm';
 
 const WAIT_BEFORE_RESENT_EMAIL_IN_SECONDS = 60 * 10;
 
@@ -135,6 +136,7 @@ const ProfileSettings: React.FC = () => {
     });
 
     const showPassword = watch('changePassword');
+    const newPassword = watch('newPassword');
 
     const fileInputRef = React.useRef<HTMLInputElement>(null);
 
@@ -482,19 +484,24 @@ const ProfileSettings: React.FC = () => {
                                                 ref={
                                                     register('newPassword').ref
                                                 }
+                                                error={errors.newPassword ? errors.newPassword.message : ''}
                                             />
-                                            <PasswordInput
-                                                {...register('confirmPassword')}
-                                                error={
-                                                    errors.confirmPassword
-                                                        ? errors.confirmPassword
-                                                              .message
-                                                        : ''
-                                                }
-                                                icon={<i className='simple-icon-lock' />}
-                                                type="password"
+                                            <PasswordConfirm
+                                                name={register('confirmPassword').name}
                                                 label="Confirm Password"
                                                 placeholder="Confirm Password"
+                                                size="md"
+                                                onChange={
+                                                    register('confirmPassword')
+                                                        .onChange
+                                                }
+                                                onBlur={
+                                                    register('confirmPassword')
+                                                        .onBlur
+                                                }
+                                                ref={register('confirmPassword').ref}
+                                                error={errors.confirmPassword ? errors.confirmPassword.message : ''}
+                                                password={newPassword || ''}
                                             />
                                         </Stack>
                                     </Collapse>
