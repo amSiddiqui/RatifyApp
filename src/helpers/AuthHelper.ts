@@ -184,4 +184,18 @@ export class AuthHelper extends ApiHelper {
             { headers: { Authorization: `Bearer ${await this.getToken()}` } },
         );
     }
+
+    async generatePasswordResetLink(email: string) {
+        await axios.post(
+            `/auth/user/forgot-password/`,
+            { email },
+        );
+    }
+
+    async resetPassword(data: {token: string, password: string, confirm_password: string}) {
+        await axios.post(
+            `/auth/user/reset-password/`,
+            data,
+        );
+    }
 }

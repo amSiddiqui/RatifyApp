@@ -145,7 +145,9 @@ const Login: React.FC = () => {
                     />
                     <Group position="apart">
                         <Checkbox {...register('rememberMe')} label="Remember Me" />
-                        <p className="text-blue-500 hover:text-blue-700 cursor-pointer underline">
+                        <p onClick={() => {
+                            navigate('/user/forgot-password');
+                        }} className="text-blue-500 hover:text-blue-700 cursor-pointer underline">
                             Forgot Password?
                         </p>
                     </Group>

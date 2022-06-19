@@ -25,6 +25,14 @@ const Login = React.lazy(() =>
   import(/* webpackChunkName: "user-login" */ './views/user/login_v2')
 );
 
+const ResetPassword = React.lazy(() =>
+  import(/* webpackChunkName: "user-reset-password" */ './views/user/reset-password')
+);
+
+const ForgotPassword = React.lazy(() =>
+  import(/* webpackChunkName: "user-forgot-password" */ './views/user/forgot-password')
+);
+
 const Register = React.lazy(() =>
   import(/* webpackChunkName: "user-register" */ './views/user/register_v2')
 );
@@ -170,6 +178,8 @@ function App() {
                                     <Route path='login' element={<Login />} />
                                     <Route path='register' element={<Register />} />
                                     <Route path='verify-email' element={<VerifyEmail />} />
+                                    <Route path='forgot-password' element={<ForgotPassword />} />
+                                    <Route path='reset-password' element={<ResetPassword />} />
                                 </Route>
                                 <Route path='agreements' element={<><Outlet /></>}>
                                     <Route path='sign' element={<AgreementSign />} />
