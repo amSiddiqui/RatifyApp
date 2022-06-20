@@ -156,8 +156,12 @@ const AgreementCreator: React.FC = () => {
             toast.error('Please enter agreement title');
             return;
         }
+        if (signers.length === 0) {
+            toast.error('Please add at least one signer, viewer or approver!');
+            return;
+        }
         prepareSendHandler.open();
-    }, [agreementName, prepareSendHandler]);
+    }, [agreementName, prepareSendHandler, signers]);
 
     function onDocumentLoadSuccess({ numPages }: any) {
         setNumPages(numPages);
@@ -391,7 +395,7 @@ const AgreementCreator: React.FC = () => {
                         inputElement.id = ids[inputElement.uid];
                     }
                     return newInputElements;
-                })
+                });
             });
             inputElementsSynchronized.current = true;
         } else {
