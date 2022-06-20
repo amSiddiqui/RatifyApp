@@ -5,18 +5,23 @@ import store from './redux/index';
 import { Provider } from 'react-redux';
 import { ToastContainer } from "react-toastify";
 import 'react-toastify/dist/ReactToastify.css';
-
+import { MantineProvider } from '@mantine/core';
+import { ModalsProvider } from '@mantine/modals';
 
 const App = React.lazy(() => import(/* webpackChunkName: "App" */ './App'));
 
 const Main = () => {
   return (
     <React.StrictMode>
-      <Provider store={store}>
-        <Suspense fallback={<div className="loading" />}>
-          <App />
-        </Suspense>
-      </Provider>
+      <MantineProvider>
+        <ModalsProvider>
+          <Provider store={store}>
+            <Suspense fallback={<div className="loading" />}>
+              <App />
+            </Suspense>
+          </Provider>
+        </ModalsProvider>
+      </MantineProvider>
       <ToastContainer />
     </React.StrictMode>
   );

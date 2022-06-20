@@ -446,4 +446,19 @@ export class ContractHelper extends ApiHelper {
         );
         return response.data;
     }
+
+    async updateAgreementTemplate(id: number, {name, category, description}: {name: string, category: string, description: string}) {
+        await axios.put(
+            `contracts/templates/${id}/`,
+            { name, category, description },
+            { headers: { Authorization: `Bearer ${await this.getToken()}` } },
+        );
+    }
+
+    async deleteAgreementTemplate(id: number) {
+        await axios.delete(
+            `contracts/templates/${id}/`,
+            { headers: { Authorization: `Bearer ${await this.getToken()}` } },
+        );
+    }
 } 

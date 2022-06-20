@@ -108,6 +108,22 @@ const ContractAgreements: React.FC = () => {
         }
     }, [selectedTemplate, contractHelper, navigate, templateConfirmHandlers]);
 
+    const onAgreementUpdate = React.useCallback((id: number, name: string, category: string, description: string) => {
+        setTemplates(prev => {
+            const newTemplates = [...prev];
+            for (const template of newTemplates) {
+                if (template.id === id) {
+                    template.name = name;
+                    template.category = category;
+                    template.description = description;
+                }
+            }
+            const categories = new Set(newTemplates.map(t => t.category));
+            setTemplateCategories(Array.from(categories));
+            return newTemplates;
+        });
+    }, []);
+
     React.useEffect(() => {
         contractHelper
             .getAgreementTemplates().then(data => {
@@ -188,16 +204,17 @@ const ContractAgreements: React.FC = () => {
                 <Stack>
                     {templateCategories.map((category, index) => {
                         const cat = category === '' ? 'Default' : category;
-                        console.log(cat);
-                        console.log({templates});
-                        return (<>
+                        return (
                         <Stack key={cat} spacing={'xs'}>
                             <Tooltip label='Template Category' className='w-fit'><h5 className='font-bold w-fit capitalize'>{index + 1}. {cat}</h5></Tooltip>
-                            <DocumentCarousel docs={templates.filter(d => d.name.toLowerCase().search(searchTerm.toLocaleLowerCase()) !== -1 && d.category === category).map(d => ({
-                                id: d.id,
-                                doc_id: d.documents[0],
-                                name: d.name,
-                            }))} intl={intl} onClick={(id, blank) => {
+                            <DocumentCarousel onTemplateDelete={(id) => {
+                                setTemplates(prev => {
+                                    const newTemplates = prev.filter(t => t.id !== id);
+                                    const categories = new Set(newTemplates.map(t => t.category));
+                                    setTemplateCategories(Array.from(categories));
+                                    return newTemplates;
+                                });
+                            }} onTemplateUpdate={onAgreementUpdate} contractHelper={contractHelper}  categories={templateCategories} templates={templates.filter(d => d.name.toLowerCase().search(searchTerm.toLocaleLowerCase()) !== -1 && d.category === category)} intl={intl} onClick={(id, blank) => {
                                 // get template using id from templates
                                 const ts = templates.filter(t => t.id === id);
                                 if (ts.length > 0) {
@@ -207,7 +224,7 @@ const ContractAgreements: React.FC = () => {
                                 }
                             }} />
                         </Stack>
-                    </>)})}
+                    )})}
                 </Stack>
             </Collapse>
             
