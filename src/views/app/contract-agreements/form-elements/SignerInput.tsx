@@ -11,12 +11,14 @@ interface Props  {
     placeholder: string;
     x: number;
     y: number;
+    width: number;
+    height: number;
     type: string;
     onFilled: (value: string | Date | null) => void;
     initialValue: string;
 }
 
-const SignerInput:React.FC<Props> = ({x, y, type, placeholder, onFilled, initialValue}) => {
+const SignerInput:React.FC<Props> = ({x, y, type, placeholder, onFilled, initialValue, width, height}) => {
 
     const [initialHide, setInitialHide] = React.useState<boolean>(true);
     const [nameValue, setNameValue] = React.useState(initialValue);

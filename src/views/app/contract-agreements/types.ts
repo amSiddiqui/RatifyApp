@@ -9,6 +9,8 @@ export type PdfFormInputType = {
     type: string;
     x: number;
     y: number;
+    width: number;
+    height: number;
     placeholder: string;
     color: string;
     required: boolean;

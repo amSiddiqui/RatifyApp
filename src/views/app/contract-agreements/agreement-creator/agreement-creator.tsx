@@ -43,7 +43,7 @@ import AddSigner from './add-signer';
 import { SignerElement } from '../../../../types/ContractTypes';
 import { AiOutlineDrag } from 'react-icons/ai';
 import DraggableInput from '../form-elements/DraggableInput';
-import { getBgColorLight, PositionType, POSITION_OFFSET_X, POSITION_OFFSET_Y, PdfFormInputType, INPUT_WIDTH, INPUT_HEIGHT, SIGN_POSITION_OFFSET_Y } from '../types';
+import { getBgColorLight, PositionType, POSITION_OFFSET_X, POSITION_OFFSET_Y, PdfFormInputType, INPUT_WIDTH, INPUT_HEIGHT, SIGN_POSITION_OFFSET_Y, SIGN_INPUT_HEIGHT } from '../types';
 import PdfFormInput from '../form-elements/PdfFormInput';
 import { getRandomStringID } from '../../../../helpers/Utils';
 import { useDebouncedValue, useDisclosure } from '@mantine/hooks';
@@ -264,6 +264,8 @@ const AgreementCreator: React.FC = () => {
                     color: i.color,
                     x: i.x,
                     y: i.y,
+                    width: i.width,
+                    height: i.height,
                     uid: i.id.toString(),
                     type: i.type,
                     page: i.page
@@ -327,7 +329,9 @@ const AgreementCreator: React.FC = () => {
             } else {
                 setInputElements((prev) => [...prev, { 
                     x: x - POSITION_OFFSET_X, y: dragInputType === 'signature' ? y - SIGN_POSITION_OFFSET_Y : y - POSITION_OFFSET_Y, 
-                    color: dragInputColor, 
+                    width: INPUT_WIDTH,
+                    height: dragInputType === 'signature' ? SIGN_INPUT_HEIGHT : INPUT_HEIGHT,
+                    color: dragInputColor,
                     placeholder: dragInputText, 
                     required: dragInputType !== 'text',
                     signerId: dragInputId, 
@@ -629,6 +633,14 @@ const AgreementCreator: React.FC = () => {
                                                                         return newInputElements;
                                                                     })
                                                                 }}
+                                                                onResize={(width, height) => {
+                                                                    setInputElements(prev => {
+                                                                        const newInputElements = [...prev];
+                                                                        newInputElements[index].width = width;
+                                                                        newInputElements[index].height = height;
+                                                                        return newInputElements;
+                                                                    })
+                                                                }}
                                                                 placeholder={element.placeholder}
                                                                 key={element.uid}
                                                                 onDelete={() => {
@@ -641,6 +653,8 @@ const AgreementCreator: React.FC = () => {
                                                                 color={element.color}
                                                                 x={element.x}
                                                                 y={element.y}
+                                                                width={element.width}
+                                                                height={element.height}
                                                                 type={element.type}
                                                             />
                                                         );

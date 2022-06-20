@@ -474,6 +474,8 @@ const AgreementSign: React.FC = () => {
                                                         if (element.page === pageNumber) {
                                                             return (
                                                                 <SignerInput
+                                                                    width={element.width}
+                                                                    height={element.height}
                                                                     initialValue={element.value}
                                                                     onFilled={(value) => {
                                                                         setInputElements(prev => {

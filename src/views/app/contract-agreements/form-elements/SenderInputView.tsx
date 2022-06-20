@@ -6,10 +6,7 @@ import { InputField } from '../../../../types/ContractTypes';
 import {
     getBgColorLight,
     getBorderColorBold,
-    INPUT_HEIGHT,
     INPUT_TOP_OFFSET,
-    INPUT_WIDTH,
-    SIGN_INPUT_HEIGHT,
 } from '../types';
 
 interface Props {
@@ -18,7 +15,7 @@ interface Props {
 
 const SenderInputView: React.FC<Props> = ({ inputField }) => {
     const [initialHide, setInitialHide] = React.useState(true);
-    const [{ x, y, type, placeholder, value, completed, color, required }] =
+    const [{ x, y, type, placeholder, value, completed, color, required, width, height }] =
         React.useState(() => {
             return {
                 x: inputField.x,
@@ -29,6 +26,8 @@ const SenderInputView: React.FC<Props> = ({ inputField }) => {
                 completed: inputField.completed,
                 color: inputField.color,
                 required: inputField.required,
+                height: inputField.height,
+                width: inputField.width,
             };
         });
 
@@ -45,11 +44,10 @@ const SenderInputView: React.FC<Props> = ({ inputField }) => {
                 className="flex-col pdf-form-input"
                 style={{
                     display: initialHide ? 'none' : 'flex',
-                    width: INPUT_WIDTH,
+                    width: width,
                     overflow: 'none',
                     zIndex: 1,
-                    height:
-                        type === 'signature' ? SIGN_INPUT_HEIGHT : INPUT_HEIGHT,
+                    height: height,
                     position: 'absolute',
                     top: y - INPUT_TOP_OFFSET,
                     left: x,
@@ -60,7 +58,7 @@ const SenderInputView: React.FC<Props> = ({ inputField }) => {
                             <div>
                                 <p
                                     style={{
-                                        width: INPUT_WIDTH,
+                                        width: width,
                                         height: INPUT_TOP_OFFSET,
                                     }}
                                     className="text-xs">
@@ -72,8 +70,8 @@ const SenderInputView: React.FC<Props> = ({ inputField }) => {
 
                                 <p
                                     style={{
-                                        height: INPUT_HEIGHT - INPUT_TOP_OFFSET,
-                                        width: INPUT_WIDTH,
+                                        height: height - INPUT_TOP_OFFSET,
+                                        width: width,
                                     }}
                                     className={classNames(
                                         getBorderColorBold(color),
@@ -90,12 +88,12 @@ const SenderInputView: React.FC<Props> = ({ inputField }) => {
                                 <p
                                     style={{
                                         height: INPUT_TOP_OFFSET,
-                                        width: INPUT_WIDTH,
+                                        width: width,
                                     }}></p>
                                 <p
                                     style={{
-                                        height: INPUT_HEIGHT - INPUT_TOP_OFFSET,
-                                        width: INPUT_WIDTH,
+                                        height: height - INPUT_TOP_OFFSET,
+                                        width: width,
                                     }}
                                     className={
                                         'px-2 pt-1 text-muted ' +
@@ -111,14 +109,14 @@ const SenderInputView: React.FC<Props> = ({ inputField }) => {
                     <>
                         {!completed && (
                             <>
-                                <p style={{height: INPUT_TOP_OFFSET, width: INPUT_WIDTH}}></p>
+                                <p style={{height: INPUT_TOP_OFFSET, width: width}}></p>
                                 <Center
                                     className={
                                         'text-muted ' + getBgColorLight(color)
                                     }
                                     style={{
-                                        height: SIGN_INPUT_HEIGHT - INPUT_TOP_OFFSET,
-                                        width: INPUT_WIDTH,
+                                        height: height - INPUT_TOP_OFFSET,
+                                        width: width,
                                     }}>
                                     {placeholder}
                                 </Center>
@@ -126,19 +124,19 @@ const SenderInputView: React.FC<Props> = ({ inputField }) => {
                         )}
                         {completed && (
                             <>
-                                <p style={{height: INPUT_TOP_OFFSET, width: INPUT_WIDTH}}></p>
+                                <p style={{height: INPUT_TOP_OFFSET, width: width}}></p>
                                 <div
                                     className={
                                         getBorderColorBold(color) + ' border-2'
                                     }
                                     style={{
-                                        height: SIGN_INPUT_HEIGHT - INPUT_TOP_OFFSET,
-                                        width: INPUT_WIDTH,
+                                        height: height - INPUT_TOP_OFFSET,
+                                        width: width,
                                     }}>
                                     <img
                                         src={value}
                                         style={{
-                                            height: SIGN_INPUT_HEIGHT - INPUT_TOP_OFFSET,
+                                            height: height - INPUT_TOP_OFFSET,
                                             width: 'auto',
                                         }}
                                         alt="Signature"

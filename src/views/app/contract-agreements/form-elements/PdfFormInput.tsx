@@ -1,6 +1,6 @@
 import classNames from 'classnames';
 import React from 'react';
-import { getBgColorLight, getBorderColorBold, INPUT_HEIGHT, INPUT_WIDTH, SIGN_INPUT_HEIGHT } from '../types';
+import { getBgColorLight, getBorderColorBold } from '../types';
 import { MdClear, MdSettings } from 'react-icons/md';
 import { AiOutlineDrag } from 'react-icons/ai';
 import { DraggableCore } from 'react-draggable';
@@ -17,6 +17,7 @@ interface Props {
     inputElementId: number;
     onDelete: () => void;
     onReposition: (x:number, y:number) => void;
+    onResize: (width:number, height:number) => void;
     placeholder: string;
     x: number;
     y: number;
@@ -26,9 +27,11 @@ interface Props {
     type: string;
     contractHelper: ContractHelper;
     required: boolean;
+    width: number;
+    height: number;
 }
 
-const PdfFormInput: React.FC<Props> = ({ x: initX, y: initY, color, onDelete, placeholder, onReposition, offsetParent, bounds, type, contractHelper, required, inputElementId }) => {
+const PdfFormInput: React.FC<Props> = ({ x: initX, y: initY, color, onDelete, placeholder, onReposition, offsetParent, bounds, type, contractHelper, required, inputElementId, width, height, onResize }) => {
     const [[x, y], setPosition] = React.useState([initX, initY]);
     const [ph, setPh] = React.useState(placeholder);
     const [req, setReq] = React.useState(required);
@@ -38,14 +41,22 @@ const PdfFormInput: React.FC<Props> = ({ x: initX, y: initY, color, onDelete, pl
     const nodeRef = React.useRef(null);
     const [inputStyles, setInputStyles] = React.useState<any>({
         zIndex: 1,
-        resize: 'horizontal',
+        resize: type === 'signature' ? 'both': 'horizontal',
         overflow: 'auto',
-        width: INPUT_WIDTH,
-        height: type === 'signature' ? SIGN_INPUT_HEIGHT : INPUT_HEIGHT,
+        width: width,
+        height: height,
         position: 'absolute',
         top: y - INPUT_TOP_OFFSET,
         left: x,
     });
+
+    const handleResize = (event: React.MouseEvent<HTMLDivElement, MouseEvent> | React.TouchEvent<HTMLDivElement>) => {
+        const { width: newWidth, height: newHeight } = event.currentTarget.getBoundingClientRect();
+        if (width === newWidth && height === newHeight) {
+            return;
+        }
+        onResize(newWidth, newHeight);
+    }
 
     React.useEffect(() => {
         setInputStyles((prev:any) => ({
@@ -62,7 +73,7 @@ const PdfFormInput: React.FC<Props> = ({ x: initX, y: initY, color, onDelete, pl
             onChange={(e) => {
                 setValue(e.currentTarget.value);
             }}
-            style={{height: INPUT_HEIGHT - INPUT_TOP_OFFSET}}
+            style={{height: height - INPUT_TOP_OFFSET}}
             className={classNames(
                 'pdf-input-element',
                 {
@@ -112,6 +123,9 @@ const PdfFormInput: React.FC<Props> = ({ x: initX, y: initY, color, onDelete, pl
                 <div
                     ref={nodeRef}
                     style={inputStyles}
+                    onMouseUpCapture={handleResize}
+                    onTouchEndCapture={handleResize}
+                    
                     className={classNames('flex-col pdf-form-input flex')}
                 >
                     <div className='flex items-center justify-between' style={{height: INPUT_TOP_OFFSET + 'px', fontSize: '1rem'}}>
@@ -126,7 +140,7 @@ const PdfFormInput: React.FC<Props> = ({ x: initX, y: initY, color, onDelete, pl
                         <Popover
                             opened={showSettings}
                             onClose={() => setShowSettings(false)}
-                            style={{height: INPUT_HEIGHT}}
+                            style={{height: height}}
                             target={PdfInput}
                             width={260}
                             position="right"
@@ -183,7 +197,7 @@ const PdfFormInput: React.FC<Props> = ({ x: initX, y: initY, color, onDelete, pl
                     {type === 'date' && <DatePicker 
                         variant='unstyled'
                         placeholder={ph}
-                        style={{height: INPUT_HEIGHT - INPUT_TOP_OFFSET, paddingLeft: 3}}
+                        style={{height: height - INPUT_TOP_OFFSET, paddingLeft: 3}}
                         size='xs'
                         className={classNames(
                             'pdf-form-input-date',

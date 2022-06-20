@@ -101,6 +101,8 @@ export interface InputField {
     type: string;
     x: number;
     y: number;
+    width: number;
+    height: number;
     placeholder: string;
     required: boolean;
     value: string;
