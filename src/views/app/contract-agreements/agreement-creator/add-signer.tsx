@@ -187,7 +187,7 @@ const AddSigner:React.FC<AddSignerProps> = ({ onConfirmAddSigner, onCancelAddSig
     });
 
     const onAddSigner = (type: 'signer' | 'approver' | 'viewer') => {
-        let color = 'slate';
+        let color = 'dark';
         if (type === 'signer') {
             color = colors[lastColorIndex % colors.length];
         }

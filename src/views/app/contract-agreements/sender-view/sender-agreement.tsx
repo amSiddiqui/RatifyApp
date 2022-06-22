@@ -191,7 +191,6 @@ const SenderAgreement: React.FC = () => {
 
                     contractHelper.getSignerProgress(contractId).then((data) => {
                         setSignerProgress(data);
-                        console.log({data});
                     }).catch(err => {
                         console.log(err);
                     });
@@ -406,12 +405,8 @@ const SenderAgreement: React.FC = () => {
                                                         ) {
                                                             return (
                                                                 <SenderInputView
-                                                                    key={
-                                                                        element.id
-                                                                    }
-                                                                    inputField={
-                                                                        element
-                                                                    }
+                                                                    key={element.id}
+                                                                    inputField={element}
                                                                 />
                                                             );
                                                         } else {

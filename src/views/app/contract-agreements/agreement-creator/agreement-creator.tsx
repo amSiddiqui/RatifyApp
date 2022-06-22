@@ -20,6 +20,7 @@ import {
     Tooltip,
     Textarea,
     Autocomplete,
+    Space,
 } from '@mantine/core';
 import { DatePicker } from '@mantine/dates';
 import { Card, CardBody } from 'reactstrap';
@@ -494,107 +495,119 @@ const AgreementCreator: React.FC = () => {
                             <p className="text-xs px-3 text-slate-400 italic">
                                 Drag and drop signers on document
                             </p>
-                            <Stack
-                                style={{ userSelect: 'none' }}
-                                className="px-3 my-4"
-                                spacing='lg'
-                            >
-                                {signers.map((signer, index) => {
-                                    return (
-                                        <Tooltip
-                                            key={signer.id}
-                                            zIndex={1}
-                                            color={signer.color}
-                                            position="left"
-                                            placement="start"
-                                            opened
-                                            label={signer.type.charAt(0).toUpperCase() + signer.type.slice(1) + ' ' + (index + 1)}
-                                            withArrow
-                                        >
-                                            <Stack className={"p-3 "+getBgColorLight(signer.color)}>
-                                                <p className='mb-0 text-muted text-center'>{signer.name}</p>
-                                                <Group
-                                                    onMouseDown={() => {
-                                                        setDragInputProps({
-                                                            dragInputColor: signer.color,
-                                                            dragInputId: signer.id,
-                                                            dragInputText: 'Full Name',
-                                                            dragInputType: 'name'
-                                                        });
-                                                        setIsDragging(true);
-                                                    }}
-                                                    position="apart"
-                                                    className="border-2 cursor-pointer border-slate-300 rounded-sm bg-white p-2 text-slate-400"
-                                                >
-                                                    <span>Name Field</span>
-                                                    <i>
-                                                        <AiOutlineDrag />
-                                                    </i>
-                                                </Group>
-                                                <Group
-                                                    onMouseDown={() => {
-                                                        setDragInputProps({
-                                                            dragInputColor: signer.color,
-                                                            dragInputId: signer.id,
-                                                            dragInputText: 'Signature',
-                                                            dragInputType: 'signature'
-                                                        });
-                                                        setIsDragging(true);
-                                                    }}
-                                                    position="apart"
-                                                    className="border-2 cursor-pointer border-slate-300 rounded-sm bg-white p-2 text-slate-400"
-                                                >
-                                                    <span>Signature</span>
-                                                    <i>
-                                                        <AiOutlineDrag />
-                                                    </i>
-                                                </Group>
-                                                <Group
-                                                    onMouseDown={() => {
-                                                        setDragInputProps({
-                                                            dragInputColor: signer.color,
-                                                            dragInputId: signer.id,
-                                                            dragInputText: 'Date',
-                                                            dragInputType: 'date',
-                                                        });
-                                                        setIsDragging(true);
-                                                    }}
-                                                    position="apart"
-                                                    className="border-2 cursor-pointer border-slate-300 rounded-sm bg-white p-2 text-slate-400"
-                                                >
-                                                    <span>Date Field</span>
-                                                    <i>
-                                                        <AiOutlineDrag />
-                                                    </i>
-                                                </Group>
-                                                {signer.text_field && <Group
-                                                    onMouseDown={() => {
-                                                        setDragInputProps({
-                                                            dragInputColor: signer.color,
-                                                            dragInputId: signer.id,
-                                                            dragInputText: 'Text Field',
-                                                            dragInputType: 'text'
-                                                        });
-                                                        setIsDragging(true);
-                                                    }}
-                                                    position="apart"
-                                                    className="border-2 cursor-pointer border-slate-300 rounded-sm bg-white p-2 text-slate-400"
-                                                >
-                                                    <span>Text Field</span>
-                                                    <i>
-                                                        <AiOutlineDrag />
-                                                    </i>
-                                                </Group>}
-                                            </Stack>
-                                        </Tooltip>
-                                    )
-                                })}
-                                {signers.length > 0 && (
-                                    <Group position='right'>
-                                        <span onClick={() => setShowSignerModal(true)}><Button color='secondary' size='xs'>Edit Signers</Button></span>
-                                    </Group>
-                                )}
-                            </Stack>
+                            <Space h='lg' />
+                            {signers.length > 0 && (
+                                <Group className='px-3' position='right'>
+                                    <span onClick={() => setShowSignerModal(true)}><Button color='secondary' size='xs'>Edit Signers</Button></span>
+                                </Group>
+                            )}
+                            <ScrollArea style={{height: '885px'}}>
+                                <Stack
+                                    style={{ userSelect: 'none' }}
+                                    className="px-3 my-4"
+                                    spacing='lg'
+                                >
+                                    {signers.map((signer, index) => {
+                                        return (
+                                            <Tooltip
+                                                key={signer.id}
+                                                zIndex={4}
+                                                color={signer.color}
+                                                position="left"
+                                                placement="start"
+                                                opened
+                                                label={signer.type.charAt(0).toUpperCase() + signer.type.slice(1) + ' ' + (index + 1)}
+                                                withArrow
+                                            >
+                                                {signer.type === 'signer' && (
+                                                    <Stack className={"p-3 "+getBgColorLight(signer.color)}>
+                                                        <p className='mb-0 text-muted text-center'>{signer.name}</p>
+                                                        <Group
+                                                            onMouseDown={() => {
+                                                                setDragInputProps({
+                                                                    dragInputColor: signer.color,
+                                                                    dragInputId: signer.id,
+                                                                    dragInputText: 'Full Name',
+                                                                    dragInputType: 'name'
+                                                                });
+                                                                setIsDragging(true);
+                                                            }}
+                                                            position="apart"
+                                                            className="border-2 cursor-pointer border-slate-300 rounded-sm bg-white p-2 text-slate-400"
+                                                            spacing='xs'
+                                                        >
+                                                            <span>Name Field</span>
+                                                            <i>
+                                                                <AiOutlineDrag />
+                                                            </i>
+                                                        </Group>
+                                                        <Group
+                                                            onMouseDown={() => {
+                                                                setDragInputProps({
+                                                                    dragInputColor: signer.color,
+                                                                    dragInputId: signer.id,
+                                                                    dragInputText: 'Signature',
+                                                                    dragInputType: 'signature'
+                                                                });
+                                                                setIsDragging(true);
+                                                            }}
+                                                            position="apart"
+                                                            className="border-2 cursor-pointer border-slate-300 rounded-sm bg-white p-2 text-slate-400"
+                                                        >
+                                                            <span>Signature</span>
+                                                            <i>
+                                                                <AiOutlineDrag />
+                                                            </i>
+                                                        </Group>
+                                                        <Group
+                                                            onMouseDown={() => {
+                                                                setDragInputProps({
+                                                                    dragInputColor: signer.color,
+                                                                    dragInputId: signer.id,
+                                                                    dragInputText: 'Date',
+                                                                    dragInputType: 'date',
+                                                                });
+                                                                setIsDragging(true);
+                                                            }}
+                                                            position="apart"
+                                                            className="border-2 cursor-pointer border-slate-300 rounded-sm bg-white p-2 text-slate-400"
+                                                        >
+                                                            <span>Date Field</span>
+                                                            <i>
+                                                                <AiOutlineDrag />
+                                                            </i>
+                                                        </Group>
+                                                        {signer.text_field && <Group
+                                                            onMouseDown={() => {
+                                                                setDragInputProps({
+                                                                    dragInputColor: signer.color,
+                                                                    dragInputId: signer.id,
+                                                                    dragInputText: 'Text Field',
+                                                                    dragInputType: 'text'
+                                                                });
+                                                                setIsDragging(true);
+                                                            }}
+                                                            position="apart"
+                                                            className="border-2 cursor-pointer border-slate-300 rounded-sm bg-white p-2 text-slate-400"
+                                                        >
+                                                            <span>Text Field</span>
+                                                            <i>
+                                                                <AiOutlineDrag />
+                                                            </i>
+                                                        </Group>}
+                                                    </Stack>
+                                                )}
+                                                {signer.type !== 'signer' && (
+                                                    <Stack className={"p-3 "+getBgColorLight(signer.color)}>
+                                                        <p className=' text-center'>{signer.name}</p>
+                                                    </Stack>
+                                                )}
+                                            </Tooltip>
+                                        )
+                                    })}
+                                    
+                                </Stack>
+                            </ScrollArea>
                         </CardBody>
                     </Card>
                 </Grid.Col>

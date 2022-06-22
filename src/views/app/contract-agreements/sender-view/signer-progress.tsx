@@ -1,4 +1,4 @@
-import { Group, Loader, Modal, Progress, Stack, TextInput, Tooltip } from '@mantine/core';
+import { Center, Collapse, Group, Loader, Modal, Progress, Stack, TextInput, Tooltip } from '@mantine/core';
 import classNames from 'classnames';
 import React from 'react';
 import { getFormatDateFromIso } from '../../../../helpers/Utils';
@@ -19,19 +19,20 @@ type Props = {
     signerProgress: {total: number, completed: number} | null;
 };
 
-const getSignerStatus = (status: string, completed: boolean) => {
-    if (status === 'completed') {
-        return 'Completed';
-    }
+const getSignerStatus = (status: string, completed: boolean, type: string) => {
     if (status === 'error') {
         return 'Error Sending';
     }
+    if (status === 'completed') {
+        return 'Completed';
+    }   
     if (status === 'sent' && !completed) {
         return 'In Progress';
     }
     if (status === 'sent' && completed) {
         return 'Not submitted';
     }
+
 }
 
 const SignerProgress: React.FC<Props> = ({ signer, contractHelper, onDocumentSent, signerProgress }) => {
@@ -42,6 +43,8 @@ const SignerProgress: React.FC<Props> = ({ signer, contractHelper, onDocumentSen
         name: Yup.string().required('Please provide the name of the recipient'),
         email: Yup.string().email('Please enter a correct email address.').required('Please provide the email of the recipient'),
     });
+
+    const [collapsed, setCollapsed] = React.useState(false);
 
     const { register, handleSubmit, formState: { errors } } = useForm({
         resolver: yupResolver(sendAgainSchema),
@@ -70,7 +73,7 @@ const SignerProgress: React.FC<Props> = ({ signer, contractHelper, onDocumentSen
                 color={signer.color}
                 opened={true}
                 withArrow
-                zIndex={1}
+                zIndex={4}
                 position="left"
                 label={
                     signer.type.charAt(0).toUpperCase() +
@@ -79,63 +82,81 @@ const SignerProgress: React.FC<Props> = ({ signer, contractHelper, onDocumentSen
                     signer.step
                 }>
                 <div
+                    style={{ width: 145 }}
                     className={classNames(
-                        'w-full px-3 py-3',
+                        'px-3 py-3',
                         getBgColorLight(signer.color),
                     )}>
-                        <Stack spacing='md'>
-                            <div className='text-center text-lg'>
-                                <span>{signer.name}</span>
-                                {signer.status === 'completed' && <Tooltip label='Email sent'><i className='simple-icon-check text-success ml-1 relative' style={{top: 1}} /></Tooltip>}
-                                {signer.status === 'error' && <Tooltip label='Cannot send email.n'><i className='simple-icon-exclamation text-danger ml-1 relative' style={{top: 1}} /></Tooltip>}
-                            </div>
-                            {signer.status === 'error' && <p className='text-danger text-xs'>
-                                Cannot send the email. Please check the email address and try to send the document again.
-                            </p>}
-                            <div>
-                                <Group position='apart'>
-                                    <p className='text-muted'>Email</p>
-                                    {signer.status === 'error' && <p className='text-primary underline'>Edit</p>}
-                                </Group>
-                                <p>{signer.email}</p>
-                            </div>
-                            {signer.last_seen && <div>
-                                <p className='text-muted'>Last seen</p>
-                                <p>{getFormatDateFromIso(signer.last_seen)}</p>
-                            </div>}
-                            <div>
-                                <p className='text-muted'>Status</p>
-                                <p>{getSignerStatus(signer.status, !!signerProgress && signerProgress.total === signerProgress.completed)}</p>
-                            </div>
-                            {signerProgress && <div className='w-full'>
-                                <Progress className='w-full h-2' value={signerProgress.total === 0 ? 100 : signerProgress.completed * 100 / signerProgress.total} />
-                                <Group position='apart' className='text-gray-600'>
-                                    <p className='text-xs'>Completed</p>
-                                    <p className='text-xs'> {signerProgress.completed}/{signerProgress.total} </p>
-                                </Group>
-                            </div>}
-                            {signer.every_unit === '0' && (
-                                <p>No Reminder</p>
-                            )}
-                            {signer.every_unit !== '0' && (
-                                <div>
-                                    <p className='text-muted'>Remind every</p>
-                                    <p>{signer.every} {signer.every_unit}</p>
+                        {!collapsed && (
+                            <Stack spacing={'md'}>
+                                <div className='text-center text-lg'>
+                                    <span>{signer.name}</span>
+                                    {signer.status === 'completed' && <Tooltip label='Email sent'><i className='simple-icon-check text-success ml-1 relative' style={{top: 1}} /></Tooltip>}
+                                    {signer.status === 'error' && <Tooltip label='Cannot send email.n'><i className='simple-icon-exclamation text-danger ml-1 relative' style={{top: 1}} /></Tooltip>}
                                 </div>
-                            )}
-                            <div>
-                                <p className='text-muted'>Last Reminder</p>
-                                <p>not sent</p>
-                            </div>
-                            {signer.status === 'sent' &&<span><Button size='xs' color='primary'>
-                                Send Reminder    
-                            </Button></span>}
-                            {signer.status === 'error' && <span onClick={() => {
-                                sendAgainHandlers.open();
-                            }}>
-                                <Button disabled={sending}>Send Again</Button>    
-                            </span>}
-                        </Stack>
+                                <Center className='cursor-pointer' onClick={() => setCollapsed(true)}>
+                                    <i className='simple-icon-arrow-down' />
+                                </Center>
+                            </Stack>
+                        )}
+                        <Collapse in={collapsed}>
+                            <Stack spacing='md'>
+                                <div className='text-center text-lg'>
+                                    <span>{signer.name}</span>
+                                    {signer.status === 'completed' && <Tooltip label='Email sent'><i className='simple-icon-check text-success ml-1 relative' style={{top: 1}} /></Tooltip>}
+                                    {signer.status === 'error' && <Tooltip label='Cannot send email.n'><i className='simple-icon-exclamation text-danger ml-1 relative' style={{top: 1}} /></Tooltip>}
+                                </div>
+                                {signer.status === 'error' && <p className='text-danger text-xs'>
+                                    Cannot send the email. Please check the email address and try to send the document again.
+                                </p>}
+                                <div>
+                                    <Group position='apart'>
+                                        <p className='text-muted'>Email</p>
+                                        {signer.status === 'error' && <p className='text-primary underline'>Edit</p>}
+                                    </Group>
+                                    <p>{signer.email}</p>
+                                </div>
+                                {signer.last_seen && <div>
+                                    <p className='text-muted'>Last seen</p>
+                                    <p>{getFormatDateFromIso(signer.last_seen)}</p>
+                                </div>}
+                                <div>
+                                    <p className='text-muted'>Status</p>
+                                    <p>{getSignerStatus(signer.status, !!signerProgress && signerProgress.total === signerProgress.completed, signer.type)}</p>
+                                </div>
+                                {signerProgress && <div className='w-full'>
+                                    <Progress className='w-full h-2' value={signerProgress.total === 0 ? 100 : signerProgress.completed * 100 / signerProgress.total} />
+                                    <Group position='apart' className='text-gray-600'>
+                                        <p className='text-xs'>Completed</p>
+                                        <p className='text-xs'> {signerProgress.completed}/{signerProgress.total} </p>
+                                    </Group>
+                                </div>}
+                                {signer.every_unit === '0' && (
+                                    <p>No Reminder</p>
+                                )}
+                                {signer.every_unit !== '0' && (
+                                    <div>
+                                        <p className='text-muted'>Remind every</p>
+                                        <p>{signer.every} {signer.every_unit}</p>
+                                    </div>
+                                )}
+                                <div>
+                                    <p className='text-muted'>Last Reminder</p>
+                                    <p>not sent</p>
+                                </div>
+                                {signer.status === 'sent' &&<span><Button size='xs' color='primary'>
+                                    Send Reminder    
+                                </Button></span>}
+                                {signer.status === 'error' && <span onClick={() => {
+                                    sendAgainHandlers.open();
+                                }}>
+                                    <Button disabled={sending}>Send Again</Button>    
+                                </span>}
+                                <Center className='cursor-pointer' onClick={() => setCollapsed(false)}>
+                                    <i className='simple-icon-arrow-up' />
+                                </Center>
+                            </Stack>
+                        </Collapse>
                     </div>
             </Tooltip>
             <Modal centered title='Send the document again' opened={sendAgainModal} onClose={sendAgainHandlers.close}>

@@ -48,8 +48,6 @@ const AppLayout = ({ children }) => {
             .catch(err => {
                 if (err.response && err.response.status === 401) {
                     toast.error('Session expired, please login again');
-                } else {
-                    toast.error('Something went wrong, try again later');
                 }
             })
             .finally(() => {
