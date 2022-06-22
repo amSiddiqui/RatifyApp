@@ -3,7 +3,7 @@ import { DatePicker } from '@mantine/dates';
 import classNames from 'classnames';
 import { DateTime } from 'luxon';
 import React from 'react';
-import { INPUT_HEIGHT, INPUT_TOP_OFFSET, INPUT_WIDTH, SIGN_INPUT_HEIGHT } from '../types';
+import { INPUT_TOP_OFFSET } from '../types';
 import SignatureInput from './SignatureInput';
 import { MdClear } from 'react-icons/md';
 
@@ -41,10 +41,10 @@ const SignerInput:React.FC<Props> = ({x, y, type, placeholder, onFilled, initial
     return (
     <div className='flex-col pdf-form-input' style={{
         display: initialHide ? 'none' : 'flex',
-        width: INPUT_WIDTH,
+        width: width,
         overflow: 'none',
         zIndex: 1,
-        height: type === 'signature' ? SIGN_INPUT_HEIGHT : INPUT_HEIGHT,
+        height: height,
         position: 'absolute',
         top: y - INPUT_TOP_OFFSET,
         left: x,
@@ -84,7 +84,7 @@ const SignerInput:React.FC<Props> = ({x, y, type, placeholder, onFilled, initial
                 onFilled(date);
             }}
             placeholder={placeholder}
-            style={{height: INPUT_HEIGHT - INPUT_TOP_OFFSET, paddingLeft: 3}}
+            style={{height: height - INPUT_TOP_OFFSET, paddingLeft: 3}}
             size='xs'
             className={classNames(
                 'pdf-form-input-date',

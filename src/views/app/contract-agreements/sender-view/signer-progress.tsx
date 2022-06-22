@@ -32,7 +32,6 @@ const getSignerStatus = (status: string, completed: boolean, type: string) => {
     if (status === 'sent' && completed) {
         return 'Not submitted';
     }
-
 }
 
 const SignerProgress: React.FC<Props> = ({ signer, contractHelper, onDocumentSent, signerProgress }) => {

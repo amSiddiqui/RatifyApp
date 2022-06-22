@@ -406,7 +406,7 @@ const AgreementSign: React.FC = () => {
                                                     const pageCompleted = checkInputPageAllComplete(pg, inputElements);
                                                     return (
                                                         <div key={key}>
-                                                            {pageCompleted && <i className='simple-icon-check text-success absolute text-xl' style={{top: 0, left: 20}} />}
+                                                            {pageCompleted && <i className='simple-icon-check text-success absolute text-xl' style={{top: 0, left: 8}} />}
                                                             <div
                                                                 className="flex flex-col justify-center items-center"
                                                             >
@@ -551,7 +551,7 @@ const AgreementSign: React.FC = () => {
                     </Grid.Col>
                 </Grid>
 
-                <Grid columns={GRID_TOTAL}>
+                {basicInfo?.signerType !== 'viewer' && <Grid columns={GRID_TOTAL}>
                     <Grid.Col span={GRID_SIDE}>
 
                     </Grid.Col>
@@ -566,7 +566,7 @@ const AgreementSign: React.FC = () => {
 
                     </Grid.Col>
 
-                </Grid>
+                </Grid>}
 
             </div>
 
