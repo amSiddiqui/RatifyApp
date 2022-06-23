@@ -23,14 +23,22 @@ const getSignerStatus = (status: string, completed: boolean, type: string) => {
     if (status === 'error') {
         return 'Error Sending';
     }
-    if (status === 'completed') {
-        return 'Completed';
-    }   
-    if (status === 'sent' && !completed) {
-        return 'In Progress';
-    }
-    if (status === 'sent' && completed) {
-        return 'Not submitted';
+    if (type === 'viewer') {
+        if (status === 'completed') {
+            return 'Viewed';
+        } else {
+            return 'Not Viewed';
+        }
+    } else {
+        if (status === 'completed') {
+            return 'Completed';
+        }   
+        if (status === 'sent' && !completed) {
+            return 'In Progress';
+        }
+        if (status === 'sent' && completed) {
+            return 'Not submitted';
+        }
     }
 }
 

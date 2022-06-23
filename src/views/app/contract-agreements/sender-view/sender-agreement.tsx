@@ -183,7 +183,22 @@ const SenderAgreement: React.FC = () => {
 
                     setAgreement(data.agreement);
                     setSigners(
-                        data.signers.sort((a, b) => {
+                        data.signers.map((signer) => {
+                            if (signer.type !== 'viewer') {
+                                return signer;
+                            } else {
+                                if (signer.status === 'error') {
+                                    return signer;
+                                } else {
+                                    if (signer.last_seen !== null) {
+                                        signer.status = 'completed';
+                                    } else {
+                                        signer.status = 'sent';
+                                    }
+                                    return signer;
+                                }
+                            }
+                        }).sort((a, b) => {
                             return a.step - b.step;
                         }),
                     );
