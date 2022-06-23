@@ -29,7 +29,13 @@ const getSignerStatus = (status: string, completed: boolean, type: string) => {
         } else {
             return 'Not Viewed';
         }
-    } else {
+    } else if (type === 'approver') {
+        if (status === 'completed') {
+            return 'Approved';
+        } else {
+            return 'In progress';
+        }
+    }  else {
         if (status === 'completed') {
             return 'Completed';
         }   

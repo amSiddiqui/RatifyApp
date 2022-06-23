@@ -161,7 +161,6 @@ const AgreementSign: React.FC = () => {
     };
 
     const onDocumentComplete = () => {
-        console.log({totalFields, completedFields});
         confirmationModalHandlers.open();
     }
 
@@ -330,13 +329,13 @@ const AgreementSign: React.FC = () => {
                                 </Group>
                                 
                             </div>
-                            <div>
+                            {basicInfo && basicInfo.signerType === 'signer' && <div>
                                 <Progress className='w-56 h-3' value={totalFields === 0 ? 0: completedFields * 100 / totalFields} color='green'/>
                                 <Group position='apart'>
                                     <p className='text-muted text-xs'>Signature & fields completed:</p>
                                     <p className='text-muted text-xs'>{completedFields} of {totalFields}</p>
                                 </Group>
-                            </div>
+                            </div>}
                         </Group>
                     </Grid.Col>
                     <Grid.Col span={GRID_SIDE}>
@@ -644,14 +643,14 @@ const AgreementSign: React.FC = () => {
             }}>
                 <Center>
                     <div className='text-center'>
-                        <p className='text-lg'>Complete this form?</p>
-                        <p className='text-muted'>Complete this form. You can go back to make changes?</p>
+                        <p className='text-lg font-bold'>{basicInfo?.signerType === 'signer' ? 'Submit' : 'Approve'} this document?</p>
+                        <p className='text-muted'>{basicInfo?.signerType === 'signer' ?  'You can click back to make any changes.' : 'You can click back to review again.'}</p>
                     </div>
                 </Center>
                 
                 <Group position='right' className='mt-5'>
-                    <span><Button color='light'>Back</Button></span>
-                    <span><Button color='success'>Complete</Button></span>
+                    <span onClick={() => { confirmationModalHandlers.close(); }}><Button color='light'>Back</Button></span>
+                    <span><Button color='success'>{basicInfo?.signerType === 'signer' ? 'Submit' : 'Approve'}</Button></span>
                 </Group>
             </Modal>
         </>
