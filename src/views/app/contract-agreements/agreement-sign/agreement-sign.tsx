@@ -170,7 +170,7 @@ const AgreementSign: React.FC = () => {
     const onDocumentSubmit = () => {
         contractHelper.completeSigningProcess(token).then(() => {
             confirmationModalHandlers.close();
-            navigate(`/agreements/success?token${token}`);
+            navigate(`/agreements/success?token${token}&confetti=true`);
         }).catch(err => {
             console.log(err);
             confirmationModalHandlers.close();

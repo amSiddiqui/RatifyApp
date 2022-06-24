@@ -12,7 +12,7 @@ import {
 import { Button } from 'reactstrap';
 import { useIntl } from 'react-intl';
 import { useDispatch } from 'react-redux';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { AuthHelper } from '../../../../helpers/AuthHelper';
 import { SignUpDataType } from '../../../../types/AuthTypes';
 import * as Yup from 'yup';
@@ -23,6 +23,8 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import { AxiosError } from 'axios';
 import PasswordStrength from '../../../user/password-strength';
 import PasswordConfirm from '../../../user/password-confirm';
+import Confetti from 'react-confetti';
+import { useViewportSize } from '@mantine/hooks';
 
 const AgreementSuccess: React.FC = () => {
     const intl = useIntl();
@@ -34,6 +36,9 @@ const AgreementSuccess: React.FC = () => {
     );
     const [error, setError] = React.useState('');
     const [sending, setSending] = React.useState(false);
+    const { height, width } = useViewportSize();
+    const [showConfetti, setShowConfetti] = React.useState(true);
+    const [searchParams] = useSearchParams();
 
     const schema = Yup.object().shape({
         email: Yup.string()
@@ -92,7 +97,24 @@ const AgreementSuccess: React.FC = () => {
             });
     };
 
+    React.useEffect(() => {
+        const confetti = searchParams.get('confetti');
+        let timeout: NodeJS.Timeout | null = null; 
+        if (confetti) {
+            setShowConfetti(true);
+            timeout = setTimeout(() => {
+                setShowConfetti(false);
+            }, 1400);
+        }
+        return () => {
+            if (timeout) {
+                clearTimeout(timeout);
+            }
+        }
+    }, [searchParams]);
+
     return (
+        <>
         <div style={{ backgroundColor: '#F8F8F8' }}>
             <SimpleGrid className='h-screen' cols={2} breakpoints={[{ maxWidth: 600, cols: 1 }]}>
                 <Center className="px-10 mb-36 h-100 mt-10 sm:mt-0">
@@ -200,6 +222,8 @@ const AgreementSuccess: React.FC = () => {
                 </Center>
             </SimpleGrid>
         </div>
+        <Confetti gravity={0.11} width={width} numberOfPieces={showConfetti ? 500 : 0} height={height} />
+        </>
     );
 };
 
