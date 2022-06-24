@@ -97,6 +97,10 @@ const AgreementDashboard = React.lazy(() =>
   import(/* webpackChunkName: "views-agreement-dashboard" */'./views/app/contract-agreements/dashboard')
 );
 
+const AgreementSuccess = React.lazy(() =>
+  import(/* webpackChunkName: "views-agreement-success" */ './views/app/contract-agreements/agreement-sign/agreement-success')
+);
+
 type ProtectedRouteProps = {
     isAuthenticated: boolean;
     authenticationPath: string;
@@ -184,6 +188,7 @@ function App() {
                                 <Route path='agreements' element={<><Outlet /></>}>
                                     <Route path='sign' element={<AgreementSign />} />
                                     <Route path='greeting' element={<AgreementGreetings />} />
+                                    <Route path='success' element={<AgreementSuccess />} />
                                 </Route>
                                 <Route path="*" element={<Navigate to='/error' />} />
                             </Routes>
