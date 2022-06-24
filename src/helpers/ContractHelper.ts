@@ -302,7 +302,7 @@ export class ContractHelper extends ApiHelper {
 
     async validateSignToken(token: string) {
         let response: AxiosResponse<{
-            status: 'success' | 'error';
+            status: 'success' | 'error' | 'completed';
             valid: boolean;
             errorType: SignerErrorTypes;
             data: {
@@ -352,6 +352,20 @@ export class ContractHelper extends ApiHelper {
             `contracts/signer/inputs/?token=${token}`,
         );
         return response.data;
+    }
+
+    async getSignerOtherInputElements(token:string) {
+        let response: AxiosResponse<SignerInputElements> = await axios.get(
+            `contracts/signer/other-inputs/?token=${token}`
+        );
+        return response.data;
+    }
+
+    async completeSigningProcess(token: string) {
+        await axios.post(
+            `contracts/signer/complete/?token=${token}`,
+            {},
+        );
     }
 
     async updateSignerResponse(token: string, data:Array<{id: number, completed: boolean, value: string}>) {

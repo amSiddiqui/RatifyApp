@@ -20,7 +20,6 @@ import { passwordValidation } from '../../../../helpers/Utils';
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 
-import { useMediaQuery } from '@mantine/hooks';
 import { AxiosError } from 'axios';
 import PasswordStrength from '../../../user/password-strength';
 import PasswordConfirm from '../../../user/password-confirm';
@@ -35,7 +34,6 @@ const AgreementSuccess: React.FC = () => {
     );
     const [error, setError] = React.useState('');
     const [sending, setSending] = React.useState(false);
-    const isSmall = useMediaQuery('(max-width: 599px)');
 
     const schema = Yup.object().shape({
         email: Yup.string()
@@ -115,7 +113,9 @@ const AgreementSuccess: React.FC = () => {
                                     Get My Document Copy
                                 </Button>
                             </span>
-                            <span>
+                            <span onClick={() => {
+                                navigate(`/`);
+                            }}>
                                 <Button color="primary">Try Ratify</Button>
                             </span>
                         </Group>

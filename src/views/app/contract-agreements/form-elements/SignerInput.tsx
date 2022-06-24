@@ -3,22 +3,25 @@ import { DatePicker } from '@mantine/dates';
 import classNames from 'classnames';
 import { DateTime } from 'luxon';
 import React from 'react';
-import { INPUT_TOP_OFFSET } from '../types';
+import { getBgColorLight, getBorderColorBold, INPUT_TOP_OFFSET } from '../types';
 import SignatureInput from './SignatureInput';
 import { MdClear } from 'react-icons/md';
+import { useDebouncedValue } from '@mantine/hooks';
 
 interface Props  {
     placeholder: string;
+    id: number;
     x: number;
     y: number;
     width: number;
     height: number;
     type: string;
-    onFilled: (value: string | Date | null) => void;
+    onFilled: (value: string | Date | null, id: number) => void;
     initialValue: string;
+    color: string;
 }
 
-const SignerInput:React.FC<Props> = ({x, y, type, placeholder, onFilled, initialValue, width, height}) => {
+const SignerInput:React.FC<Props> = ({id, x, y, type, placeholder, onFilled, initialValue, width, height, color}) => {
 
     const [initialHide, setInitialHide] = React.useState<boolean>(true);
     const [nameValue, setNameValue] = React.useState(initialValue);
@@ -30,6 +33,7 @@ const SignerInput:React.FC<Props> = ({x, y, type, placeholder, onFilled, initial
         }
     });
     const [signValue, setSignValue] = React.useState(initialValue);
+    const [debounced] = useDebouncedValue(signValue, 1000);
 
     React.useEffect(() => {
         const timeout = setTimeout(() => {
@@ -37,6 +41,12 @@ const SignerInput:React.FC<Props> = ({x, y, type, placeholder, onFilled, initial
         }, 700);
         return () => clearTimeout(timeout);
     }, []);
+
+    React.useEffect(() => {
+        if (type === 'name' || type === 'text') {
+            
+        }
+    }, [debounced, type]);
 
     return (
     <div className='flex-col pdf-form-input' style={{
@@ -53,7 +63,7 @@ const SignerInput:React.FC<Props> = ({x, y, type, placeholder, onFilled, initial
             {type !== 'date'  && type !== 'signature' && <Group position='right'>
                 <i onClick={() => {
                     setNameValue('');
-                    onFilled('');
+                    onFilled('', id);
                 }} className='cursor-pointer relative' style={{top: '23px', right: '7px'}}><MdClear /></i>
             </Group>}
         </div>
@@ -65,15 +75,17 @@ const SignerInput:React.FC<Props> = ({x, y, type, placeholder, onFilled, initial
             value={nameValue}
             onChange={(e) => {
                 setNameValue(e.currentTarget.value);
-                onFilled(e.currentTarget.value);
+            }}
+            onBlur={(e) => {
+                onFilled(e.currentTarget.value, id);
             }}
             className={classNames(
-                'pdf-input-element bg-blue-200',
+                'pdf-input-element', getBgColorLight(color),
                 {
-                    'pdf-input-element-filled border-2 ': nameValue.length > 0,
-                    'border-blue-400': true,
+                    'pdf-input-element-filled border-2 ': nameValue.length > 0,                    
                 },
-                'focus:outline-none focus:border-blue-400 focus:border-2'
+                getBorderColorBold(color),
+                'focus:outline-none focus:'+getBorderColorBold(color)+' focus:border-2'
             )}
         />}
         {type === 'date' && <DatePicker 
@@ -81,23 +93,24 @@ const SignerInput:React.FC<Props> = ({x, y, type, placeholder, onFilled, initial
             value={dateValue}
             onChange={(date) => {
                 setDateValue(date);
-                onFilled(date);
+                onFilled(date, id);
             }}
             placeholder={placeholder}
             style={{height: height - INPUT_TOP_OFFSET, paddingLeft: 3}}
             size='xs'
             className={classNames(
                 'pdf-form-input-date',
-                {'bg-blue-200': dateValue === null, 'border-blue-400 border-2 pdf-form-input-date-filled': dateValue !== null},
+                {'border-2 pdf-form-input-date-filled': dateValue !== null},
+                dateValue === null ? getBgColorLight(color) : getBorderColorBold(color),
             )}
         />}
 
 
         {type === 'signature' && 
-        <SignatureInput initialValue={signValue} onSignComplete={(value) => {
-            onFilled(value);
+        <SignatureInput height={height} initialValue={signValue} onSignComplete={(value) => {
+            onFilled(value, id);
             setSignValue(value);
-        }} placeholder={placeholder} />}
+        }} placeholder={placeholder} color={color} />}
     </div>);
 }
 

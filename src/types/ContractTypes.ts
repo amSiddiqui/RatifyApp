@@ -110,6 +110,7 @@ export interface InputField {
     completed: boolean;
     page: number;
     signer: number;
+    signerName: string;
 }
 
 export type GetAgreementResponse = {

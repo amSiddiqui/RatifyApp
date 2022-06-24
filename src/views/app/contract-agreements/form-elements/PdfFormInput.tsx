@@ -139,7 +139,12 @@ const PdfFormInput: React.FC<Props> = ({ x: initX, y: initY, color, onDelete, pl
                     {type === 'text' && <>
                         <Popover
                             opened={showSettings}
-                            onClose={() => setShowSettings(false)}
+                            onClose={() => {
+                                setShowSettings(false);
+                                contractHelper.updateInputFieldSettings(inputElementId, ph, req).then(() => {
+                                }).catch(() => {
+                                });    
+                            }}
                             style={{height: height}}
                             target={PdfInput}
                             width={260}
@@ -172,7 +177,7 @@ const PdfFormInput: React.FC<Props> = ({ x: initX, y: initY, color, onDelete, pl
                                     <Group position='right'>
                                         <span onClick={() => setShowSettings(false)}><Button size='xs' color='light'>Close</Button></span>
                                         <span onClick={() => {
-                                            setShowSettings(false)
+                                            setShowSettings(false);
                                             contractHelper.updateInputFieldSettings(inputElementId, ph, req).then(() => {
                                                 toast.success('Saved');
                                             }).catch(() => {

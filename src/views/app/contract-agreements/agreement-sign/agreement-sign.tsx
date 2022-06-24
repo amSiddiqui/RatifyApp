@@ -20,6 +20,7 @@ import classNames from 'classnames';
 import SignerInput from '../form-elements/SignerInput';
 import SignerComments from './signer-comments';
 import { getFormatDateFromIso } from '../../../../helpers/Utils';
+import SenderInputView from '../form-elements/SenderInputView';
 
 const GRID_TOTAL = 16;
 const GRID_SIDE = 3;
@@ -86,13 +87,11 @@ const AgreementSign: React.FC = () => {
 
     const [confirmationModal, confirmationModalHandlers] = useDisclosure(false);
 
-
     const [token, setToken] = React.useState<string>('');
     const [agreement, setAgreement] = React.useState<Agreement | null>(null);
     const [clientLogo, setClientLogo] = React.useState('');
     const [loadingLogo, setLoadingLogo] = React.useState(true);
     const [clientName, setClientName] = React.useState('');
-
 
     const [pdf, setPdf] = React.useState('');
     const [pdfLoading, setPdfLoading] = React.useState(true);
@@ -102,8 +101,8 @@ const AgreementSign: React.FC = () => {
     const [pageNumber, setPageNumber] = React.useState(1);
     const canvasRef = React.useRef<HTMLDivElement>(null);
 
-
     const [inputElements, setInputElements] = React.useState<InputField[]>([]);
+    const [otherInputElements, setOtherInputElements] = React.useState<InputField[]>([]);
     const [totalFields, setTotalFields] = React.useState(0);
     const [completedFields, setCompletedFields] = React.useState(0);
     const [shouldUpdate, setShouldUpdate] = React.useState(false);
@@ -161,8 +160,49 @@ const AgreementSign: React.FC = () => {
     };
 
     const onDocumentComplete = () => {
+        if (inputElements.filter(i => !i.completed).length > 0) {
+            toast.error('Please complete all the fields before submitting');
+            return;
+        }
         confirmationModalHandlers.open();
     }
+
+    const onDocumentSubmit = () => {
+        contractHelper.completeSigningProcess(token).then(() => {
+            confirmationModalHandlers.close();
+            navigate(`/agreements/success?token${token}`);
+        }).catch(err => {
+            console.log(err);
+            confirmationModalHandlers.close();
+            toast.error('Something went wrong. Try again later!');
+        })
+    }
+
+    const onFilled = React.useCallback((value, id) => {
+        setInputElements(prev => {
+            const newElements = [...prev];
+            for (let element of newElements) {
+                if (element.id === id) {
+                    if ((element.type === 'name' || element.type === 'signature' || element.type === 'text') && typeof value === 'string') {
+                        element.value = value;
+                        element.completed = value.trim().length > 0;
+                    }
+                    if (element.type === 'date' && (value instanceof Date || value === null)) {
+                        if (value === null) {
+                            element.value = '';
+                            element.completed = false;
+                        } else {
+                            let dtStr = DateTime.fromJSDate(value).toISO();
+                            element.value = dtStr;
+                            element.completed = true;
+                        }
+                    }
+                } 
+            }
+            return newElements;
+        });
+        setShouldUpdate(true);
+    }, []);
 
     React.useEffect(() => {
         const token = searchParams.get('token');
@@ -174,6 +214,10 @@ const AgreementSign: React.FC = () => {
         contractHelper
             .validateSignToken(token)
             .then((resp) => {
+                if (resp.status === 'completed') {
+                    navigate(`/agreements/success?token=${token}`);
+                    return;
+                }
                 if (resp.valid) {
                     setTokenValid(true);
                     setBasicInfo(resp.data);
@@ -196,10 +240,7 @@ const AgreementSign: React.FC = () => {
                 if (err.response && err.response.data) {
                     setTokenErrorType(err.response.data.errorType ? err.response.data.errorType : 'SERVER');
                 }
-
             });
-        
-        
     }, [searchParams, navigate, contractHelper]);
 
 
@@ -247,7 +288,15 @@ const AgreementSign: React.FC = () => {
                 setInputElements(input_fields);
             }
         }).catch(err => {
-            toast.error('Error Loading Document. Please contact support');
+            console.log(err);
+        });
+
+        contractHelper.getSignerOtherInputElements(token).then(resp => {
+            if (resp.valid) {
+                let input_fields = resp.data;
+                setOtherInputElements(input_fields);
+            }
+        }).catch(err => {
             console.log(err);
         });
 
@@ -255,12 +304,7 @@ const AgreementSign: React.FC = () => {
 
     React.useEffect(() => {
         const completed = inputElements.filter(field => field.completed).length;
-        if (completed === inputElements.length && inputElements.length !== 0) {
-            toast.success('Please click on Complete button to proceed');
-        }
         setCompletedFields(completed);
-
-
     }, [inputElements]);
 
     React.useEffect(() => {
@@ -270,6 +314,7 @@ const AgreementSign: React.FC = () => {
                 completed: field.completed,
                 value: field.value,
             }));
+            console.log({data});
             contractHelper.updateSignerResponse(token, data).then(resp => {
                 if (!resp.valid) {
                     toast.error('Error saving data. Please contact support');
@@ -473,40 +518,31 @@ const AgreementSign: React.FC = () => {
                                                         if (element.page === pageNumber) {
                                                             return (
                                                                 <SignerInput
+                                                                    id={element.id}
                                                                     width={element.width}
                                                                     height={element.height}
                                                                     initialValue={element.value}
-                                                                    onFilled={(value) => {
-                                                                        setInputElements(prev => {
-                                                                            const newElements = [...prev];
-                                                                            const element = newElements[index];
-                                                                            if ((element.type === 'name' || element.type === 'signature' || element.type === 'text') && typeof value === 'string') {
-                                                                                newElements[index].value = value;
-                                                                                newElements[index].completed = value.trim().length > 0;
-                                                                            }
-                                                                            if (element.type === 'date' && (value instanceof Date || value === null)) {
-                                                                                if (value === null) {
-                                                                                    newElements[index].value = '';
-                                                                                    newElements[index].completed = false;
-                                                                                } else {
-                                                                                    let dtStr = DateTime.fromJSDate(value).toISO();
-                                                                                    newElements[index].value = dtStr;
-                                                                                    newElements[index].completed = true;
-                                                                                }
-                                                                            }
-                                                                            return newElements;
-                                                                        });
-                                                                        setShouldUpdate(true);
-                                                                    }}
+                                                                    onFilled={onFilled}
                                                                     key={element.id}
                                                                     placeholder={element.placeholder}
                                                                     x={element.x}
                                                                     y={element.y}
+                                                                    color={element.color}
                                                                     type={element.type} 
                                                                 />
                                                             )
                                                         }
                                                         return null;
+                                                    }
+                                                )}
+                                                {otherInputElements.map(
+                                                    (element, index) => {
+                                                        if (element.page  === pageNumber) {
+                                                            return <SenderInputView key={element.id} inputField={element} />
+                                                        }
+                                                        else {
+                                                            return null;
+                                                        }
                                                     }
                                                 )}
                                             </div>
@@ -650,7 +686,7 @@ const AgreementSign: React.FC = () => {
                 
                 <Group position='right' className='mt-5'>
                     <span onClick={() => { confirmationModalHandlers.close(); }}><Button color='light'>Back</Button></span>
-                    <span><Button color='success'>{basicInfo?.signerType === 'signer' ? 'Submit' : 'Approve'}</Button></span>
+                    <span onClick={() => onDocumentSubmit()}><Button color='success'>{basicInfo?.signerType === 'signer' ? 'Submit' : 'Approve'}</Button></span>
                 </Group>
             </Modal>
         </>

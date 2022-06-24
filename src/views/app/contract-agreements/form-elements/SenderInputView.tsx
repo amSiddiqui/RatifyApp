@@ -75,7 +75,7 @@ const SenderInputView: React.FC<Props> = ({ inputField }) => {
                                     }}
                                     className={classNames(
                                         getBorderColorBold(color),
-                                        'border-2 px-2',
+                                        'border-2 px-2 font-bold',
                                     )}>
                                     {type === 'date'
                                         ? getFormatDateFromIso(value)
@@ -125,9 +125,9 @@ const SenderInputView: React.FC<Props> = ({ inputField }) => {
                         {completed && (
                             <>
                                 <p style={{height: INPUT_TOP_OFFSET, width: width}}></p>
-                                <div
+                                <Center
                                     className={
-                                        getBorderColorBold(color) + ' border-2'
+                                        getBorderColorBold(color) + ' w-full h-full border-2 cursor-pointer text-gray-600'
                                     }
                                     style={{
                                         height: height - INPUT_TOP_OFFSET,
@@ -136,12 +136,12 @@ const SenderInputView: React.FC<Props> = ({ inputField }) => {
                                     <img
                                         src={value}
                                         style={{
-                                            height: height - INPUT_TOP_OFFSET,
+                                            height: height - INPUT_TOP_OFFSET - 4,
                                             width: 'auto',
                                         }}
                                         alt="Signature"
                                     />
-                                </div>
+                                </Center>
                             </>
                         )}
                     </>

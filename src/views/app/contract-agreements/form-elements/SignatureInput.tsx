@@ -8,15 +8,17 @@ import SignatureDrawing from './SignatureDrawing';
 import SignatureCanvas from 'react-signature-canvas'
 import { toast } from 'react-toastify';
 import html2canvas from 'html2canvas';
-import {SIGN_INPUT_HEIGHT, INPUT_TOP_OFFSET} from '../types';
+import { INPUT_TOP_OFFSET, getBgColorLight, getBorderColorBold} from '../types';
 
 interface Props  {
     placeholder: string;
     onSignComplete: (sig: string) => void;
     initialValue?: string;
+    color: string;
+    height: number;
 }
 
-const SignatureInput:React.FC<Props> = ({placeholder, onSignComplete, initialValue}) => {
+const SignatureInput:React.FC<Props> = ({placeholder, onSignComplete, initialValue, color, height}) => {
     
     const [showSignModal, signModalHandlers] = useDisclosure(false);
     const [lastName, setLastName] = useInputState('');
@@ -103,13 +105,13 @@ const SignatureInput:React.FC<Props> = ({placeholder, onSignComplete, initialVal
                 setFinalImage('');
                 onSignComplete('');
             }
-        } className='cursor-pointer'><MdClear></MdClear></i></Group>
-        {!signed && <Center onClick={() => {signModalHandlers.open(); setSigned(false); }} className='w-full h-full cursor-pointer text-gray-600 bg-blue-200'>
+        } className='cursor-pointer text-black font-bold'><MdClear></MdClear></i></Group>
+        {!signed && <Center onClick={() => {signModalHandlers.open(); setSigned(false); }} className={'w-full h-full cursor-pointer text-gray-600 ' + getBgColorLight(color)} >
             {placeholder}
         </Center>}
         {signed && 
-        <Center onClick={() => {signModalHandlers.open(); setSigned(false);}} className='w-full h-full border-2 cursor-pointer text-gray-600 border-blue-400'>
-            <img style={{height: SIGN_INPUT_HEIGHT - INPUT_TOP_OFFSET, width: 'auto'}} src={finalImage} alt="Signature" />
+        <Center onClick={() => {signModalHandlers.open(); setSigned(false);}} className={'w-full h-full border-2 cursor-pointer text-gray-600 ' + getBorderColorBold(color)}>
+            <img style={{height: height - INPUT_TOP_OFFSET, width: 'auto'}} src={finalImage} alt="Signature" />
         </Center>}
 
         <Modal size={'lg'} title='Add your signature' centered opened={showSignModal} onClose={signModalHandlers.close}>
