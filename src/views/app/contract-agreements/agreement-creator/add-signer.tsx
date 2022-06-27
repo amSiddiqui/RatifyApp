@@ -227,7 +227,11 @@ const AddSigner:React.FC<AddSignerProps> = ({ onConfirmAddSigner, onCancelAddSig
             return;
         }
         signers.sort((a, b) => order.indexOf(a.step - 1) - order.indexOf(b.step - 1));
-        onConfirmAddSigner(signers as SignerElement[]);
+        const signerWithSteps = signers.map((s, i) => ({
+            ...s,
+            step: i + 1
+        }));
+        onConfirmAddSigner(signerWithSteps as SignerElement[]);
     }
 
     const updateItems = React.useCallback((index:number, data:SignerElementFormProps) => {
@@ -271,7 +275,6 @@ const AddSigner:React.FC<AddSignerProps> = ({ onConfirmAddSigner, onCancelAddSig
                         uid={items[i].uid} 
                         onDelete={() => {
                             setItems(prev => {
-                                console.log('deleting at index: ', i, ' Item: ', items[i], ' Signer Data: ', signerData[i]);
                                 const dup:SingerElementStyleProps[] = [];
                                 for (let j = 0; j < prev.length; j++) {
                                     const item = prev[j];
