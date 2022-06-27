@@ -1,4 +1,4 @@
-import { Center, Loader, Stack } from '@mantine/core';
+import { Center, Loader, PasswordInput, Stack } from '@mantine/core';
 import React from 'react';
 import AuthLayout from './auth-layout';
 import * as Yup from 'yup';
@@ -9,8 +9,6 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import { AuthHelper } from '../../helpers/AuthHelper';
-import PasswordStrength from './password-strength';
-import PasswordConfirm from './password-confirm';
 import { Alert, Button } from 'reactstrap';
 
 const ResetPassword:React.FC = () => {
@@ -24,7 +22,7 @@ const ResetPassword:React.FC = () => {
     );
     const [searchParams] = useSearchParams();
     const [token, setToken] = React.useState('');
-    const [completed, setCompleted] = React.useState(true);
+    const [completed, setCompleted] = React.useState(false);
     const [sending, setSending] = React.useState(false);
     const [errorMessage, setErrorMessage] = React.useState('');
     
@@ -48,7 +46,6 @@ const ResetPassword:React.FC = () => {
     const {
         register,
         handleSubmit,
-        watch,
         formState: { errors },
     } = useForm<{password: string, confirm_password: string}>({
         resolver: yupResolver(schema),
@@ -57,8 +54,6 @@ const ResetPassword:React.FC = () => {
             confirm_password: '',
         },
     });
-
-    const password = watch('password');
 
     const onSubmit = (data: {password: string, confirm_password: string}) => {
         setSending(true);
@@ -113,36 +108,31 @@ const ResetPassword:React.FC = () => {
                     </Alert>
                 )}
                 <p className='text-muted text-sm'>Strong password should include letters in lower and uppercase, at least 1 number and the password should be longer than 8 characters long.</p>
-                <PasswordStrength
-                        error={errors.password ? errors.password.message : ''}
-                        name={register('password').name}
-                        label="Password"
-                        placeholder="********"
-                        size={'md'}
-                        onChange={register('password').onChange}
-                        onBlur={register('password').onBlur}
-                        ref={register('password').ref}
-                    />
-                    <PasswordConfirm
-                        error={errors.confirm_password ? errors.confirm_password.message : ''}
-                        name={register('confirm_password').name}
-                        label="Confirm Password"
-                        placeholder="********"
-                        size={'md'}
-                        onChange={register('confirm_password').onChange}
-                        onBlur={register('confirm_password').onBlur}
-                        ref={register('confirm_password').ref}
-                        password={password}
-                    />
-                    <span className="w-full mt-4">
-                        <Button
-                            size="lg"
-                            className="w-full"
-                            color="primary">
-                            Submit
-                        </Button>
-                    </span>
-                    
+                <PasswordInput
+                    {...register('password')}
+                    error={errors.password ? errors.password.message : ''}
+                    size='md'
+                    icon={<i className="simple-icon-lock" />}
+                    label='Password'
+                    placeholder='*********'
+                />
+                <PasswordInput
+                    {...register('confirm_password')}
+                    error={errors.confirm_password ? errors.confirm_password.message : ''}
+                    size='md'
+                    icon={<i className="simple-icon-lock" />}
+                    label='Confirm Password'
+                    placeholder='*********'
+                />
+                <span className="w-full mt-4">
+                    <Button
+                        size="lg"
+                        className="w-full"
+                        color="primary">
+                        Submit
+                    </Button>
+                </span>
+                
             </Stack>
         </form>}
         {completed && <Stack>

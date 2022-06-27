@@ -30,8 +30,6 @@ import {
 } from '../../types/AuthTypes';
 import { authActions } from '../../redux/auth-slice';
 import { DateTime } from 'luxon';
-import PasswordStrength from '../user/password-strength';
-import PasswordConfirm from '../user/password-confirm';
 
 const WAIT_BEFORE_RESENT_EMAIL_IN_SECONDS = 60 * 10;
 
@@ -136,7 +134,6 @@ const ProfileSettings: React.FC = () => {
     });
 
     const showPassword = watch('changePassword');
-    const newPassword = watch('newPassword');
 
     const fileInputRef = React.useRef<HTMLInputElement>(null);
 
@@ -251,9 +248,7 @@ const ProfileSettings: React.FC = () => {
                                                             authHelper
                                                                 .sendVerificationLink()
                                                                 .then(() => {
-                                                                    setVerificationSent(
-                                                                        true,
-                                                                    );
+                                                                    setVerificationSent(true);
                                                                 })
                                                                 .catch((err) => {
                                                                     toast.error(
@@ -307,9 +302,7 @@ const ProfileSettings: React.FC = () => {
                                     <div className="profile-picture-container ml-2">
                                         <img
                                             src={
-                                                image.length === 0
-                                                    ? '/static/img/default.jpg'
-                                                    : image
+                                                image.length === 0 ? '/static/img/default.jpg' : image
                                             }
                                             className="object-cover w-24 h-24 rounded-full shadow"
                                             alt="Profile"
@@ -319,9 +312,7 @@ const ProfileSettings: React.FC = () => {
                                                 <Menu.Item
                                                     className="hover:bg-gray-100"
                                                     onClick={() => {
-                                                        if (
-                                                            fileInputRef.current
-                                                        ) {
+                                                        if (fileInputRef.current) {
                                                             fileInputRef.current.click();
                                                         }
                                                     }}>
@@ -333,29 +324,14 @@ const ProfileSettings: React.FC = () => {
                                                             .deleteProfileImage()
                                                             .then(() => {
                                                                 if (auth.user) {
-                                                                    setImage(
-                                                                        '',
-                                                                    );
-                                                                    setImgUpdated(
-                                                                        false,
-                                                                    );
-                                                                    dispatchFn(
-                                                                        authActions.setUser(
-                                                                            {
-                                                                                ...auth.user,
-                                                                                img: '',
-                                                                            },
-                                                                        ),
-                                                                    );
+                                                                    setImage('');
+                                                                    setImgUpdated(false);
+                                                                    dispatchFn(authActions.setUser({...auth.user, img: '',}));
                                                                 }
                                                             })
                                                             .catch((err) => {
-                                                                toast.error(
-                                                                    'Cannot delete profile image. Try again later!',
-                                                                );
-                                                                console.log(
-                                                                    err,
-                                                                );
+                                                                toast.error('Cannot delete profile image. Try again later!');
+                                                                console.log(err);
                                                             });
                                                     }}
                                                     className="hover:bg-gray-100"
@@ -378,12 +354,7 @@ const ProfileSettings: React.FC = () => {
                                             <TextInput
                                                 required={true}
                                                 {...register('firstName')}
-                                                error={
-                                                    errors.firstName
-                                                        ? errors.firstName
-                                                              .message
-                                                        : ''
-                                                }
+                                                error={errors.firstName ? errors.firstName.message : ''}
                                                 icon={<i className='simple-icon-user' />}
                                                 placeholder={intl.formatMessage(
                                                     {
@@ -466,42 +437,21 @@ const ProfileSettings: React.FC = () => {
                                                 label="Old Password"
                                                 placeholder="Old Password"
                                             />
-                                            <PasswordStrength
-                                                name={
-                                                    register('newPassword').name
-                                                }
-                                                label="New Password"
-                                                placeholder="New Password"
-                                                size="md"
-                                                onChange={
-                                                    register('newPassword')
-                                                        .onChange
-                                                }
-                                                onBlur={
-                                                    register('newPassword')
-                                                        .onBlur
-                                                }
-                                                ref={
-                                                    register('newPassword').ref
-                                                }
+                                            <PasswordInput
+                                                {...register('newPassword')}
                                                 error={errors.newPassword ? errors.newPassword.message : ''}
+                                                size='md'
+                                                icon={<i className="simple-icon-lock" />}
+                                                label='Password'
+                                                placeholder='*********'
                                             />
-                                            <PasswordConfirm
-                                                name={register('confirmPassword').name}
-                                                label="Confirm Password"
-                                                placeholder="Confirm Password"
-                                                size="md"
-                                                onChange={
-                                                    register('confirmPassword')
-                                                        .onChange
-                                                }
-                                                onBlur={
-                                                    register('confirmPassword')
-                                                        .onBlur
-                                                }
-                                                ref={register('confirmPassword').ref}
+                                            <PasswordInput
+                                                {...register('confirmPassword')}
                                                 error={errors.confirmPassword ? errors.confirmPassword.message : ''}
-                                                password={newPassword || ''}
+                                                size='md'
+                                                icon={<i className="simple-icon-lock" />}
+                                                label='Confirm Password'
+                                                placeholder='*********'
                                             />
                                         </Stack>
                                     </Collapse>

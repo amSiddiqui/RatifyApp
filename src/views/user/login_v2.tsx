@@ -88,7 +88,7 @@ const Login: React.FC = () => {
                         }
                         const intervalVal = setInterval(() => {
                             setSuspendedSec((prev) => {
-                                return prev === 0 ? 0 : prev - 1;
+                                return prev <= 0 ? -1 : prev - 1;
                             });
                         }, 1000);
                         setIntervalValue(intervalVal);
