@@ -108,7 +108,9 @@ const ResetPassword:React.FC = () => {
                     </Center>
                 )}
                 {!sending && errorMessage.length > 0 && (
-                    <p className='text-danger text-center text-lg'>{errorMessage}</p>
+                    <Alert color='danger'>
+                        <p className='text-lg'>{errorMessage}</p>
+                    </Alert>
                 )}
                 <p className='text-muted text-sm'>Strong password should include letters in lower and uppercase, at least 1 number and the password should be longer than 8 characters long.</p>
                 <PasswordStrength

@@ -7,13 +7,12 @@ import {
     Loader,
     PasswordInput,
     Popover,
-    Divider,
 } from '@mantine/core';
 import React from 'react';
 import { useIntl } from 'react-intl';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link, useNavigate } from 'react-router-dom';
-import { Button } from 'reactstrap';
+import { Alert, Button } from 'reactstrap';
 import { AuthHelper } from '../../helpers/AuthHelper';
 import { RootState } from '../../redux';
 import * as Yup from 'yup';
@@ -36,6 +35,7 @@ const Login: React.FC = () => {
     const [sending, setSending] = React.useState(false);
     const [suspendedSec, setSuspendedSec] = React.useState(-1);
     const [showTooltip, setShowTooltip] = React.useState(false);
+    const [intervalValue, setIntervalValue] = React.useState<null | NodeJS.Timeout>(null);
     const navigate = useNavigate();
 
     const schema = Yup.object().shape({
@@ -83,6 +83,17 @@ const Login: React.FC = () => {
                         const now = DateTime.utc();
                         const diff = suspendedTillDate.diff(now, 'seconds').seconds;
                         setSuspendedSec(diff);
+                        if (intervalValue !== null) {
+                            clearInterval(intervalValue);
+                        }
+                        const intervalVal = setInterval(() => {
+                            setSuspendedSec((prev) => {
+                                return prev === 0 ? 0 : prev - 1;
+                            });
+                        }, 1000);
+                        setIntervalValue(intervalVal);
+                    
+
                     }  else if (status === 'unauthorized') {
                         const retries = err.response.data.retries;
                         if (retries === 2) {
@@ -101,6 +112,14 @@ const Login: React.FC = () => {
             });
     };
 
+    React.useEffect(() => {
+        return () => {
+            if (intervalValue !== null) {
+                clearInterval(intervalValue);
+            }
+        }
+    }, [intervalValue]);
+
 
     return (
         <AuthLayout>
@@ -115,11 +134,18 @@ const Login: React.FC = () => {
                         </Center>
                     )}
                     {!(sending || loading) && error && (
-                        <p className="text-red-500 text-lg text-center">
-                            {suspendedSec === -1 && errorMessage}
+                        <>
+                            {suspendedSec === -1 && (
+                                <Alert color='danger'><p className='text-lg'>{errorMessage}</p></Alert>
+                            )}
                             {suspendedSec === 0 && ''}
-                            {suspendedSec > 0 && `Account suspended for ${secondsToHourMinutesSeconds(suspendedSec)}`}
-                        </p>
+                            {suspendedSec > 0 && 
+                            <Alert color='danger'>
+                                <p className='text-lg'>
+                                    {`Account suspended for ${secondsToHourMinutesSeconds(suspendedSec)}`}
+                                </p>
+                            </Alert>}
+                        </>
                     )}
                     <TextInput
                         {...register('email')}

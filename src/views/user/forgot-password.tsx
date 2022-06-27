@@ -48,11 +48,13 @@ const ForgotPassword:React.FC = () => {
                 </Center>
             )}
             {!sending && error && (
-                <p className='text-center text-lg text-danger'>{errorMessage}</p>
+                <Alert color='danger'>
+                    <p className='text-lg'>{errorMessage}</p>
+                </Alert>
             )}
             {!sending && !error && emailSent && (
                 <Alert>
-                    <p className='text-lg text-success'>Your request for a new password has been submitted! If we find an associated account, we will send you instructions to reset your password via email.</p>
+                    <p className='text-lg'>Your request for a new password has been submitted! If we find an associated account, we will send you instructions to reset your password via email.</p>
                 </Alert>
             )}
             <p className='text-muted text-sm'>We all forget things sometimes. Please provide the email address you use to login.</p>

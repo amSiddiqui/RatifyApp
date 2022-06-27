@@ -16,6 +16,7 @@ import {
     Loader,
     PasswordInput,
 } from '@mantine/core';
+import { Alert } from 'reactstrap';
 import { RootState } from '../../redux';
 import { Button } from 'reactstrap';
 import { AxiosError } from 'axios';
@@ -101,9 +102,11 @@ const Register: React.FC = () => {
                         </Center>
                     )}
                     {!(sending || loading) && error && (
-                        <p className="text-red-500 text-lg text-center">
-                            {error}
-                        </p>
+                        <Alert color='danger'>
+                            <p className="text-lg">
+                                {error}
+                            </p>
+                        </Alert>
                     )}
                     <TextInput
                         {...register('email')}
