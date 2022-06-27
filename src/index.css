@@ -65,6 +65,22 @@ label {
     padding-right: 3px;
 }
 
+input {
+    color: black !important;
+}
+
+::placeholder {
+    color: #b5baca !important;
+}
+
+::-webkit-input-placeholder {
+    color: #b5baca !important;
+}
+
+::-ms-input-placeholder {
+    color: #b5baca !important;
+}
+
 .pdf-input-element::placeholder {
     @apply text-gray-600;
 }

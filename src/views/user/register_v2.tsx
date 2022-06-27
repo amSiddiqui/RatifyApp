@@ -14,13 +14,12 @@ import {
     TextInput,
     Group,
     Loader,
+    PasswordInput,
 } from '@mantine/core';
 import { RootState } from '../../redux';
 import { Button } from 'reactstrap';
 import { AxiosError } from 'axios';
-import PasswordStrength from './password-strength';
 import AuthLayout from './auth-layout';
-import PasswordConfirm from './password-confirm';
 
 const Register: React.FC = () => {
     const navigate = useNavigate();
@@ -58,7 +57,6 @@ const Register: React.FC = () => {
     const {
         register,
         handleSubmit,
-        watch,
         formState: { errors },
     } = useForm<SignUpDataType>({
         resolver: yupResolver(schema),
@@ -68,8 +66,6 @@ const Register: React.FC = () => {
             confirm_password: '',
         },
     });
-
-    const password = watch('password');
 
     const onUserRegister = (data: SignUpDataType) => {
         setSending(true);
@@ -117,26 +113,21 @@ const Register: React.FC = () => {
                         label="Email"
                         placeholder="Enter you email"
                     />
-                    <PasswordStrength
+                    <PasswordInput
+                        {...register('password')}
                         error={errors.password ? errors.password.message : ''}
-                        name={register('password').name}
-                        label="Password"
-                        placeholder="********"
                         size='md'
-                        onChange={register('password').onChange}
-                        onBlur={register('password').onBlur}
-                        ref={register('password').ref}
+                        icon={<i className="simple-icon-lock" />}
+                        label='Password'
+                        placeholder='*********'
                     />
-                    <PasswordConfirm
+                    <PasswordInput
+                        {...register('confirm_password')}
                         error={errors.confirm_password ? errors.confirm_password.message : ''}
-                        name={register('confirm_password').name}
-                        label="Confirm Password"
-                        placeholder="********"
                         size='md'
-                        onChange={register('confirm_password').onChange}
-                        onBlur={register('confirm_password').onBlur}
-                        ref={register('confirm_password').ref}
-                        password={password}
+                        icon={<i className="simple-icon-lock" />}
+                        label='Confirm Password'
+                        placeholder='*********'
                     />
                     <span className="w-full mt-4">
                         <Button
