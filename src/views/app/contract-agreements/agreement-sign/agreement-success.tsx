@@ -226,5 +226,5 @@ const AgreementSuccess: React.FC = () => {
         </>
     );
 };
-
+ 
 export default AgreementSuccess;

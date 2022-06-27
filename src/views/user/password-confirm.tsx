@@ -27,12 +27,12 @@ const PasswordConfirm = React.forwardRef(({
     
     const color = password === value && value !== '' ? 'green' : 'red';
     const strength = password === value && value !== '' ? 100 : 0;
-    const requirementConfirm = password !== value || value === '' ? 'Password doest not match' : 'Password confirmed';
+    const requirementConfirm = password !== value || value === '' ? 'Passwords do not match' : 'Passwords matched';
     
     return (<Popover
         opened={isOpen}
-        position='bottom'
-        placement='start'
+        position='right'
+        placement='center'
         withArrow
         styles={{ popover: { width: '100%' } }}
         trapFocus={false}
@@ -40,7 +40,6 @@ const PasswordConfirm = React.forwardRef(({
         onFocusCapture={() => setIsOpen(true)}
         onBlurCapture={() => setIsOpen(false)}
         target={<PasswordInput
-            required
             icon={<i className='simple-icon-lock' />}
             label={label}
             error={error}

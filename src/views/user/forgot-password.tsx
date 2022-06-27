@@ -2,7 +2,7 @@ import { Center, Group, Loader, Stack, TextInput } from '@mantine/core';
 import React from 'react';
 import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import { Button } from 'reactstrap';
+import { Alert, Button } from 'reactstrap';
 import { AuthHelper } from '../../helpers/AuthHelper';
 import AuthLayout from './auth-layout';
 
@@ -30,7 +30,8 @@ const ForgotPassword:React.FC = () => {
         }).catch(err => {
             setError(true);
             if (err.response && err.response.status === 400) {
-                setErrorMessage('A user with this email address does not exist.');   
+                setError(false);
+                setEmailSent(true);
             } else {
                 setErrorMessage('Something went wrong. Try again later');
             }
@@ -40,7 +41,7 @@ const ForgotPassword:React.FC = () => {
 
     return (<AuthLayout>
         <Stack className='w-full'>
-            <h1 className='font-bold text-3xl'>Forgot Password?</h1>
+            <h1 className='font-bold text-3xl'>Reset your password</h1>
             {sending && (
                 <Center>
                     <Loader variant='dots' />
@@ -50,10 +51,12 @@ const ForgotPassword:React.FC = () => {
                 <p className='text-center text-lg text-danger'>{errorMessage}</p>
             )}
             {!sending && !error && emailSent && (
-                <p className='text-center text-lg text-success'>Password reset link sent to your email.</p>
+                <Alert>
+                    <p className='text-lg text-success'>Your request for a new password has been submitted! If we find an associated account, we will send you instructions to reset your password via email.</p>
+                </Alert>
             )}
+            <p className='text-muted text-sm'>We all forget things sometimes. Please provide the email address you use to login.</p>
             <TextInput
-                required
                 size={'md'}
                 value={email}
                 error={error}
@@ -62,7 +65,7 @@ const ForgotPassword:React.FC = () => {
                 onChange={(e) => setEmail(e.currentTarget.value)}
                 icon={<i className="simple-icon-envelope" />}
                 placeholder='Email'
-                description='We will send you a link to reset your password.'
+                description=''
                 label='Please enter your email'
             />
             <Group position='right'>

@@ -79,8 +79,8 @@ const PasswordStrength = forwardRef(({
     return (
         <Popover
             opened={popoverOpened}
-            position="bottom"
-            placement="start"
+            position="right"
+            placement="center"
             withArrow
             styles={{ popover: { width: '100%' } }}
             trapFocus={false}
@@ -89,11 +89,9 @@ const PasswordStrength = forwardRef(({
             onBlurCapture={() => setPopoverOpened(false)}
             target={
                 <PasswordInput
-                    required
                     icon={<i className='simple-icon-lock' />}
                     label={label}
                     placeholder={placeholder}
-                    description="Strong password should include letters in lower and uppercase, at least 1 number"
                     value={value}
                     onChange={(event) => {
                         setValue(event.currentTarget.value);

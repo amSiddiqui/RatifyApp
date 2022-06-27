@@ -270,7 +270,7 @@ const ContractAgreements: React.FC = () => {
                                     <span className="text-success text-center text-3xl">
                                         <i className="simple-icon-check"></i>
                                     </span>
-                                    <p>Document Ready!</p>
+                                    <p>Your document is uploaded and ready!</p>
                                 </Stack>
                             )}
                         </Center>

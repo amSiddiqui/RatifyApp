@@ -6,8 +6,9 @@ import {
     Checkbox,
     Loader,
     PasswordInput,
+    Popover,
+    Divider,
 } from '@mantine/core';
-import { useMediaQuery } from '@mantine/hooks';
 import React from 'react';
 import { useIntl } from 'react-intl';
 import { useDispatch, useSelector } from 'react-redux';
@@ -34,7 +35,7 @@ const Login: React.FC = () => {
     const [errorMessage, setErrorMessage] = React.useState('');
     const [sending, setSending] = React.useState(false);
     const [suspendedSec, setSuspendedSec] = React.useState(-1);
-    const isSmall = useMediaQuery('(max-width: 599px)');
+    const [showTooltip, setShowTooltip] = React.useState(false);
     const navigate = useNavigate();
 
     const schema = Yup.object().shape({
@@ -123,11 +124,10 @@ const Login: React.FC = () => {
                     <TextInput
                         {...register('email')}
                         error={errors.email ? errors.email.message : ''}
-                        required
-                        size={isSmall ? 'md' : 'lg'}
+                        size={'md'}
                         icon={<i className="simple-icon-envelope" />}
                         label="Email"
-                        placeholder="Email"
+                        placeholder='Enter your email'
                     />
                     <PasswordInput
                         {...register('password')}
@@ -136,22 +136,35 @@ const Login: React.FC = () => {
                                 ? errors.password.message
                                 : ''
                         }
-                        required
                         type="password"
-                        size={isSmall ? 'md' : 'lg'}
+                        size={'md'}
                         icon={<i className="simple-icon-lock" />}
                         label="Password"
                         placeholder="*********"
                     />
                     <Group position="apart">
-                        <Checkbox {...register('rememberMe')} label="Remember Me" />
+                        <Group>
+                            <Checkbox {...register('rememberMe')} label="Keep me signed in" />
+                            <Popover title={<p className='font-bold'>"Keep me signed in" Checkbox</p>} withCloseButton withArrow position='top' opened={showTooltip} onClose={() => {
+                                setShowTooltip(false);
+                            }} target={
+                                <p style={{position: 'relative', top: 1.3}} className='text-blue-500 cursor-pointer' onClick={() => {
+                                    setShowTooltip(true);
+                                }}>Details <i className='simple-icon-arrow-down relative' style={{fontSize: '0.6rem', top: 1}} /></p>
+                            }>
+                                <div className='w-[300px]'>
+                                    <p className='mb-1'>Selecting "keep me signed" in reduces the number of times you're asked to Login on this device. This option will keep you logged in for <span className='font-bold'>14</span> days.</p>
+                                    <p>To keep your account secure, use this option only on your personal devices.</p>
+                                </div>
+                            </Popover>
+                        </Group>
                         <p onClick={() => {
                             navigate('/user/forgot-password');
                         }} className="text-blue-500 hover:text-blue-700 cursor-pointer underline">
                             Forgot Password?
                         </p>
                     </Group>
-                    <span className="w-full">
+                    <span className="w-full mt-4">
                         <Button
                             size="lg"
                             className="w-full"

@@ -15,7 +15,6 @@ import {
     Group,
     Loader,
 } from '@mantine/core';
-import { useMediaQuery } from '@mantine/hooks';
 import { RootState } from '../../redux';
 import { Button } from 'reactstrap';
 import { AxiosError } from 'axios';
@@ -35,7 +34,6 @@ const Register: React.FC = () => {
     );
     const [error, setError] = React.useState('');
     const [sending, setSending] = React.useState(false);
-    const isSmall = useMediaQuery('(max-width: 599px)');
 
     const schema = Yup.object().shape({
         email: Yup.string()
@@ -114,18 +112,17 @@ const Register: React.FC = () => {
                     <TextInput
                         {...register('email')}
                         error={errors.email ? errors.email.message : ''}
-                        required
-                        size={isSmall ? 'md' : 'lg'}
+                        size='md'
                         icon={<i className="simple-icon-envelope" />}
                         label="Email"
-                        placeholder="Email"
+                        placeholder="Enter you email"
                     />
                     <PasswordStrength
                         error={errors.password ? errors.password.message : ''}
                         name={register('password').name}
                         label="Password"
                         placeholder="********"
-                        size={isSmall ? 'md' : 'lg'}
+                        size='md'
                         onChange={register('password').onChange}
                         onBlur={register('password').onBlur}
                         ref={register('password').ref}
@@ -135,13 +132,13 @@ const Register: React.FC = () => {
                         name={register('confirm_password').name}
                         label="Confirm Password"
                         placeholder="********"
-                        size={isSmall ? 'md' : 'lg'}
+                        size='md'
                         onChange={register('confirm_password').onChange}
                         onBlur={register('confirm_password').onBlur}
                         ref={register('confirm_password').ref}
                         password={password}
                     />
-                    <span className="w-full">
+                    <span className="w-full mt-4">
                         <Button
                             size="lg"
                             className="w-full"

@@ -63,7 +63,7 @@ const PrepareSend: React.FC<Props> = ({
     return (
         <div>
             <Stack>
-                <h5>Send {title} to</h5>
+                <h5>Send <span className='text-rose-500 mb-4'>{title}</span> to</h5>
                 {signers.map((signer) => (
                     <Card key={signer.uid}>
                         <CardBody>
@@ -117,41 +117,37 @@ const PrepareSend: React.FC<Props> = ({
                         </CardBody>
                     </Card>
                 ))}
-                <List size="sm" spacing={'sm'} className="ml-2" center>
+                <List size="sm" spacing={'sm'} className="ml-2 mt-4" center>
                     {sequence && (
                         <List.Item
                             icon={
                                 <i className="text-success simple-icon-check"></i>
                             }>
-                            <p>Signer Must Sign in sequence</p>
+                            <p>Approval (where applicable) and signing will be completed in a sequence.</p>
                         </List.Item>
                     )}
                     
-                    <List.Item
+                    {signBefore !== null && <List.Item
                         icon={
                             <i className="text-primary simple-icon-calendar"></i>
                         }>
-                        {signBefore !== null && <p>
-                            Document must be signed before:{' '}
-                            {signBefore.toLocaleString(DateTime.DATE_FULL)}
-                        </p>}
-                        {signBefore === null && <p>
-                            Document does not have a sign before date.
-                        </p>}
-                    </List.Item>
+                        <p>
+                            This document is required to be signed before{' '}
+                            <span className='text-rose-500'>{signBefore.toLocaleString(DateTime.DATE_FULL)}</span>.
+                        </p>
+                        
+                    </List.Item>}
                     
-                    <List.Item
+                    {endDate !== null &&<List.Item
                         icon={
                             <i className="text-primary simple-icon-calendar"></i>
                         }>
-                        {endDate!== null && <p>
-                            Document end date:{' '}
-                            {endDate.toLocaleString(DateTime.DATE_FULL)}
-                        </p>}
-                        {endDate === null && <p>
-                            Document does not have an end date.
-                        </p>}
-                    </List.Item>
+                        <p>
+                            This document has an end date of{' '}
+                            <span className='text-rose-500'>{endDate.toLocaleString(DateTime.DATE_FULL)}</span>.
+                        </p>
+                        
+                    </List.Item>}
                 
                     {Object.values(signerStatus).includes('error') && (
                         <List.Item icon={

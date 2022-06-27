@@ -312,6 +312,7 @@ const SenderAgreement: React.FC = () => {
                                     {!pdfLoading && (
                                         <Tooltip
                                             label="Download Document"
+                                            sx={{fontSize: '12px'}}
                                             className="cursor-pointer">
                                             <a
                                                 href={

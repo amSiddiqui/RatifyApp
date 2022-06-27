@@ -10,9 +10,8 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import { AuthHelper } from '../../helpers/AuthHelper';
 import PasswordStrength from './password-strength';
-import { useMediaQuery } from '@mantine/hooks';
 import PasswordConfirm from './password-confirm';
-import { Button } from 'reactstrap';
+import { Alert, Button } from 'reactstrap';
 
 const ResetPassword:React.FC = () => {
     
@@ -25,9 +24,8 @@ const ResetPassword:React.FC = () => {
     );
     const [searchParams] = useSearchParams();
     const [token, setToken] = React.useState('');
-    const [completed, setCompleted] = React.useState(false);
+    const [completed, setCompleted] = React.useState(true);
     const [sending, setSending] = React.useState(false);
-    const isSmall = useMediaQuery('(max-width: 599px)');
     const [errorMessage, setErrorMessage] = React.useState('');
     
     const schema = Yup.object().shape({
@@ -112,12 +110,13 @@ const ResetPassword:React.FC = () => {
                 {!sending && errorMessage.length > 0 && (
                     <p className='text-danger text-center text-lg'>{errorMessage}</p>
                 )}
+                <p className='text-muted text-sm'>Strong password should include letters in lower and uppercase, at least 1 number and the password should be longer than 8 characters long.</p>
                 <PasswordStrength
                         error={errors.password ? errors.password.message : ''}
                         name={register('password').name}
                         label="Password"
                         placeholder="********"
-                        size={isSmall ? 'md' : 'lg'}
+                        size={'md'}
                         onChange={register('password').onChange}
                         onBlur={register('password').onBlur}
                         ref={register('password').ref}
@@ -127,13 +126,13 @@ const ResetPassword:React.FC = () => {
                         name={register('confirm_password').name}
                         label="Confirm Password"
                         placeholder="********"
-                        size={isSmall ? 'md' : 'lg'}
+                        size={'md'}
                         onChange={register('confirm_password').onChange}
                         onBlur={register('confirm_password').onBlur}
                         ref={register('confirm_password').ref}
                         password={password}
                     />
-                    <span className="w-full">
+                    <span className="w-full mt-4">
                         <Button
                             size="lg"
                             className="w-full"
@@ -145,11 +144,16 @@ const ResetPassword:React.FC = () => {
             </Stack>
         </form>}
         {completed && <Stack>
-            <h1 className='font-bold text-3xl'>New password saved successfully.</h1>
-            <span className='w-full' onClick={() => {
-                navigate('/user/login')
+            <h1 className='font-bold text-3xl'>Password Reset</h1>
+            <Alert>
+                <p className='text-lg'>New password saved successfully!</p>
+                <p className='text-xs'>You will be redirected to your dashboard in a moment.</p>
+            </Alert>
+            <p className='text-sm text-muted'>If you are not automatically redirected in 5 seconds, please click the link below.</p>
+            <span className='text-blue-500 underline cursor-pointer' onClick={() => {
+                navigate('/')
             }}>
-                <Button className='w-full' color='primary'>Login</Button>
+                Dashboard
             </span>
         </Stack>}
     </AuthLayout>

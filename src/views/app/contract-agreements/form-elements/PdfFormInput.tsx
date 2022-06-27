@@ -1,8 +1,6 @@
 import classNames from 'classnames';
 import React from 'react';
 import { getBgColorLight, getBorderColorBold } from '../types';
-import { MdClear, MdSettings } from 'react-icons/md';
-import { AiOutlineDrag } from 'react-icons/ai';
 import { DraggableCore } from 'react-draggable';
 import { useId } from '@mantine/hooks';
 import { Center, Checkbox, Grid, Group, Popover, Stack, TextInput } from '@mantine/core';
@@ -11,6 +9,7 @@ import { DatePicker } from '@mantine/dates';
 import { Button } from 'reactstrap';
 import { ContractHelper } from '../../../../helpers/ContractHelper';
 import { toast } from 'react-toastify';
+import { BsTrash } from 'react-icons/bs';
  
 
 interface Props {
@@ -42,7 +41,7 @@ const PdfFormInput: React.FC<Props> = ({ x: initX, y: initY, color, onDelete, pl
     const [inputStyles, setInputStyles] = React.useState<any>({
         zIndex: 1,
         resize: type === 'signature' ? 'both': 'horizontal',
-        overflow: 'auto',
+        overflow: 'hidden',
         width: width,
         height: height,
         position: 'absolute',
@@ -129,21 +128,23 @@ const PdfFormInput: React.FC<Props> = ({ x: initX, y: initY, color, onDelete, pl
                     className={classNames('flex-col pdf-form-input flex')}
                 >
                     <div className='flex items-center justify-between' style={{height: INPUT_TOP_OFFSET + 'px', fontSize: '1rem'}}>
-                        <i id={uuid} className='flex text-black text-xl justify-center items-center cursor-pointer'><AiOutlineDrag /></i>
-                        <div className='flex'>
-                            {type === 'text' && <i className='mr-2 cursor-pointer' onClick={() => setShowSettings(true)}><MdSettings></MdSettings></i>}
-                            <i onClick={onDelete} className='cursor-pointer text-danger'><MdClear /></i>
-                        </div>
+                        <i id={uuid} className='flex text-black text-xl justify-center hover:text-blue-500 items-center cursor-pointer'><i className='simple-icon-cursor-move' style={{fontSize: '14px'}} /></i>
+                        <Group spacing={1}>
+                            {type === 'text' && <i className='mr-2 cursor-pointer hover:text-blue-500' onClick={() => setShowSettings(true)}><i className='simple-icon-settings' style={{fontSize: '14px'}} /></i>}
+                            <i style={{overflow: 'none'}} onClick={onDelete} className='cursor-pointer hover:text-red-500 relative'><BsTrash style={{fontSize: '14px'}} /></i>
+                        </Group>
                     </div>
                     {type === 'name' && PdfInput }
                     {type === 'text' && <>
                         <Popover
                             opened={showSettings}
                             onClose={() => {
-                                setShowSettings(false);
-                                contractHelper.updateInputFieldSettings(inputElementId, ph, req).then(() => {
-                                }).catch(() => {
-                                });    
+                                if (showSettings) {
+                                    contractHelper.updateInputFieldSettings(inputElementId, ph, req).then(() => {
+                                    }).catch(() => {
+                                    });    
+                                }
+                                setShowSettings(false); 
                             }}
                             style={{height: height}}
                             target={PdfInput}

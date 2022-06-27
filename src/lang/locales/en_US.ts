@@ -75,16 +75,16 @@ export const enMessages = {
     'server-error': 'Something went wrong. Try again later!',
 
     // 05. Auth Messages
-    'auth.password.min': 'Password must be at least 8 characters long',
-    'auth.password.required': 'Please enter a password',
+    'auth.password.min': 'Passwords must be at least 8 characters.',
+    'auth.password.required': 'Please enter a password.',
     'auth.password.invalid':
-        'Password must contain at least one capital letter and one number',
-    'auth.password.mismatch': 'Passwords do not match',
-    'auth.password.confirm': 'Please confirm your password',
-    'auth.email.required': 'Please enter your email',
-    'auth.email.invalid': 'Please enter a valid email',
-    'auth.login.notify': 'Invalid email or password',
-    'auth.login.error': 'Invalid email or password',
+        'Password must contain at least one capital letter and one number.',
+    'auth.password.mismatch': 'Passwords do not match.',
+    'auth.password.confirm': 'Please confirm your password.',
+    'auth.email.required': 'Please enter your email.',
+    'auth.email.invalid': 'Please enter a valid email.',
+    'auth.login.notify': 'Invalid email or password.',
+    'auth.login.error': 'Invalid email or password.',
 
     // 06. Account
     'account.account': 'My Account',
@@ -102,7 +102,7 @@ export const enMessages = {
     'contract-agreement.create-new': 'Create New',
     'contract-agreement.agreement-creator': 'Contracts & Agreements',
 
-    'agreement-creator.title-placeholder': 'Type document title here',
+    'agreement-creator.title-placeholder': 'Document Name',
     'contract-agreement.agreement-dashboard': 'Dashboard',
 
     'contract.error.404': 'Agreement not found',

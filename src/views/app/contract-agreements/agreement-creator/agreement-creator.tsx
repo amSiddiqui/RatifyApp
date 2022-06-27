@@ -445,19 +445,20 @@ const AgreementCreator: React.FC = () => {
                 </Colxx>
             </Row>
             <Center className="mb-14">
-                <TextInput
-                    className="center-input"
-                    style={{ minWidth: '300px', width: '40%' }}
-                    size="xl"
-                    error={showAgreementErrors && agreementName.length === 0 }
-                    onChange={(event: React.FormEvent<HTMLInputElement>) => {
-                        setAgreementName(event.currentTarget.value);
-                    }}
-                    value={agreementName}
-                    placeholder={intl.formatMessage({
-                        id: 'agreement-creator.title-placeholder',
-                    })}
-                />
+                    <TextInput
+                        label={<p style={{fontSize: '1.1rem'}}>Document Name</p>}
+                        description={<p className='text-muted'>Give your document a short name, e.g. Employment Contract</p>}
+                        style={{ minWidth: '300px', width: '40%', fontSize: '1.1rem' }}
+                        size="xl"
+                        error={showAgreementErrors && agreementName.length === 0 }
+                        onChange={(event: React.FormEvent<HTMLInputElement>) => {
+                            setAgreementName(event.currentTarget.value);
+                        }}
+                        value={agreementName}
+                        placeholder={intl.formatMessage({
+                            id: 'agreement-creator.title-placeholder',
+                        })}
+                    />
             </Center>
             <Grid columns={GRID_COLUMNS}>
                 <Grid.Col span={GRID_SIDE}>
@@ -488,12 +489,12 @@ const AgreementCreator: React.FC = () => {
                 <Grid.Col span={GRID_SIDE}>
                     <Card style={{ height: '1080px' }}>
                         <CardBody className="p-0">
-                            <h5 className="text-center py-4">
+                            <h5 className="text-center bg-gray-50 py-4">
                                 Signing Workflow
                             </h5>
                             <Divider className="mb-4" />
                             <p className="text-xs px-3 text-slate-400 italic">
-                                Drag and drop signers on document
+                                Drag and drop signers on the document
                             </p>
                             <Space h='lg' />
                             {signers.length > 0 && (
@@ -711,7 +712,7 @@ const AgreementCreator: React.FC = () => {
                 <Grid.Col span={GRID_SIDE}>
                     <Card style={{ height: '1080px' }}>
                         <CardBody className="p-0">
-                            <h5 className="text-center py-4">
+                            <h5 className="text-center bg-gray-50 py-4">
                                 Page Navigation
                             </h5>
                             <Divider className="mb-4" />
@@ -796,12 +797,15 @@ const AgreementCreator: React.FC = () => {
                                     </ScrollArea>
                                 )}
                             </Center>
-                            <Divider className="my-4" />
-                            <h5 className="text-center mb-5">Settings</h5>
-                            <Divider className="my-4" />
+                            <Divider className="mt-4" />
+                            <div className='py-4 bg-gray-50'>
+                                <h5 className="text-center ">Settings</h5>
+                                <p className='text-center text-muted text-xs'>Optional</p>
+                            </div>
+                            <Divider className="mb-4" />
                             <Stack spacing={'lg'} className="px-4">
                                 <Group position="apart">
-                                    <div>Has end date?</div>
+                                    <div>Does this document have an end date?</div>
                                     <Switch
                                         checked={showEndDate}
                                         onChange={(checked) => {
@@ -878,10 +882,10 @@ const AgreementCreator: React.FC = () => {
                                 )}
                             </Stack>
                             <Divider className='mt-6 mb-2' />
-                            <Stack spacing={'lg'} className="px-4 mt-4">
+                            <Stack spacing='xs' className="px-4 mt-4">
+                                <p>This document must be signed by:</p>
                                 <DatePicker
                                     inputFormat='DD/MM/YYYY'
-                                    label="Document must be signed by"
                                     value={signedBefore}
                                     onChange={(value) => { setSignedBefore(value); }}
                                     error={showAgreementErrors && !signedBefore ? 'Please select a date': ''}
@@ -895,25 +899,26 @@ const AgreementCreator: React.FC = () => {
                     </Card>
                 </Grid.Col>
             </Grid>
-            <Grid className='mt-4' columns={GRID_COLUMNS}>
+            <Grid className='mt-12 mb-12' columns={GRID_COLUMNS}>
                 <Grid.Col span={GRID_SIDE}></Grid.Col>
                 <Grid.Col span={GRID_CENTER}>
                     <Group position='apart'>
                         <Group>
                             <span onClick={deleteModalHandlers.open}><Button color='danger' className='agreement-button' >Delete</Button></span>
-                            <span onClick={() => {toast.success('Draft saved!')}}><Button color='secondary' className='agreement-button' >Save as draft</Button></span>
+                            <span onClick={() => {toast.success('Draft saved!')}}><Button color='secondary' className='agreement-button' >Save Draft</Button></span>
                             <span><Button
+                                type='button'
                                 onClick={() => {
                                     saveTemplateHandlers.open();
                                 }}
                                 className="contract-agreements-create-new flex agreement-button items-center justify-center"
                                 color="secondary"
                             >
-                                <span>Save as template</span>
+                                <span>Save As Template</span>
                             </Button></span>
                         </Group>
                         <Group position='right'>
-                            <span onClick={() => {onPrepareSend()}}><Button color='success' className='agreement-button' >Prepare to send</Button></span>
+                            <span onClick={() => {onPrepareSend()}}><Button color='success' className='agreement-button' >Prepare To Send</Button></span>
                         </Group>
                     </Group>
                 </Grid.Col>
