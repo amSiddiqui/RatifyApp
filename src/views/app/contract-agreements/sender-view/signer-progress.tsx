@@ -11,6 +11,7 @@ import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { ContractHelper } from '../../../../helpers/ContractHelper';
 import { toast } from 'react-toastify';
+import SignerPopover from '../signer-popover';
 
 type Props = {
     signer: Signer;
@@ -81,20 +82,9 @@ const SignerProgress: React.FC<Props> = ({ signer, contractHelper, onDocumentSen
 
     return (
         <>
-            <Tooltip
-                placement="start"
+            <SignerPopover
                 color={signer.color}
-                opened={true}
-                withArrow
-                zIndex={4}
-                position="left"
-                label={
-                    signer.type.charAt(0).toUpperCase() +
-                    signer.type.substring(1) +
-                    ' ' +
-                    signer.step
-                }>
-                <div
+                target={(<div
                     style={{ width: 145 }}
                     className={classNames(
                         'px-3 py-3',
@@ -170,8 +160,17 @@ const SignerProgress: React.FC<Props> = ({ signer, contractHelper, onDocumentSen
                                 </Center>
                             </Stack>
                         </Collapse>
-                    </div>
-            </Tooltip>
+                    </div>)}
+
+            >
+                {
+                    signer.type.charAt(0).toUpperCase() +
+                    signer.type.substring(1) +
+                    ' ' +
+                    signer.step
+                }
+            </SignerPopover>
+            
             <Modal centered title='Send the document again' opened={sendAgainModal} onClose={sendAgainHandlers.close}>
                 <form onSubmit={handleSubmit(onSendAgain)}>
                     <Stack>

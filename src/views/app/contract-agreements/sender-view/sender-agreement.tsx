@@ -531,39 +531,18 @@ const SenderAgreement: React.FC = () => {
                                                                     <span
                                                                         className={classNames(
                                                                             'border-4',
-                                                                            {
-                                                                                'border-sky-500':
-                                                                                    pageNumber ===
-                                                                                    parseInt(
-                                                                                        key,
-                                                                                    ) +
-                                                                                        1,
-                                                                            },
-                                                                            {
-                                                                                'border-gray-300':
-                                                                                    pageNumber !==
-                                                                                    parseInt(
-                                                                                        key,
-                                                                                    ) +
-                                                                                        1,
-                                                                            },
+                                                                            { 'border-sky-500': pageNumber === parseInt( key, ) + 1 },
+                                                                            { 'border-gray-300': pageNumber !== parseInt( key, ) + 1 },
                                                                             'cursor-pointer',
                                                                         )}>
                                                                         <img
-                                                                            src={
-                                                                                'data:image/jpeg;base64,' +
-                                                                                pdfThumbnails[
-                                                                                    key
-                                                                                ]
-                                                                            }
+                                                                            src={ 'data:image/jpeg;base64,' + pdfThumbnails[ key ] }
                                                                             style={{
                                                                                 height: 100,
                                                                             }}
                                                                             alt="Page"
                                                                             onClick={() =>
-                                                                                setPageNumber(
-                                                                                    pg,
-                                                                                )
+                                                                                setPageNumber( pg )
                                                                             }
                                                                         />
                                                                     </span>

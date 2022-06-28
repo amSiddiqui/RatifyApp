@@ -17,7 +17,6 @@ import {
     Group,
     ScrollArea,
     Modal,
-    Tooltip,
     Textarea,
     Autocomplete,
     Space,
@@ -49,6 +48,7 @@ import PdfFormInput from '../form-elements/PdfFormInput';
 import { getRandomStringID } from '../../../../helpers/Utils';
 import { useDebouncedValue, useDisclosure } from '@mantine/hooks';
 import PrepareSend from './prepare-send';
+import SignerPopover from '../signer-popover';
 
 // luxon today date
 const today = DateTime.local();
@@ -510,16 +510,10 @@ const AgreementCreator: React.FC = () => {
                                 >
                                     {signers.map((signer, index) => {
                                         return (
-                                            <Tooltip
-                                                key={signer.id}
-                                                zIndex={4}
-                                                color={signer.color}
-                                                position="left"
-                                                placement="start"
-                                                opened
-                                                label={signer.type.charAt(0).toUpperCase() + signer.type.slice(1) + ' ' + (index + 1)}
-                                                withArrow
-                                            >
+                                            <SignerPopover
+                                            color={signer.color}
+                                            key={signer.id}
+                                            target={(<>
                                                 {signer.type === 'signer' && (
                                                     <Stack className={"p-3 "+getBgColorLight(signer.color)}>
                                                         <p className='mb-0 text-muted text-center'>{signer.name}</p>
@@ -603,7 +597,10 @@ const AgreementCreator: React.FC = () => {
                                                         <p className=' text-center'>{signer.name}</p>
                                                     </Stack>
                                                 )}
-                                            </Tooltip>
+                                            </>)}
+                                            >
+                                                {signer.type.charAt(0).toUpperCase() + signer.type.slice(1) + ' ' + (index + 1)}
+                                            </SignerPopover>
                                         )
                                     })}
                                     
