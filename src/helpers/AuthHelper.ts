@@ -23,7 +23,7 @@ export class AuthHelper extends ApiHelper {
         try {
             let response: AxiosResponse<TokenType> = await axios.post(
                 '/auth/token/',
-                { email, password },
+                { email, password, rememberMe },
             );
             this.dispatchFn(authActions.login(response.data));
             this.updateToken();
@@ -193,9 +193,11 @@ export class AuthHelper extends ApiHelper {
     }
 
     async resetPassword(data: {token: string, password: string, confirm_password: string}) {
-        await axios.post(
+        let response:AxiosResponse<{email: string}> = await axios.post(
             `/auth/user/reset-password/`,
             data,
         );
+
+        return response.data;
     }
 }

@@ -25,6 +25,7 @@ const ResetPassword:React.FC = () => {
     const [completed, setCompleted] = React.useState(false);
     const [sending, setSending] = React.useState(false);
     const [errorMessage, setErrorMessage] = React.useState('');
+    const [timeoutValue, setTimeoutValue] = React.useState<NodeJS.Timeout | null>(null);
     
     const schema = Yup.object().shape({
         password: Yup.string()
@@ -58,9 +59,16 @@ const ResetPassword:React.FC = () => {
     const onSubmit = (data: {password: string, confirm_password: string}) => {
         setSending(true);
         setErrorMessage('');
-        authHelper.resetPassword({token, password: data.password, confirm_password: data.confirm_password}).then(() => {
+        authHelper.resetPassword({token, password: data.password, confirm_password: data.confirm_password}).then(({ email }) => {
             setSending(false);
             setCompleted(true);
+            authHelper.loginRequest({email, password: data.password, rememberMe: false}).then(() => {
+                setTimeoutValue(setTimeout(() => {
+                    navigate('/');
+                }, 4000));
+            }).catch(err => {
+                
+            });
         }).catch(err => {
             setSending(false);
             if (err.response && err.response.status === 400) {
@@ -92,6 +100,14 @@ const ResetPassword:React.FC = () => {
         setToken(tokenStr);
     
     }, [searchParams, navigate]);
+
+    React.useEffect(() => {
+        return () => {
+            if (timeoutValue !== null) {
+                clearTimeout(timeoutValue);
+            }
+        }
+    }, [timeoutValue]);
 
     return <AuthLayout>
         {!completed && <form onSubmit={handleSubmit(onSubmit)} className='w-full'>
@@ -143,7 +159,7 @@ const ResetPassword:React.FC = () => {
             </Alert>
             <p className='text-sm text-muted'>If you are not automatically redirected in 5 seconds, please click the link below.</p>
             <span className='text-blue-500 underline cursor-pointer' onClick={() => {
-                navigate('/')
+                navigate('/');
             }}>
                 Dashboard
             </span>
