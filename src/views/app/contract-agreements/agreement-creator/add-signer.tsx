@@ -21,7 +21,7 @@ import { clamp } from 'lodash-es';
 import { useMediaQuery } from '@mantine/hooks';
 import { GoPlus } from 'react-icons/go';
 import { colors, getBgColorLight as getColor } from '../types';
-import { getRandomStringID } from '../../../../helpers/Utils';
+import { generateSignerLabels, getRandomStringID } from '../../../../helpers/Utils';
 import { SingerElementStyleProps, SignerElementFormProps, SignerElement } from '../../../../types/ContractTypes';
 
 interface SignerRowProps extends SingerElementStyleProps {
@@ -32,9 +32,10 @@ interface SignerRowProps extends SingerElementStyleProps {
     index: number;
     onDelete: () => void;
     signerData: SignerElementFormProps;
+    label: string;
 }
 
-const SignerRow:React.FC<SignerRowProps> = ({ index, color, step, onDragEnd, onDragStart, type, onDataChange, confirm, onDelete, uid, signerData }) => {
+const SignerRow:React.FC<SignerRowProps> = ({ index, color, step, onDragEnd, onDragStart, type, onDataChange, confirm, onDelete, uid, signerData, label }) => {
     const [i] = React.useState(index);
     const [name, setName] = React.useState(signerData.name);
     const [email, setEmail] = React.useState(signerData.email);
@@ -64,7 +65,7 @@ const SignerRow:React.FC<SignerRowProps> = ({ index, color, step, onDragEnd, onD
                 </p>
                 <Group position='apart'>
                     <Group>
-                        <div className={ classNames('p-2 border-2 rounded-sm capitalize', getColor(color))}>{type} {step}</div>
+                        <div className={ classNames('p-2 border-2 rounded-sm capitalize', getColor(color))}>{label}</div>
                         <TextInput error={confirm && name.length === 0 ? 'Please enter full name' : ''} placeholder='Name' value={name} onChange={(event) => setName(event.currentTarget.value)}  />
                         <TextInput error={confirm && email.length === 0 ? 'Please enter email' : ''} placeholder='Email' value={email} onChange={(event) => setEmail(event.currentTarget.value)} />
                         <TextInput placeholder='Job Title' style={{width: 100}} value={job_title} onChange={(event) => setJobTitle(event.currentTarget.value)} />
@@ -172,6 +173,7 @@ const AddSigner:React.FC<AddSignerProps> = ({ onConfirmAddSigner, onCancelAddSig
     const [confirming, setConfirming] = React.useState(false);
 
     const [order, setOrder] = React.useState<number[]>(items.map((_, index) => index));
+    const [labels, setLabels] = React.useState<Array<{uid: string, label: string}>>([]);
 
     const [springs, api] =  useSprings(items.length, fn(order, elementHeight));
     const [shouldDrag, setShouldDrag] = React.useState(false);
@@ -197,7 +199,7 @@ const AddSigner:React.FC<AddSignerProps> = ({ onConfirmAddSigner, onCancelAddSig
         const id = getRandomStringID();
         setLastColorIndex((prev) => prev + 1);
         setItems((prev) => [...prev, { step: prev.length + 1, color, type, name: '', email: '', uid: id }]);
-        setSignerData((prev) => [...prev, { name: '', email: '', uid: id, job_title: '', text_field: false, every: 1, every_unit: 'months' }]);
+        setSignerData((prev) => [...prev, { name: '', email: '', uid: id, job_title: '', text_field: false, every: 1, every_unit: 'months'}]);
         setOrder((prev) => [...prev, prev.length]);
     }
 
@@ -254,6 +256,10 @@ const AddSigner:React.FC<AddSignerProps> = ({ onConfirmAddSigner, onCancelAddSig
         }
     }, [matches]);
 
+    React.useEffect(() => {
+        setLabels(generateSignerLabels(order, items.map(i => ({uid: i.uid, type: i.type, step: i.step})), false) );
+    }, [order, items]);
+
     return (<>
         <div className='relative' style={{height: containerHeight}}>
             {springs.map(({zIndex, shadow, y, scale}, i) => (
@@ -273,6 +279,14 @@ const AddSigner:React.FC<AddSignerProps> = ({ onConfirmAddSigner, onCancelAddSig
                 >
                     <SignerRow 
                         uid={items[i].uid} 
+                        label={function() {
+                            const label = labels.find(l => l.uid === items[i].uid);
+                            if (label) {
+                                return label.label;
+                            } else {
+                                return '';
+                            }
+                        }()}
                         onDelete={() => {
                             setItems(prev => {
                                 const dup:SingerElementStyleProps[] = [];

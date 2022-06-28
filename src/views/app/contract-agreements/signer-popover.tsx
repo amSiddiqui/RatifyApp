@@ -16,7 +16,7 @@ const SignerPopover: React.FC<{target: ReactElement, color: string}> = ({childre
         >
             <div className={getBgColorLight(color) + ' px-2 text-xs py-1 relative'} style={{
                 width: '105%',
-                height: '105%',
+                height: '27px',
                 right: 1,
                 top: 0
             }}>

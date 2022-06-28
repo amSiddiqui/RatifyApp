@@ -18,6 +18,7 @@ type Props = {
     contractHelper: ContractHelper;
     onDocumentSent: (id: number) => void;
     signerProgress: {total: number, completed: number} | null;
+    label: string;
 };
 
 const getSignerStatus = (status: string, completed: boolean, type: string) => {
@@ -49,7 +50,7 @@ const getSignerStatus = (status: string, completed: boolean, type: string) => {
     }
 }
 
-const SignerProgress: React.FC<Props> = ({ signer, contractHelper, onDocumentSent, signerProgress }) => {
+const SignerProgress: React.FC<Props> = ({ signer, contractHelper, onDocumentSent, signerProgress, label }) => {
     const [sendAgainModal, sendAgainHandlers] = useDisclosure(false);
     const [sending, setSending] = React.useState(false);
 
@@ -163,12 +164,7 @@ const SignerProgress: React.FC<Props> = ({ signer, contractHelper, onDocumentSen
                     </div>)}
 
             >
-                {
-                    signer.type.charAt(0).toUpperCase() +
-                    signer.type.substring(1) +
-                    ' ' +
-                    signer.step
-                }
+                {label}
             </SignerPopover>
             
             <Modal centered title='Send the document again' opened={sendAgainModal} onClose={sendAgainHandlers.close}>

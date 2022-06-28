@@ -22,7 +22,7 @@ import {
 } from '../../../../components/common/CustomBootstrap';
 import Breadcrumb from '../../../../containers/navs/Breadcrumb';
 import { Button, Card, CardBody } from 'reactstrap';
-import { getFormatDateFromIso } from '../../../../helpers/Utils';
+import { generateSignerLabels, getFormatDateFromIso } from '../../../../helpers/Utils';
 import { Document, Page } from 'react-pdf/dist/esm/entry.webpack5';
 import {
     HiChevronLeft,
@@ -58,6 +58,7 @@ const SenderAgreement: React.FC = () => {
     );
     const [agreement, setAgreement] = React.useState<Agreement | null>(null);
     const [signers, setSigners] = React.useState<Signer[]>([]);
+    const [labels, setLabels] = React.useState<{uid: string, label: string}[]>([]);
     const [signerProgress, setSignerProgress] = React.useState<SignerProgressType>();
     const [inputElements, setInputElements] = React.useState<InputField[]>([]);
 
@@ -202,6 +203,7 @@ const SenderAgreement: React.FC = () => {
                             return a.step - b.step;
                         }),
                     );
+                    setLabels(generateSignerLabels([], data.signers.map((s) => ({ uid: s.id.toString(), type: s.type, step: s.step })), true));
                     setInputElements(data.input_fields);
 
                     contractHelper.getSignerProgress(contractId).then((data) => {
@@ -376,6 +378,14 @@ const SenderAgreement: React.FC = () => {
                                         {signers.map((signer) => {
                                             return (
                                                 <SignerProgress
+                                                    label={function() {
+                                                        const label = labels.find(label => label.uid === signer.id.toString());
+                                                        if (label) {
+                                                            return label.label;
+                                                        } else {
+                                                            return '';
+                                                        }
+                                                    }()}
                                                     signerProgress={signerProgress ? signerProgress[signer.id] : null}
                                                     onDocumentSent={setSignerDocumentSuccess}
                                                     contractHelper={contractHelper}

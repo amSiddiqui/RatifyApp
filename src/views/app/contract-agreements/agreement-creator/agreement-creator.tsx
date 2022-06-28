@@ -45,7 +45,7 @@ import { AiOutlineDrag } from 'react-icons/ai';
 import DraggableInput from '../form-elements/DraggableInput';
 import { getBgColorLight, PositionType, POSITION_OFFSET_X, POSITION_OFFSET_Y, PdfFormInputType, INPUT_WIDTH, INPUT_HEIGHT, SIGN_POSITION_OFFSET_Y, SIGN_INPUT_HEIGHT } from '../types';
 import PdfFormInput from '../form-elements/PdfFormInput';
-import { getRandomStringID } from '../../../../helpers/Utils';
+import { generateSignerLabels, getRandomStringID } from '../../../../helpers/Utils';
 import { useDebouncedValue, useDisclosure } from '@mantine/hooks';
 import PrepareSend from './prepare-send';
 import SignerPopover from '../signer-popover';
@@ -96,6 +96,7 @@ const AgreementCreator: React.FC = () => {
     const [showSignerModal, setShowSignerModal] = React.useState(false);
     const [{dragInputText, dragInputColor, dragInputId, dragInputType}, setDragInputProps] = React.useState({dragInputText: 'Full Name', dragInputColor: 'red', dragInputId: -1, dragInputType: 'name'},);
     const [signers, setSigners] = React.useState<SignerElement[]>([]);
+    const [labels, setLabels] = React.useState<Array<{uid: string, label: string}>>([]);
 
     const canvasRef = React.useRef<HTMLDivElement>(null);
 
@@ -138,6 +139,7 @@ const AgreementCreator: React.FC = () => {
                     signer.id = ids[signer.uid];
                 }
                 setSigners(newSigners);
+                setLabels(generateSignerLabels([], newSigners.map((s) => ({uid: s.uid, type: s.type, step: s.step}) ), true));
             }).catch(err => {
                 console.log(err);
                 toast.error('Error adding signers');
@@ -260,6 +262,8 @@ const AgreementCreator: React.FC = () => {
                     every: s.every,
                     every_unit: s.every_unit,
                 } as SignerElement )));
+                
+                setLabels(generateSignerLabels([], agreement_signers.map((s) => ({uid: s.id.toString(), type: s.type, step: s.step}) ), true));
 
                 setInputElements(agreement_input_fields.map((i) => ({
                     id: i.id,
@@ -599,7 +603,14 @@ const AgreementCreator: React.FC = () => {
                                                 )}
                                             </>)}
                                             >
-                                                {signer.type.charAt(0).toUpperCase() + signer.type.slice(1) + ' ' + (index + 1)}
+                                                {function() {
+                                                    const label = labels.find(label => label.uid === signer.uid);
+                                                    if (label) {
+                                                        return label.label;
+                                                    } else {
+                                                        return ''
+                                                    }
+                                                }()}
                                             </SignerPopover>
                                         )
                                     })}

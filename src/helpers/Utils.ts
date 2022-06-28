@@ -200,3 +200,42 @@ export const secondsToHourMinutesSeconds = (seconds: number) => {
     finalString += `${secondsLeft}s`;
     return finalString;
 }
+
+export const generateSignerLabels = (order: number[], signers: Array<{uid: string, type: string, step: number}>, sorted: boolean) => {
+    // sort signer by order
+    
+    let sortedSigners = signers;
+    if (!sorted) {
+        sortedSigners = signers.sort((a, b) => {
+            return order.indexOf(a.step - 1) - order.indexOf(b.step - 1);
+        });
+    }
+
+    // const get all approver
+    const approvers = sortedSigners.filter((signer) => signer.type === 'approver');
+    // const get all signer
+    const signersLabels = sortedSigners.filter((signer) => signer.type === 'signer');
+    // const get all viewer
+    const viewers = sortedSigners.filter((signer) => signer.type === 'viewer');
+    const labels: Array<{uid: string, label: string}> = [];
+    for (let i = 0; i < approvers.length; i++) {
+        labels.push({
+            uid: approvers[i].uid,
+            label: `Approver ${i + 1}`,
+        });
+    }
+    for (let i = 0; i < signersLabels.length; i++) {
+        labels.push({
+            uid: signersLabels[i].uid,
+            label: `Signer ${i + 1}`,
+        });
+    }
+
+    for (let i = 0; i < viewers.length; i++) {
+        labels.push({
+            uid: viewers[i].uid,
+            label: `Viewer ${i + 1}`,
+        });
+    }
+    return labels;
+}
