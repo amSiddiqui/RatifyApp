@@ -85,9 +85,13 @@ const AgreementCreator: React.FC = () => {
     const [thumbnailsLoading, setThumbnailsLoading] = React.useState(true);
     
     const [showEndDate, setShowEndDate] = React.useState(false);
+    const [showStartDate, setShowStartDate] = React.useState(false);
     const [endDate, setEndDate] = React.useState<DateTime>(() => {
         const endDate = today.plus({ months: 6 });
         return endDate;
+    });
+    const [startDate, setStartDate] = React.useState<DateTime>(() => {
+        return today;
     });
     const [signSequence, setSignSequence] = React.useState<boolean>(false);
     
@@ -244,6 +248,10 @@ const AgreementCreator: React.FC = () => {
                     setEndDate(DateTime.fromISO(agreement.end_date));
                     setTemplateDate('');
                 }
+                if (agreement.start_date !== null) {
+                    setShowStartDate(true);
+                    setStartDate(DateTime.fromISO(agreement.start_date));
+                }
                 if (agreement.signed_before !== null) {
                     setSignedBefore(new Date(agreement.signed_before));
                 }
@@ -262,7 +270,7 @@ const AgreementCreator: React.FC = () => {
                     every: s.every,
                     every_unit: s.every_unit,
                 } as SignerElement )));
-                
+
                 setLabels(generateSignerLabels([], agreement_signers.map((s) => ({uid: s.id.toString(), type: s.type, step: s.step}) ), true));
 
                 setInputElements(agreement_input_fields.map((i) => ({
@@ -378,10 +386,14 @@ const AgreementCreator: React.FC = () => {
         if (!showEndDate) {
             ed = null;
         }
-        contractHelper.updateAgreementDateSequence(contractId, ed, signedBefore ? DateTime.fromJSDate(signedBefore).toISO() : null, signSequence).catch(err => {
+        let sd: string | null = startDate.toISO();
+        if (!showStartDate) {
+            sd = null;
+        }
+        contractHelper.updateAgreementDateSequence(contractId, ed, signedBefore ? DateTime.fromJSDate(signedBefore).toISO() : null, signSequence, sd).catch(err => {
             toast.error('Error updating agreement');
         });
-    }, [contractId, contractHelper, endDate, signedBefore, showEndDate, signSequence, pdfLoading]);
+    }, [contractId, contractHelper, endDate, signedBefore, showEndDate, signSequence, pdfLoading, showStartDate, startDate]);
 
     React.useEffect(() => {
         if (pdfLoading || !contractId) {
@@ -811,98 +823,132 @@ const AgreementCreator: React.FC = () => {
                                 <p className='text-center text-muted text-xs'>Optional</p>
                             </div>
                             <Divider className="mb-4" />
-                            <Stack spacing={'lg'} className="px-4">
-                                <Group position="apart">
-                                    <div>Does this document have an end date?</div>
-                                    <Switch
-                                        checked={showEndDate}
-                                        onChange={(checked) => {
-                                            setShowEndDate(
-                                                checked.target.checked,
-                                            );
-                                        }}
-                                        size="md"
-                                    ></Switch>
-                                </Group>
-                                {showEndDate && (
-                                    <div>
-                                        End Date
-                                        <br />
-                                        <span>
-                                            {endDate.toLocaleString(
-                                                DateTime.DATE_HUGE,
-                                            )}
-                                        </span>
-                                    </div>
-                                )}
-                                {showEndDate && (
-                                    <Stack spacing={1}>
-                                        <Select
-                                            style={{ width: 120 }}
-                                            placeholder="Select End Date"
-                                            defaultValue={templateDate}
-                                            value={templateDate}
-                                            onChange={(value) => {
-                                                if (value !== null) {
-                                                    setTemplateDate(value);
-                                                    const months =
-                                                        parseInt(value);
-                                                    setEndDate(
-                                                        today.plus({ months }),
-                                                    );
-                                                }
+                            <ScrollArea style={{
+                                width: '100%',
+                                height: 480
+                            }}>
+                                <Stack className='pl-2'>
+                                    <Group position='apart'>
+                                        <div>Does this document have a start date?</div>
+                                        <Switch
+                                            checked={showStartDate}
+                                            onChange={(checked) => {
+                                                setShowStartDate(checked.target.checked);
                                             }}
-                                            data={[
-                                                {
-                                                    value: '1', label: '1 month',
-                                                },
-                                                {
-                                                    value: '6', label: '6 months',
-                                                },
-                                                {
-                                                    value: '12', label: '1 year',
-                                                },
-                                                {
-                                                    value: '24', label: '2 years',
-                                                },
-                                                {
-                                                    value: '36', label: '3 years',
-                                                },
-                                            ]}
+                                            size={'md'}
                                         />
-                                        <div>Or pick a date</div>
+                                    </Group>
+                                    {showStartDate && (
                                         <DatePicker
                                             onChange={(value) => {
                                                 if (value !== null) {
-                                                    setTemplateDate('');
-                                                    setEndDate( DateTime.fromJSDate( value, ), );
+                                                    setStartDate(DateTime.fromJSDate(value));
                                                 }
                                             }}
-                                            value={endDate.toJSDate()}
+                                            value={startDate.toJSDate()}
                                             inputFormat="DD/MM/YYYY"
-                                            defaultValue={endDate.toJSDate()}
+                                            defaultValue={startDate.toJSDate()}
                                             excludeDate={(dt) => dt < today.toJSDate() }
                                             icon={<MdCalendarToday />}
                                             style={{ width: 150 }}
                                             placeholder="Select Date"
                                         />
-                                    </Stack>
-                                )}
-                            </Stack>
-                            <Divider className='mt-6 mb-2' />
-                            <Stack spacing='xs' className="px-4 mt-4">
-                                <p>This document must be signed by:</p>
-                                <DatePicker
-                                    inputFormat='DD/MM/YYYY'
-                                    value={signedBefore}
-                                    onChange={(value) => { setSignedBefore(value); }}
-                                    error={showAgreementErrors && !signedBefore ? 'Please select a date': ''}
-                                    excludeDate={(dt) => dt < today.toJSDate()}
-                                    icon={<MdCalendarToday />}
-                                    style={{ width: 150 }}
-                                    placeholder="Select Date"
-                                />
-                            </Stack>
+                                    )}
+                                </Stack>
+                                <Divider className="my-4" />
+                                <Stack spacing={'lg'} className="pl-2">
+                                    <Group position="apart">
+                                        <div>Does this document have an end date?</div>
+                                        <Switch
+                                            checked={showEndDate}
+                                            onChange={(checked) => {
+                                                setShowEndDate(
+                                                    checked.target.checked,
+                                                );
+                                            }}
+                                            size="md"
+                                        ></Switch>
+                                    </Group>
+                                    {showEndDate && (
+                                        <div>
+                                            End Date
+                                            <br />
+                                            <span>
+                                                {endDate.toLocaleString(
+                                                    DateTime.DATE_HUGE,
+                                                )}
+                                            </span>
+                                        </div>
+                                    )}
+                                    {showEndDate && (
+                                        <Stack spacing={1}>
+                                            <Select
+                                                style={{ width: 120 }}
+                                                placeholder="Select End Date"
+                                                defaultValue={templateDate}
+                                                value={templateDate}
+                                                onChange={(value) => {
+                                                    if (value !== null) {
+                                                        setTemplateDate(value);
+                                                        const months =
+                                                            parseInt(value);
+                                                        setEndDate(
+                                                            today.plus({ months }),
+                                                        );
+                                                    }
+                                                }}
+                                                data={[
+                                                    {
+                                                        value: '1', label: '1 month',
+                                                    },
+                                                    {
+                                                        value: '6', label: '6 months',
+                                                    },
+                                                    {
+                                                        value: '12', label: '1 year',
+                                                    },
+                                                    {
+                                                        value: '24', label: '2 years',
+                                                    },
+                                                    {
+                                                        value: '36', label: '3 years',
+                                                    },
+                                                ]}
+                                            />
+                                            <div>Or pick a date</div>
+                                            <DatePicker
+                                                onChange={(value) => {
+                                                    if (value !== null) {
+                                                        setTemplateDate('');
+                                                        setEndDate( DateTime.fromJSDate( value, ), );
+                                                    }
+                                                }}
+                                                value={endDate.toJSDate()}
+                                                inputFormat="DD/MM/YYYY"
+                                                defaultValue={endDate.toJSDate()}
+                                                excludeDate={(dt) => dt < today.toJSDate() }
+                                                icon={<MdCalendarToday />}
+                                                style={{ width: 150 }}
+                                                placeholder="Select Date"
+                                            />
+                                        </Stack>
+                                    )}
+                                </Stack>
+                                <Divider className='mt-6 mb-2' />
+                                <Stack spacing='xs' className="pl-2 mt-4">
+                                    <p>This document must be signed by:</p>
+                                    <DatePicker
+                                        inputFormat='DD/MM/YYYY'
+                                        value={signedBefore}
+                                        onChange={(value) => { setSignedBefore(value); }}
+                                        error={showAgreementErrors && !signedBefore ? 'Please select a date': ''}
+                                        excludeDate={(dt) => dt < today.toJSDate()}
+                                        icon={<MdCalendarToday />}
+                                        style={{ width: 150 }}
+                                        placeholder="Select Date"
+                                    />
+                                </Stack>
+                            </ScrollArea>
                         </CardBody>
                     </Card>
                 </Grid.Col>
@@ -994,9 +1040,19 @@ const AgreementCreator: React.FC = () => {
             withCloseButton={false}
             opened = {prepareSend} onClose = {prepareSendHandler.close} centered
             >
-                <PrepareSend onCancel={() => {
-                    prepareSendHandler.close();
-                }} contractId={contractId} contractHelper={contractHelper} title={agreementName} sequence={signSequence} signBefore={!!signedBefore ? DateTime.fromJSDate(signedBefore) : null} endDate={showEndDate ? endDate : null} signers={signers} />
+                <PrepareSend 
+                    startDate={startDate}
+                    onCancel={() => {
+                        prepareSendHandler.close();
+                    }} 
+                    contractId={contractId} 
+                    contractHelper={contractHelper} 
+                    title={agreementName} 
+                    sequence={signSequence} 
+                    signBefore={!!signedBefore ? DateTime.fromJSDate(signedBefore) : null} 
+                    endDate={showEndDate ? endDate : null} 
+                    signers={signers} 
+                />
             </Modal>
 
             <Modal

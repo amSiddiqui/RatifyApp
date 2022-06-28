@@ -14,6 +14,7 @@ export interface Agreement {
     title: string;
     description: string;
     end_date: string | null;
+    start_date: string | null;
     signed_before: string | null;
     sequence: boolean;
     draft: boolean;

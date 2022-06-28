@@ -125,6 +125,7 @@ export class ContractHelper extends ApiHelper {
         end_date: string | null,
         signed_before: string | null,
         sequence: boolean,
+        start_date: string | null,
     ): Promise<BaseResponse> {
         let token = await this.getToken();
         if (token === null) {
@@ -136,6 +137,7 @@ export class ContractHelper extends ApiHelper {
                 end_date: end_date,
                 signed_before: signed_before,
                 sequence: sequence,
+                start_date: start_date
             },
             { headers: { Authorization: `Bearer ${token}` } },
         );

@@ -12,6 +12,7 @@ type Props = {
     sequence: boolean;
     signBefore: DateTime | null;
     endDate: DateTime | null;
+    startDate: DateTime | null;
     signers: SignerElement[];
     contractHelper: ContractHelper;
     contractId: string | undefined;
@@ -27,6 +28,7 @@ const PrepareSend: React.FC<Props> = ({
     contractHelper,
     contractId,
     onCancel,
+    startDate,
 }) => {
     const [signerStatus, setSignerStatus] = React.useState<{
         [id: number]: string;
@@ -138,6 +140,16 @@ const PrepareSend: React.FC<Props> = ({
                         
                     </List.Item>}
                     
+                    {startDate !== null &&<List.Item
+                        icon={
+                            <i className="text-primary simple-icon-calendar"></i>
+                        }>
+                        <p>
+                            This document has a start date of{' '}
+                            <span className='text-rose-500'>{startDate.toLocaleString(DateTime.DATE_FULL)}</span>.
+                        </p>
+                        
+                    </List.Item>}
                     {endDate !== null &&<List.Item
                         icon={
                             <i className="text-primary simple-icon-calendar"></i>

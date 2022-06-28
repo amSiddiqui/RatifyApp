@@ -331,18 +331,12 @@ const SenderAgreement: React.FC = () => {
                                             </a>
                                         </Tooltip>
                                     )}
-                                    <div className="flex justify-center items-center">
+                                    {agreement && agreement.signed_before && <div className="flex justify-center items-center">
                                         <i className="simple-icon-info text-lg text-warning" />
                                         <p className="ml-2">
-                                            This document must be signed by{' '}
-                                            {agreement && agreement.end_date
-                                                ? getFormatDateFromIso(
-                                                      agreement.end_date,
-                                                  )
-                                                : ''}
-                                            .
+                                            This document must be signed by {getFormatDateFromIso(agreement.signed_before)}.
                                         </p>
-                                    </div>
+                                    </div>}
                                 </Group>
                             </div>
                         </Group>
