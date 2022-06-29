@@ -175,7 +175,7 @@ const Login: React.FC = () => {
                                 setShowTooltip(false);
                             }} target={
                                 <p style={{position: 'relative', top: 1.3}} className='text-blue-500 cursor-pointer' onClick={() => {
-                                    setShowTooltip(true);
+                                    setShowTooltip(prev => !prev);
                                 }}>Details <i className='simple-icon-arrow-down relative' style={{fontSize: '0.6rem', top: 1}} /></p>
                             }>
                                 <div className='w-[300px]'>

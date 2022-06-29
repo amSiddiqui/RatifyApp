@@ -9,6 +9,7 @@ import {
     Tooltip,
     Skeleton,
     ScrollArea,
+    Modal,
 } from '@mantine/core';
 import { useDispatch, useSelector } from 'react-redux';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
@@ -73,6 +74,7 @@ const SenderAgreement: React.FC = () => {
     const canvasRef = React.useRef<HTMLDivElement>(null);
     const [organizationName, setOrganizationName] = React.useState<string>('');
     const [clientLogo, setClientLogo] = React.useState('');
+    const [showConfirmWithdraw, setShowConfirmWithdraw] = React.useState(false);
     const inputRef = React.useRef<HTMLInputElement>(null);
 
     const onPreviousPage = () => {
@@ -578,6 +580,57 @@ const SenderAgreement: React.FC = () => {
                     </Grid.Col>
                 </Grid>
             </div>
+            <Grid className='mt-12 mb-12' columns={GRID_TOTAL}>
+                <Grid.Col span={GRID_SIDE}></Grid.Col>
+                <Grid.Col span={GRID_CENTER}>
+                    <Group position='left'>
+                        <span onClick={() => {
+                            setShowConfirmWithdraw(true);
+                        }}><Button color='danger'>Withdraw Document</Button></span>
+                    </Group>
+                </Grid.Col>
+                <Grid.Col span={GRID_SIDE}></Grid.Col>
+            </Grid>
+
+            <Modal
+                size='lg'
+                opened={showConfirmWithdraw}
+                onClose={() => setShowConfirmWithdraw(false)}
+                centered
+                title={<p className='font-bold text-lg'>Confirm Withdraw?</p>}
+            >
+                <Center>
+                    <Stack>
+                        <span className="text-center text-5xl text-danger">
+                            <i className="simple-icon-exclamation"></i>
+                        </span>
+                        <div className='text-center'>
+                            <p className='text-lg'>Are you sure you want to withdraw this agreement?</p>
+                            <p className='text-muted'>Note this will notify all the signers and they will not be able to view the document any longer.</p>
+                        </div>
+                        <Group position='right' className='mt-3'>
+                            <span onClick={() => setShowConfirmWithdraw(false)}><Button color='light'>Cancel</Button></span>
+                            <span onClick={() => {
+                                if (contractId) {
+                                    contractHelper.deleteAgreement(contractId).then(() => {
+                                        setShowConfirmWithdraw(false);
+                                        if (agreement) {
+                                            toast.success(`${agreement.title} withdrawn!`);
+                                        } else {
+                                            toast.success('Agreement withdrawn!');
+                                        }
+                                        navigate('/');
+                                    }).catch(err => {
+                                        toast.error('Cannot withdraw agreement! Try again later!');
+                                        setShowConfirmWithdraw(false);
+                                        console.log(err);
+                                    });   
+                                }
+                            }}><Button color='danger'>Delete</Button></span>
+                        </Group>
+                    </Stack>
+                </Center>
+            </Modal>
         </>
     );
 };
