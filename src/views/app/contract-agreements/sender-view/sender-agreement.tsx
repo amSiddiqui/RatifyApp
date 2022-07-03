@@ -605,8 +605,8 @@ const SenderAgreement: React.FC = () => {
                             <i className="simple-icon-exclamation"></i>
                         </span>
                         <div className='text-center'>
-                            <p className='text-lg'>Are you sure you want to withdraw this agreement?</p>
-                            <p className='text-muted'>Note this will notify all the signers and they will not be able to view the document any longer.</p>
+                            <p className='text-lg'>Are you sure you want to withdraw this document?</p>
+                            <p className='text-muted'>Note: Withdrawing the document will notify signer(s) and approver(s) and they will no longer be able to view this document.</p>
                         </div>
                         <Group position='right' className='mt-3'>
                             <span onClick={() => setShowConfirmWithdraw(false)}><Button color='light'>Cancel</Button></span>

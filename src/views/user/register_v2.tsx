@@ -123,6 +123,7 @@ const Register: React.FC = () => {
                         icon={<i className="simple-icon-lock" />}
                         label='Password'
                         placeholder='*********'
+                        description={<p className='text-muted text-xs'>Password must include at least one number, one uppercase, one lowercase and at least 8 characters</p>}
                     />
                     <PasswordInput
                         {...register('confirm_password')}

@@ -123,7 +123,7 @@ const ResetPassword:React.FC = () => {
                         <p className='text-lg'>{errorMessage}</p>
                     </Alert>
                 )}
-                <p className='text-muted text-sm'>Strong password should include letters in lower and uppercase, at least 1 number and the password should be longer than 8 characters long.</p>
+                
                 <PasswordInput
                     {...register('password')}
                     error={errors.password ? errors.password.message : ''}
@@ -131,6 +131,7 @@ const ResetPassword:React.FC = () => {
                     icon={<i className="simple-icon-lock" />}
                     label='Password'
                     placeholder='*********'
+                    description={<p className='text-muted text-xs'>Password must include at least one number, one uppercase, one lowercase and at least 8 characters</p>}
                 />
                 <PasswordInput
                     {...register('confirm_password')}

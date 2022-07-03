@@ -8,17 +8,19 @@ const SignerPopover: React.FC<{target: ReactElement, color: string}> = ({childre
         <Popover
             opened={true}
             zIndex={4}
-            gutter={5}
+            gutter={-10}
             spacing={0}
             position='left'
             placement='start'
             target={target}
+            shadow='lg'
         >
-            <div className={getBgColorLight(color) + ' px-2 text-xs py-1 relative'} style={{
+            <div className={getBgColorLight(color) + ' rounded-lg px-2 text-xs py-1 relative'} style={{
                 width: '105%',
                 height: '27px',
                 right: 1,
-                top: 0
+                top: 0,
+                border: '1px solid #999',
             }}>
                 {children}
             </div>

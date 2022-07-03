@@ -162,7 +162,6 @@ const SignerProgress: React.FC<Props> = ({ signer, contractHelper, onDocumentSen
                             </Stack>
                         </Collapse>
                     </div>)}
-
             >
                 {label}
             </SignerPopover>

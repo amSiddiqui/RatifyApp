@@ -21,6 +21,9 @@ import SignerInput from '../form-elements/SignerInput';
 import SignerComments from './signer-comments';
 import { getFormatDateFromIso } from '../../../../helpers/Utils';
 import SenderInputView from '../form-elements/SenderInputView';
+import { MdPendingActions } from 'react-icons/md';
+import { IoWarningOutline } from 'react-icons/io5';
+
 
 const GRID_TOTAL = 16;
 const GRID_SIDE = 3;
@@ -354,33 +357,39 @@ const AgreementSign: React.FC = () => {
                 </Grid>
 
 
-                <Grid columns={GRID_TOTAL}>
+                <Grid className='mb-4' columns={GRID_TOTAL}>
                     <Grid.Col span={GRID_SIDE}></Grid.Col>
                     <Grid.Col span={GRID_CENTER}>
                         <Group position='apart'>
                             <div>
-                                <p className='text-primary text-lg'>Please <span>{!basicInfo ? 'sign': basicInfo.signerType.substring(0, basicInfo.signerType.length - 2)}</span> the following document!</p>
+                                <Group spacing={'xs'} className='text-primary'><span><MdPendingActions className='text-xl' /></span><p className=' text-lg'>Please <span>{!basicInfo ? 'sign': basicInfo.signerType.substring(0, basicInfo.signerType.length - 2)}</span> the following document!</p></Group>
                                 <Group className='relative' style={{top: '15px'}} spacing={'xl'}>
                                     {pdfLoading && <Loader size='xs' />}
-                                    {!pdfLoading && <Tooltip label='Download Document' className='cursor-pointer'>
+                                    {!pdfLoading && <Group spacing='xs'>    
+                                    <Tooltip label='Download Document' className='cursor-pointer'>
                                         <a href={"data:application/pdf;base64,"+pdf} download={agreement ? agreement.title + '.pdf' : 'document.pdf'}>
-                                            <i className='iconsminds-data-download text-lg'/>
+                                            <i className='iconsminds-download-1 text-lg'/>
                                         </a>
-                                    </Tooltip>}
-                                    <div className='flex justify-center items-center'>
-                                        <i className="simple-icon-info text-lg text-warning" />
-                                        <p className='ml-2'>This document must be signed by {agreement && agreement.end_date ? getFormatDateFromIso(agreement.end_date) : ''}.</p>
-                                    </div>
+                                    </Tooltip>
+                                    <p>Download Document</p>
+                                    </Group>}
                                 </Group>
-                                
                             </div>
                             {basicInfo && basicInfo.signerType === 'signer' && <div>
-                                <Progress className='w-56 h-3' value={totalFields === 0 ? 0: completedFields * 100 / totalFields} color='green'/>
-                                <Group position='apart'>
-                                    <p className='text-muted text-xs'>Signature & fields completed:</p>
-                                    <p className='text-muted text-xs'>{completedFields} of {totalFields}</p>
-                                </Group>
-                            </div>}
+                                <div>
+                                    <Progress className='w-full h-3' value={totalFields === 0 ? 0: completedFields * 100 / totalFields} color='green'/>
+                                    <Group position='apart'>
+                                        <p className='text-muted text-xs'>Actions completed:</p>
+                                        <p className='text-muted text-xs'>{completedFields} of {totalFields}</p>
+                                    </Group>
+                                </div>
+                                <div style={{top: '15px'}} className='flex justify-center items-center relative'>
+                                                
+                                    <IoWarningOutline className='text-warning text-xl' />
+                                    <p className='ml-2'>This document is required to be signed before {agreement && agreement.end_date ? getFormatDateFromIso(agreement.end_date) : ''}.</p>
+                                </div>
+                            </div>
+                            }
                         </Group>
                     </Grid.Col>
                     <Grid.Col span={GRID_SIDE}>
@@ -581,12 +590,17 @@ const AgreementSign: React.FC = () => {
                                 </h5>
                                 <Divider className='mb-4' />
                                 {!!basicInfo && <SignerComments type='signer' token={token} signerId={basicInfo.signerId} contractHelper={contractHelper} />}
+                                
+                                <Stack className='px-4'>
+                                    <p>This document has a start date of</p>
+                                    <p>This document has a start date of</p>
+                                </Stack>
                             </CardBody>
                         </Card>
                     </Grid.Col>
                 </Grid>
 
-                {basicInfo?.signerType !== 'viewer' && <Grid columns={GRID_TOTAL}>
+                {basicInfo?.signerType !== 'viewer' && <Grid className='mt-8' columns={GRID_TOTAL}>
                     <Grid.Col span={GRID_SIDE}>
 
                     </Grid.Col>
