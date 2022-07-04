@@ -6,6 +6,7 @@ import {
     Agreement,
     AgreementRowData,
     AgreementTemplate,
+    AuditTrailData,
     ContractCreateResponseType,
     DocumentsResponseType,
     GetAgreementResponse,
@@ -476,5 +477,20 @@ export class ContractHelper extends ApiHelper {
             `contracts/templates/${id}/`,
             { headers: { Authorization: `Bearer ${await this.getToken()}` } },
         );
+    }
+
+    async getAuditTrail(id: string) {
+        let response: AxiosResponse<{status: string, data: AuditTrailData[]}> = await axios.get(
+            `contracts/${id}/trail/`,
+            { headers: { Authorization: `Bearer ${await this.getToken()}` } },
+        );
+        return response.data;
+    }
+
+    async getSignerAuditTrail(token: string) {
+        let response: AxiosResponse<{status: string, data: AuditTrailData[], valid: boolean}> = await axios.get(
+            `contracts/signer/trail/?token=${token}`,
+        );
+        return response.data;
     }
 } 

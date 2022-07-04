@@ -98,7 +98,9 @@ const SignerProgress: React.FC<Props> = ({ signer, contractHelper, onDocumentSen
                                     {signer.status === 'completed' && <Tooltip label='Email sent'><i className='simple-icon-check text-success ml-1 relative' style={{top: 1}} /></Tooltip>}
                                     {signer.status === 'error' && <Tooltip label='Cannot send email.n'><i className='simple-icon-exclamation text-danger ml-1 relative' style={{top: 1}} /></Tooltip>}
                                 </div>
-                                <Center className='cursor-pointer' onClick={() => setCollapsed(true)}>
+                                <Center className='cursor-pointer' onClick={() => {
+                                    setCollapsed(true)
+                                    }}>
                                     <i className='simple-icon-arrow-down' />
                                 </Center>
                             </Stack>
@@ -156,7 +158,9 @@ const SignerProgress: React.FC<Props> = ({ signer, contractHelper, onDocumentSen
                                 }}>
                                     <Button disabled={sending}>Send Again</Button>    
                                 </span>}
-                                <Center className='cursor-pointer' onClick={() => setCollapsed(false)}>
+                                <Center className='cursor-pointer' onClick={() => {
+                                    setCollapsed(false)
+                                    }}>
                                     <i className='simple-icon-arrow-up' />
                                 </Center>
                             </Stack>

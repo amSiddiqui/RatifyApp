@@ -68,6 +68,9 @@ label {
 .mantine-Modal-close {
     border: 1px solid black;
     border-radius: 50%;
+    position: relative;
+    top: -4px;
+    right: 7px;
 }
 
 input {

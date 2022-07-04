@@ -163,3 +163,23 @@ export type SignerComment = {
     created_at: string;
     updated_at: string;
 }
+
+/** 
+    Action types: 'create' | 'sent' | 'error' | 'deleted' | 'viewed' | 'submit'
+*/
+
+export type AuditTrailActionType = 'create' | 'sent' | 'error' | 'deleted' | 'viewed' | 'submit';
+
+export interface AuditTrailData {
+    id: number;
+    agreement: string;
+    agreement_id: number;
+    date: string;
+    action_type: AuditTrailActionType;
+    description: string;
+    user: string;
+    user_id: number | null;
+    signer: string;
+    signer_id: number | null;
+    signer_type: string | null;
+}

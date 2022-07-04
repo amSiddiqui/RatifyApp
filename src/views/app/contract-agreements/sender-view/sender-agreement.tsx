@@ -37,6 +37,7 @@ import SenderInputView from '../form-elements/SenderInputView';
 import { AuthHelper } from '../../../../helpers/AuthHelper';
 import SignerComments from '../agreement-sign/signer-comments';
 import SignerProgress from './signer-progress';
+import AuditTrail from '../audit-trail';
 
 const GRID_TOTAL = 20;
 const GRID_SIDE = 3;
@@ -76,6 +77,7 @@ const SenderAgreement: React.FC = () => {
     const [clientLogo, setClientLogo] = React.useState('');
     const [showConfirmWithdraw, setShowConfirmWithdraw] = React.useState(false);
     const inputRef = React.useRef<HTMLInputElement>(null);
+    const [showAuditTrail, setShowAuditTrail] = React.useState(false);
 
     const onPreviousPage = () => {
         setPageNumber((prev) => {
@@ -245,6 +247,9 @@ const SenderAgreement: React.FC = () => {
                 setClientLogo(data);
             })
             .catch((err) => {
+                if (err.response && err.response.status === 404) {
+                    return;
+                }
                 console.log(err.response);
             });
     }, [authHelper]);
@@ -345,11 +350,11 @@ const SenderAgreement: React.FC = () => {
                     </Grid.Col>
                     <Grid.Col span={GRID_SIDE}>
                         <Center>
-                            <span>
+                            <span onClick={() => setShowAuditTrail(true)}>
                                 <Button
                                     className="agreement-button"
                                     color="primary">
-                                    Signer Chat
+                                    Audit Trail
                                 </Button>
                             </span>
                         </Center>
@@ -359,7 +364,7 @@ const SenderAgreement: React.FC = () => {
                     <Grid.Col span={GRID_SIDE}>
                         <Card style={{ height: '1080px' }}>
                             <CardBody className="p-0">
-                                <h5 className="text-center py-4">
+                                <h5 className="text-center bg-gray-50 py-4">
                                     Signing Workflow
                                 </h5>
                                 <Divider className="mb-4" />
@@ -470,7 +475,7 @@ const SenderAgreement: React.FC = () => {
                     <Grid.Col span={GRID_SIDE}>
                         <Card style={{ height: '1080px' }}>
                             <CardBody className="p-0">
-                                <h5 className="text-center py-4">
+                                <h5 className="text-center bg-gray-50 py-4">
                                     Page Navigation
                                 </h5>
                                 <Divider className="mb-4" />
@@ -564,9 +569,11 @@ const SenderAgreement: React.FC = () => {
                                         </ScrollArea>
                                     )}
                                 </Center>
+                                <Divider />
+                                <div className='py-4 bg-gray-50'>
+                                    <h5 className="text-center ">Comments</h5>
+                                </div>
                                 <Divider className="mb-4" />
-                                <h5 className="text-center mb-5">Comments</h5>
-                                <Divider className="my-4" />
                                 {contractId && user && (
                                     <SignerComments
                                         type="sender"
@@ -591,9 +598,27 @@ const SenderAgreement: React.FC = () => {
                 </Grid.Col>
                 <Grid.Col span={GRID_SIDE}></Grid.Col>
             </Grid>
-
+            
             <Modal
                 size='lg'
+                overflow='inside'
+                opened={showAuditTrail}
+                onClose={() => setShowAuditTrail(false)}
+                centered
+                title={<p className='font-bold text-lg'>Audit Trail</p>}
+            >   
+            <Stack>
+                <AuditTrail contractHelper={contractHelper} contractId={contractId} />
+                <Group position='right'>
+                    <span onClick={() => setShowAuditTrail(false)}>
+                        <Button color='light'>Close</Button>
+                    </span>
+                </Group>
+            </Stack>
+            
+            </Modal>
+
+            <Modal
                 opened={showConfirmWithdraw}
                 onClose={() => setShowConfirmWithdraw(false)}
                 centered

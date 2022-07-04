@@ -23,6 +23,7 @@ import { getFormatDateFromIso } from '../../../../helpers/Utils';
 import SenderInputView from '../form-elements/SenderInputView';
 import { MdPendingActions } from 'react-icons/md';
 import { IoWarningOutline } from 'react-icons/io5';
+import AuditTrail from '../audit-trail';
 
 
 const GRID_TOTAL = 16;
@@ -109,6 +110,7 @@ const AgreementSign: React.FC = () => {
     const [totalFields, setTotalFields] = React.useState(0);
     const [completedFields, setCompletedFields] = React.useState(0);
     const [shouldUpdate, setShouldUpdate] = React.useState(false);
+    const [showAuditTrail, setShowAuditTrail] = React.useState(false);
 
     const [basicInfo, setBasicInfo] = React.useState<{
         signerEmail: string;
@@ -394,7 +396,7 @@ const AgreementSign: React.FC = () => {
                     </Grid.Col>
                     <Grid.Col span={GRID_SIDE}>
                         <Center>
-                            <span><Button className='agreement-button' color='primary'>Contact Sender</Button></span>
+                            <span onClick={() => setShowAuditTrail(true)}><Button className='agreement-button' color='primary'>Audit Trail</Button></span>
                         </Center>
                     </Grid.Col>
                 </Grid>
@@ -702,6 +704,23 @@ const AgreementSign: React.FC = () => {
                     <span onClick={() => { confirmationModalHandlers.close(); }}><Button color='light'>Back</Button></span>
                     <span onClick={() => onDocumentSubmit()}><Button color='success'>{basicInfo?.signerType === 'signer' ? 'Submit' : 'Approve'}</Button></span>
                 </Group>
+            </Modal>
+            <Modal
+                size='lg'
+                overflow='inside'
+                opened={showAuditTrail}
+                onClose={() => setShowAuditTrail(false)}
+                centered
+                title={<p className='font-bold text-lg'>Audit Trail</p>}
+            >
+                <Stack>
+                    <AuditTrail contractHelper={contractHelper} token={token} contractId={basicInfo ? basicInfo.agreementId.toString() : undefined} />
+                    <Group position='right'>
+                        <span onClick={() => setShowAuditTrail(false)}>
+                            <Button color='light'>Close</Button>
+                        </span>
+                    </Group>
+                </Stack>
             </Modal>
         </>
     );
