@@ -448,6 +448,17 @@ export class ContractHelper extends ApiHelper {
         return response.data;
     }
 
+    async getSignerProgress(token: string) {
+        let response: AxiosResponse<{ status: 'success' | 'error', valid: boolean, data: {
+            totalProgress: number,
+            completedProgress: number,
+            completed: boolean
+        }}> = await axios.get(
+            `contracts/signer/progress/?token=${token}`,
+        );
+        return response.data;
+    }
+
     async sendDocumentAgain(id: number, name: string, email: string) {
         await axios.post(
             `contracts/signer/send/`,
@@ -456,7 +467,7 @@ export class ContractHelper extends ApiHelper {
         );
     }
 
-    async getSignerProgress(id: string) {
+    async getSignerSenderProgress(id: string) {
         let response: AxiosResponse<SignerProgressType> = await axios.get(
             `contracts/${id}/signers/progress/`,
             { headers: { Authorization: `Bearer ${await this.getToken()}` } },

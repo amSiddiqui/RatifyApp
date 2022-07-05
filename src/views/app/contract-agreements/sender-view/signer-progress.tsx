@@ -95,8 +95,8 @@ const SignerProgress: React.FC<Props> = ({ signer, contractHelper, onDocumentSen
                             <Stack spacing={'md'}>
                                 <div className='text-center text-lg'>
                                     <span>{signer.name}</span>
-                                    {signer.status === 'completed' && <Tooltip label='Email sent'><i className='simple-icon-check text-success ml-1 relative' style={{top: 1}} /></Tooltip>}
-                                    {signer.status === 'error' && <Tooltip label='Cannot send email.n'><i className='simple-icon-exclamation text-danger ml-1 relative' style={{top: 1}} /></Tooltip>}
+                                    {signer.status === 'completed' && <Tooltip label='Completed'><i className='simple-icon-check text-success ml-1 relative' style={{top: 1}} /></Tooltip>}
+                                    {signer.status === 'error' && <Tooltip label='Cannot send email.'><i className='simple-icon-exclamation text-danger ml-1 relative' style={{top: 1}} /></Tooltip>}
                                 </div>
                                 <Center className='cursor-pointer' onClick={() => {
                                     setCollapsed(true)
@@ -110,7 +110,7 @@ const SignerProgress: React.FC<Props> = ({ signer, contractHelper, onDocumentSen
                                 <div className='text-center text-lg'>
                                     <span>{signer.name}</span>
                                     {signer.status === 'completed' && <Tooltip label='Email sent'><i className='simple-icon-check text-success ml-1 relative' style={{top: 1}} /></Tooltip>}
-                                    {signer.status === 'error' && <Tooltip label='Cannot send email.n'><i className='simple-icon-exclamation text-danger ml-1 relative' style={{top: 1}} /></Tooltip>}
+                                    {signer.status === 'error' && <Tooltip label='Cannot send email.'><i className='simple-icon-exclamation text-danger ml-1 relative' style={{top: 1}} /></Tooltip>}
                                 </div>
                                 {signer.status === 'error' && <p className='text-danger text-xs'>
                                     Cannot send the email. Please check the email address and try to send the document again.

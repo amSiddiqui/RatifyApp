@@ -111,6 +111,7 @@ const AgreementSign: React.FC = () => {
     const [completedFields, setCompletedFields] = React.useState(0);
     const [shouldUpdate, setShouldUpdate] = React.useState(false);
     const [showAuditTrail, setShowAuditTrail] = React.useState(false);
+    const [{ totalProgress, completedProgress }, setProgress] = React.useState({ totalProgress: 0, completedProgress: 0 });
 
     const [basicInfo, setBasicInfo] = React.useState<{
         signerEmail: string;
@@ -305,6 +306,14 @@ const AgreementSign: React.FC = () => {
             console.log(err);
         });
 
+        contractHelper.getSignerProgress(token).then(data => {
+            if (data.valid) {
+                setProgress({ totalProgress: data.data.totalProgress, completedProgress: data.data.completedProgress });
+            }
+        }).catch(err => {
+            console.log(err);
+        });
+
     }, [token, tokenValid, contractHelper]);
 
     React.useEffect(() => {
@@ -377,26 +386,38 @@ const AgreementSign: React.FC = () => {
                                     </Group>}
                                 </Group>
                             </div>
-                            {basicInfo && basicInfo.signerType === 'signer' && <div>
+                            
+                            <div>
+                            {basicInfo && basicInfo.signerType === 'signer' && 
                                 <div>
-                                    <Progress className='w-full h-3' value={totalFields === 0 ? 0: completedFields * 100 / totalFields} color='green'/>
+                                    <Progress style={{ width: 300 }} className=' h-3' value={totalFields === 0 ? 0: completedFields * 100 / totalFields} color='green'/>
                                     <Group position='apart'>
                                         <p className='text-muted text-xs'>Actions completed:</p>
                                         <p className='text-muted text-xs'>{completedFields} of {totalFields}</p>
                                     </Group>
                                 </div>
-                                <div style={{top: '15px'}} className='flex justify-center items-center relative'>
-                                                
-                                    <IoWarningOutline className='text-warning text-xl' />
-                                    <p className='ml-2'>This document is required to be signed before {agreement && agreement.end_date ? getFormatDateFromIso(agreement.end_date) : ''}.</p>
-                                </div>
-                            </div>
                             }
+                            {basicInfo && basicInfo.signerType !== 'signer' && 
+                                <div>
+                                    <Progress style={{ width: 300 }} className='h-3' value={totalProgress === 0 ? 0: completedProgress * 100 / totalProgress} color='green'/>
+                                    <Group position='apart'>
+                                        <p className='text-muted text-xs'>Actions completed:</p>
+                                        <p className='text-muted text-xs'>{completedProgress} of {totalProgress}</p>
+                                    </Group>
+                                </div>
+                            }
+                            {agreement && agreement.signed_before && 
+                                <div style={{top: '15px'}} className='flex justify-center items-center relative'>     
+                                    <IoWarningOutline className='text-warning text-xl' />
+                                    <p className='ml-2'>This document is required to be signed before {agreement && agreement.signed_before ? getFormatDateFromIso(agreement.signed_before) : ''}.</p>
+                                </div>
+                            }
+                            </div>
                         </Group>
                     </Grid.Col>
                     <Grid.Col span={GRID_SIDE}>
                         <Center>
-                            <span onClick={() => setShowAuditTrail(true)}><Button className='agreement-button' color='primary'>Audit Trail</Button></span>
+                            {basicInfo && basicInfo.signerType !== 'signer' && <span onClick={() => setShowAuditTrail(true)}><Button className='agreement-button' color='primary'>Audit Trail</Button></span>}
                         </Center>
                     </Grid.Col>
                 </Grid>
@@ -405,7 +426,7 @@ const AgreementSign: React.FC = () => {
                     <Grid.Col span={GRID_SIDE}>
                         <Card style={{height: '1080px'}}>
                             <CardBody className='p-0'>
-                                <h5 className='text-center py-4'>
+                                <h5 className='text-center bg-gray-50 py-4'>
                                     Page Navigation
                                 </h5>
                                 <Divider className='mb-4' />
@@ -587,16 +608,11 @@ const AgreementSign: React.FC = () => {
                     <Grid.Col span={GRID_SIDE}>
                         <Card style={{height: '1080px'}}>
                             <CardBody className='p-0'>
-                                <h5 className='text-center py-4'>
+                                <h5 className='text-center bg-gray-50 py-4'>
                                     Comments
                                 </h5>
                                 <Divider className='mb-4' />
                                 {!!basicInfo && <SignerComments type='signer' token={token} signerId={basicInfo.signerId} contractHelper={contractHelper} />}
-                                
-                                <Stack className='px-4'>
-                                    <p>This document has a start date of</p>
-                                    <p>This document has a start date of</p>
-                                </Stack>
                             </CardBody>
                         </Card>
                     </Grid.Col>

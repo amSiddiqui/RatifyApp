@@ -210,7 +210,7 @@ const SenderAgreement: React.FC = () => {
                     setLabels(generateSignerLabels([], data.signers.map((s) => ({ uid: s.id.toString(), type: s.type, step: s.step })), true));
                     setInputElements(data.input_fields);
 
-                    contractHelper.getSignerProgress(contractId).then((data) => {
+                    contractHelper.getSignerSenderProgress(contractId).then((data) => {
                         setSignerProgress(data);
                     }).catch(err => {
                         console.log(err);
