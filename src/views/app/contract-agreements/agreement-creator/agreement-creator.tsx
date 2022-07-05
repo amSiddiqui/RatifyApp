@@ -461,20 +461,20 @@ const AgreementCreator: React.FC = () => {
                 </Colxx>
             </Row>
             <Center className="mb-14">
-                    <TextInput
-                        label={<p style={{fontSize: '1.1rem'}}>Document Name</p>}
-                        description={<p className='text-muted'>Give your document a short name, e.g. Employment Contract</p>}
-                        style={{ minWidth: '300px', width: '40%', fontSize: '1.1rem' }}
-                        size="xl"
-                        error={showAgreementErrors && agreementName.length === 0 }
-                        onChange={(event: React.FormEvent<HTMLInputElement>) => {
-                            setAgreementName(event.currentTarget.value);
-                        }}
-                        value={agreementName}
-                        placeholder={intl.formatMessage({
-                            id: 'agreement-creator.title-placeholder',
-                        })}
-                    />
+                <TextInput
+                    label={<p style={{fontSize: '1.1rem'}}>Document Name</p>}
+                    description={<p className='text-muted'>Give your document a short name, e.g. Employment Contract</p>}
+                    style={{ minWidth: '300px', width: '40%', fontSize: '1.1rem' }}
+                    size="xl"
+                    error={showAgreementErrors && agreementName.length === 0 }
+                    onChange={(event: React.FormEvent<HTMLInputElement>) => {
+                        setAgreementName(event.currentTarget.value);
+                    }}
+                    value={agreementName}
+                    placeholder={intl.formatMessage({
+                        id: 'agreement-creator.title-placeholder',
+                    })}
+                />
             </Center>
             <Grid columns={GRID_COLUMNS}>
                 <Grid.Col span={GRID_SIDE}>
