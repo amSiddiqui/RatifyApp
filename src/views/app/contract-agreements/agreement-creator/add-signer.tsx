@@ -9,10 +9,10 @@ import {
     Switch,
     Group,
     Checkbox,
-    NumberInput
+    NumberInput,
+    Tooltip
 } from '@mantine/core';
 import { AiOutlineDrag } from 'react-icons/ai';
-import { MdClear } from 'react-icons/md';
 import { Card, CardBody, Button } from 'reactstrap';
 import classNames from 'classnames';
 import { useSprings, animated } from 'react-spring';
@@ -23,6 +23,7 @@ import { GoPlus } from 'react-icons/go';
 import { colors, getBgColorLight as getColor } from '../types';
 import { generateSignerLabels, getRandomStringID } from '../../../../helpers/Utils';
 import { SingerElementStyleProps, SignerElementFormProps, SignerElement } from '../../../../types/ContractTypes';
+import { BsTrash } from 'react-icons/bs';
 
 interface SignerRowProps extends SingerElementStyleProps {
     onDragStart: () => void;
@@ -60,9 +61,11 @@ const SignerRow:React.FC<SignerRowProps> = ({ index, color, step, onDragEnd, onD
     return <>
         <Card>
             <CardBody className='p-3'>
-                <p onClick={onDelete} className='absolute text-danger text-xl hover:scale-110 cursor-pointer' style={{top: '-8px', right: '-8px'}}>
-                    <MdClear />
-                </p>
+                <Tooltip withArrow  className='absolute' style={{top: '-2px', right: '15px'}} label='Delete Row'>
+                    <p onClick={onDelete} className='absolute text-danger text-xl hover:scale-110 cursor-pointer' >
+                        <BsTrash />
+                    </p>
+                </Tooltip>
                 <Group position='apart'>
                     <Group>
                         <div className={ classNames('p-2 border-2 rounded-sm capitalize', getColor(color))}>{label}</div>
