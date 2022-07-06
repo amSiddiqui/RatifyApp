@@ -3,7 +3,7 @@ import { toast } from 'react-toastify';
 import { ContractHelper } from '../../../../helpers/ContractHelper';
 import { AuditTrailActionType, AuditTrailData } from '../../../../types/ContractTypes';
 import { Center, Loader, Stack, Timeline } from '@mantine/core';
-import { MdCreate, MdErrorOutline, MdSearch, MdSend } from 'react-icons/md';
+import { MdClear, MdCreate, MdErrorOutline, MdSearch, MdSend } from 'react-icons/md';
 import { BsTrash } from 'react-icons/bs';
 import { TbWritingSign } from 'react-icons/tb';
 import { DateTime } from 'luxon';
@@ -27,6 +27,8 @@ function timelineIconFromType(type: AuditTrailActionType) {
             return <MdSend />;
         case 'submit':
             return <TbWritingSign />;
+        case 'decline':
+            return <MdClear />;
         default:
             return <MdSearch />;
     }
@@ -51,6 +53,8 @@ function timelineTitleFromType(type: AuditTrailActionType, signer_type: string |
                 return 'Document Approved';
             }
             return 'Document Submitted';
+        case 'decline':
+            return 'Document Declined';
         default:
             return 'Document Viewed';
     }
@@ -95,6 +99,9 @@ function timelineDescriptionFromType(data: AuditTrailData) {
     }
     if (data.action_type === 'viewed') {
         return `${data.signer} viewed the document ${data.agreement}`;
+    }
+    if (data.action_type === 'decline') {
+        return `${data.signer} declined the document ${data.agreement}`;
     }
 }
 

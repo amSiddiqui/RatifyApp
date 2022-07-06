@@ -168,7 +168,7 @@ export type SignerComment = {
     Action types: 'create' | 'sent' | 'error' | 'deleted' | 'viewed' | 'submit'
 */
 
-export type AuditTrailActionType = 'create' | 'sent' | 'error' | 'deleted' | 'viewed' | 'submit';
+export type AuditTrailActionType = 'create' | 'sent' | 'error' | 'deleted' | 'viewed' | 'submit' | 'decline';
 
 export interface AuditTrailData {
     id: number;

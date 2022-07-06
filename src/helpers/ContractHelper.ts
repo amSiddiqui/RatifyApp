@@ -317,6 +317,7 @@ export class ContractHelper extends ApiHelper {
                 agreementId: number;
                 senderEmail: string;
                 fieldsCount: number;
+                declined: boolean;
             }
         }> = await axios.get(`contracts/sign-token-validate/?token=${token}`);
         return response.data;
@@ -503,5 +504,19 @@ export class ContractHelper extends ApiHelper {
             `contracts/signer/trail/?token=${token}`,
         );
         return response.data;
+    }
+
+    async getSignerDeclineMessage(token: string) {
+        let response: AxiosResponse<{ status: string, valid: boolean, data: { declined: boolean, declineMessage: string } }> = await axios.get(
+            `contracts/signer/decline/?token=${token}`,
+        );
+        return response.data;
+    }
+
+    async signerDecline(token: string, declineMessage: string) {
+        await axios.post(
+            `contracts/signer/decline/?token=${token}`,
+            { message: declineMessage },
+        );
     }
 } 

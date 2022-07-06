@@ -1,4 +1,4 @@
-import { Center, Modal, Loader, Stack, Group, Divider, Grid, Progress, Tooltip, Skeleton, ScrollArea } from '@mantine/core';
+import { Center, Modal, Loader, Stack, Group, Divider, Grid, Progress, Tooltip, Skeleton, ScrollArea, Textarea } from '@mantine/core';
 import React from 'react';
 import { useDispatch } from 'react-redux';
 import { NavLink, useNavigate, useSearchParams } from 'react-router-dom';
@@ -112,6 +112,8 @@ const AgreementSign: React.FC = () => {
     const [shouldUpdate, setShouldUpdate] = React.useState(false);
     const [showAuditTrail, setShowAuditTrail] = React.useState(false);
     const [{ totalProgress, completedProgress }, setProgress] = React.useState({ totalProgress: 0, completedProgress: 0 });
+    const [showDecline, setShowDecline] = React.useState(false);
+    const [declineMessage, setDeclineMessage] = React.useState('');
 
     const [basicInfo, setBasicInfo] = React.useState<{
         signerEmail: string;
@@ -122,6 +124,7 @@ const AgreementSign: React.FC = () => {
         agreementId: number;
         senderEmail: string;
         fieldsCount: number;
+        declined: boolean;
     }>();
 
     const onPreviousPage = () => {
@@ -176,7 +179,7 @@ const AgreementSign: React.FC = () => {
     const onDocumentSubmit = () => {
         contractHelper.completeSigningProcess(token).then(() => {
             confirmationModalHandlers.close();
-            navigate(`/agreements/success?token${token}&confetti=true`);
+            navigate(`/agreements/success?token=${token}&confetti=true`);
         }).catch(err => {
             console.log(err);
             confirmationModalHandlers.close();
@@ -222,6 +225,10 @@ const AgreementSign: React.FC = () => {
             .then((resp) => {
                 if (resp.status === 'completed') {
                     navigate(`/agreements/success?token=${token}`);
+                    return;
+                }
+                if (resp.data.declined) {
+                    navigate('/agreements/decline?token=' + token);
                     return;
                 }
                 if (resp.valid) {
@@ -625,7 +632,7 @@ const AgreementSign: React.FC = () => {
                     
                     <Grid.Col span={GRID_CENTER}>
                         <Group position='apart'>
-                            <span><Button color='danger' className='agreement-button' >Decline</Button></span>
+                            <span onClick={() => setShowDecline(true)}><Button color='danger' className='agreement-button' >Decline</Button></span>
                             <span onClick={onDocumentComplete}><Button className='items-center justify-center capitalize agreement-button' color='success'>{basicInfo ? getCompleteButtonLabel(basicInfo.signerType) : ''}</Button></span>
                         </Group>
                     </Grid.Col>
@@ -735,6 +742,32 @@ const AgreementSign: React.FC = () => {
                         <span onClick={() => setShowAuditTrail(false)}>
                             <Button color='light'>Close</Button>
                         </span>
+                    </Group>
+                </Stack>
+            </Modal>
+            <Modal
+                size='lg'
+                opened={showDecline}
+                onClose={() => setShowDecline(false)}
+                centered
+                title={<p className='font-bold text-lg'>Confirm Decline?</p>}
+            >
+                <Stack>
+                    <p className='text-lg font-bold'>Are you sure you want to decline this document?</p>
+                    <Center className='w-full'>
+                        <Textarea className='w-full' autosize minRows={3} value={declineMessage} onChange={(event) => setDeclineMessage(event.target.value)} label='Reason for decline' />
+                    </Center>
+                    <Group position='right'>
+                        <span onClick={() => setShowDecline(false)}><Button color='light'>Close</Button></span>
+                        <span onClick={() => {
+                            setShowDecline(false);
+                            contractHelper.signerDecline(token, declineMessage).then(() => {
+                                navigate('/agreements/decline?token='+token);
+                            }).catch(err => {
+                                console.log(err);
+                                toast.error('Something went wrong. Please try again later.');
+                            });
+                        }}><Button color='danger'>Decline</Button></span>
                     </Group>
                 </Stack>
             </Modal>
