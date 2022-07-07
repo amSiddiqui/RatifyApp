@@ -619,7 +619,25 @@ const AgreementSign: React.FC = () => {
                                     Comments
                                 </h5>
                                 <Divider className='mb-4' />
-                                {!!basicInfo && <SignerComments type='signer' token={token} signerId={basicInfo.signerId} contractHelper={contractHelper} />}
+                                <div style={{ height: '475px' }}>
+                                    {!!basicInfo && <SignerComments type='signer' token={token} signerId={basicInfo.signerId} contractHelper={contractHelper} />}
+                                </div>
+                                <Divider />
+                                <div className='py-4 bg-gray-50'>
+                                    <h5 className='text-center'>Information</h5>
+                                </div>
+                                <Divider className='mb-4' />
+                                <Stack spacing='xl' className='px-4'>
+                                    {agreement && agreement.start_date && <div className='items-center flex'>
+                                        <i className='text-lg simple-icon-calendar mr-3 text-info' />
+                                        <p>Document start date: <span className='text-rose-400'>{getFormatDateFromIso(agreement.start_date)}</span></p>
+                                    </div>}
+                                    {agreement && agreement.end_date && <div className='items-center flex'>
+                                        <i className='text-lg simple-icon-calendar mr-3 text-info' />
+                                        <p>Document end date: <span className='text-rose-400'>{getFormatDateFromIso(agreement.end_date)}</span></p>
+                                    </div>}
+                                    {agreement && !agreement.start_date && !agreement.end_date && <p className='text-muted italic'>No extra information associated with this document</p>}
+                                </Stack>
                             </CardBody>
                         </Card>
                     </Grid.Col>

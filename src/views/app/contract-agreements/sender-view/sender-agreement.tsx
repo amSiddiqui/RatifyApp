@@ -10,6 +10,7 @@ import {
     Skeleton,
     ScrollArea,
     Modal,
+    Progress,
 } from '@mantine/core';
 import { useDispatch, useSelector } from 'react-redux';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
@@ -78,6 +79,7 @@ const SenderAgreement: React.FC = () => {
     const [showConfirmWithdraw, setShowConfirmWithdraw] = React.useState(false);
     const inputRef = React.useRef<HTMLInputElement>(null);
     const [showAuditTrail, setShowAuditTrail] = React.useState(false);
+    const [[overallProgress, overallTotalProgress], setOverallProgress] = React.useState<[number, number]>([0, 0]);
 
     const onPreviousPage = () => {
         setPageNumber((prev) => {
@@ -210,8 +212,32 @@ const SenderAgreement: React.FC = () => {
                     setLabels(generateSignerLabels([], data.signers.map((s) => ({ uid: s.id.toString(), type: s.type, step: s.step })), true));
                     setInputElements(data.input_fields);
 
-                    contractHelper.getSignerSenderProgress(contractId).then((data) => {
-                        setSignerProgress(data);
+                    contractHelper.getSignerSenderProgress(contractId).then((dt) => {
+                        setSignerProgress(dt);
+                        let tp = 0;
+                        let p = 0;
+                        data.signers.forEach((s) => {
+                            if (s.type === 'signer') {
+                                return;
+                            }
+                            tp += 1;
+                            if (s.type === 'viewer') {
+                                if (s.last_seen) {
+                                    p += 1;
+                                }
+                            }
+                            if (s.type === 'approver') {
+                                if (s.declined || s.approved) {
+                                    p += 1;
+                                }
+                            }
+                        });
+                        Object.values(dt).forEach(val => {
+                            tp += val.total;
+                            p += val.completed;
+                        });
+                        setOverallProgress([p, tp]);
+                        
                     }).catch(err => {
                         console.log(err);
                     });
@@ -319,32 +345,42 @@ const SenderAgreement: React.FC = () => {
                                     spacing={'xl'}>
                                     {pdfLoading && <Loader size="xs" />}
                                     {!pdfLoading && (
-                                        <Tooltip
-                                            label="Download Document"
-                                            sx={{fontSize: '12px'}}
-                                            className="cursor-pointer">
-                                            <a
-                                                href={
-                                                    'data:application/pdf;base64,' +
-                                                    pdf
-                                                }
-                                                download={
-                                                    agreement
-                                                        ? agreement.title +
-                                                          '.pdf'
-                                                        : 'document.pdf'
-                                                }>
-                                                <i className="iconsminds-data-download text-lg" />
+                                        <Group spacing='xs'>    
+                                        <Tooltip label='Download Document' className='cursor-pointer'>
+                                            <a href={"data:application/pdf;base64,"+pdf} download={agreement ? agreement.title + '.pdf' : 'document.pdf'}>
+                                                <i className='iconsminds-download-1 text-lg'/>
                                             </a>
                                         </Tooltip>
+                                        <p>Download Document</p>
+                                        </Group>
                                     )}
-                                    {agreement && agreement.signed_before && <div className="flex justify-center items-center">
-                                        <i className="simple-icon-info text-lg text-warning" />
-                                        <p className="ml-2">
-                                            This document must be signed by {getFormatDateFromIso(agreement.signed_before)}.
-                                        </p>
-                                    </div>}
+                                    <Stack spacing={2}>
+                                        {agreement && agreement.signed_before && <div className="flex items-center">
+                                            <i className="simple-icon-calendar mr-2 text-lg text-info" />
+                                            <p>
+                                                This document must be signed by <span className='text-rose-400'>{getFormatDateFromIso(agreement.signed_before)}</span>
+                                            </p>
+                                        </div>}
+                                        {agreement && agreement.start_date && <div className='flex items-center'>
+                                            <i className="simple-icon-calendar mr-2 text-lg text-info" />
+                                            <p>Document start date: <span className='text-rose-400'>{getFormatDateFromIso(agreement.start_date)}</span></p>
+                                        </div>}
+                                        {agreement && agreement.end_date && <div className='flex items-center'>
+                                            <i className="simple-icon-calendar mr-2 text-lg text-info" />
+                                            <p>Document end date: <span className='text-rose-400'>{getFormatDateFromIso(agreement.end_date)}</span></p>
+                                        </div>}
+                                    </Stack>
                                 </Group>
+                            </div>
+                            <div>
+                                <div>
+                                    <Progress style={{ width: 300 }} className='h-3' value={overallTotalProgress === 0 ? 0 : overallProgress * 100 / overallTotalProgress} color='green'/>
+                                    <Group position='apart'>
+                                        <p className='text-muted text-xs'>Actions completed:</p>
+                                        <p className='text-muted text-xs'>{overallProgress}/{overallTotalProgress}</p>
+                                    </Group>
+                                </div>
+                                
                             </div>
                         </Group>
                     </Grid.Col>

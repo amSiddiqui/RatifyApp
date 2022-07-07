@@ -25,6 +25,8 @@
     "@types/react-pdf": "^5.7.1",
     "@types/react-signature-canvas": "^1.0.2",
     "@use-gesture/react": "^10.2.11",
+    "ag-grid-community": "^28.0.0",
+    "ag-grid-react": "^28.0.0",
     "axios": "^0.26.1",
     "babel-eslint": "^10.1.0",
     "chart.js": "^2.9.4",
