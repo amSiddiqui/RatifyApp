@@ -1,4 +1,4 @@
-import { Center } from '@mantine/core';
+import { Center, Tooltip } from '@mantine/core';
 import classNames from 'classnames';
 import React from 'react';
 import { getFormatDateFromIso } from '../../../../helpers/Utils';
@@ -11,9 +11,10 @@ import {
 
 interface Props {
     inputField: InputField;
+    declined?: boolean;
 }
 
-const SenderInputView: React.FC<Props> = ({ inputField }) => {
+const SenderInputView: React.FC<Props> = ({ inputField, declined }) => {
     const [initialHide, setInitialHide] = React.useState(true);
     const [{ x, y, type, placeholder, value, completed, color, required, width, height }] =
         React.useState(() => {
@@ -40,7 +41,10 @@ const SenderInputView: React.FC<Props> = ({ inputField }) => {
 
     return (
         <>
-            <div
+            <Tooltip
+                label={declined ? inputField.signerName + ' declined' : inputField.signerName + '\'s Input Field'}
+                color={declined ? 'red' : 'blue'}
+                position='bottom'
                 className="flex-col pdf-form-input"
                 style={{
                     display: initialHide ? 'none' : 'flex',
@@ -73,7 +77,7 @@ const SenderInputView: React.FC<Props> = ({ inputField }) => {
                                         height: height - INPUT_TOP_OFFSET,
                                         width: width,
                                     }}
-                                    className={classNames(
+                                    className={declined ? 'border-2 px-2 font-bold border-red-500' : classNames(
                                         getBorderColorBold(color),
                                         'border-2 px-2 font-bold',
                                     )}>
@@ -96,8 +100,8 @@ const SenderInputView: React.FC<Props> = ({ inputField }) => {
                                         width: width,
                                     }}
                                     className={
-                                        'px-2 pt-1 text-muted ' +
-                                        getBgColorLight(color)
+                                        'px-2  text-muted ' +
+                                        getBgColorLight(color) + (declined ? ' border-red-500 border-2 ' : '')
                                     }>
                                     {placeholder}
                                 </p>
@@ -112,7 +116,7 @@ const SenderInputView: React.FC<Props> = ({ inputField }) => {
                                 <p style={{height: INPUT_TOP_OFFSET, width: width}}></p>
                                 <Center
                                     className={
-                                        'text-muted ' + getBgColorLight(color)
+                                        'text-muted ' +getBgColorLight(color) + ( declined ? ' border-2 border-red-500 ' : '')
                                     }
                                     style={{
                                         height: height - INPUT_TOP_OFFSET,
@@ -127,7 +131,7 @@ const SenderInputView: React.FC<Props> = ({ inputField }) => {
                                 <p style={{height: INPUT_TOP_OFFSET, width: width}}></p>
                                 <Center
                                     className={
-                                        getBorderColorBold(color) + ' w-full h-full border-2 cursor-pointer text-gray-600'
+                                        'w-full h-full border-2 cursor-pointer text-gray-600 ' + (declined ? ' border-red-500 ' : getBorderColorBold(color) )
                                     }
                                     style={{
                                         height: height - INPUT_TOP_OFFSET,
@@ -146,7 +150,7 @@ const SenderInputView: React.FC<Props> = ({ inputField }) => {
                         )}
                     </>
                 )}
-            </div>
+            </Tooltip>
         </>
     );
 };

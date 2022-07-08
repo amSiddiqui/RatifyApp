@@ -484,7 +484,7 @@ const AgreementSign: React.FC = () => {
                                     <ScrollArea
                                         style={{
                                             height: 290,
-                                            overflowY: 'scroll',
+                                            overflow: 'hidden',
                                             width: '70%',
                                         }}
                                         className="rounded-md"
@@ -584,7 +584,7 @@ const AgreementSign: React.FC = () => {
                                                 {otherInputElements.map(
                                                     (element, index) => {
                                                         if (element.page  === pageNumber) {
-                                                            return <SenderInputView key={element.id} inputField={element} />
+                                                            return <SenderInputView key={element.id} inputField={element} declined={element.declined} />
                                                         }
                                                         else {
                                                             return null;

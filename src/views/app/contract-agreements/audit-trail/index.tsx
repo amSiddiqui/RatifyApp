@@ -2,7 +2,7 @@ import React from 'react';
 import { toast } from 'react-toastify';
 import { ContractHelper } from '../../../../helpers/ContractHelper';
 import { AuditTrailActionType, AuditTrailData } from '../../../../types/ContractTypes';
-import { Center, Loader, Stack, Timeline } from '@mantine/core';
+import { Center, Loader, ScrollArea, Timeline } from '@mantine/core';
 import { MdClear, MdCreate, MdErrorOutline, MdSearch, MdSend } from 'react-icons/md';
 import { BiUndo } from 'react-icons/bi';
 import { TbWritingSign } from 'react-icons/tb';
@@ -13,14 +13,6 @@ type Props = {
     contractId?: string;
     token?: string;
 }
-
-// TODO: create' | 'sent' | 'error' | 'deleted' | 'viewed' | 'submit' | 'decline';
-// colors:
-// create: Blue
-// sent: Blue and view
-// decline red
-// withdraw: orange
-// submit: green
 
 function timelineColorFromType(type: AuditTrailActionType) {
     switch (type) {
@@ -176,7 +168,7 @@ const AuditTrail:React.FC<Props> = ({ contractHelper, contractId, token }) => {
         {loading && <Center className='w-full h-36'>
             <Loader size='lg' />    
         </Center>}
-        {!loading && !error && <Stack>
+        {!loading && !error && <ScrollArea style={{ height: 500 }}>
             <Timeline active={auditTrail.length} bulletSize={24} lineWidth={2}>
                 {auditTrail.map((item, index) => {
                     return (
@@ -190,7 +182,7 @@ const AuditTrail:React.FC<Props> = ({ contractHelper, contractId, token }) => {
                     </Timeline.Item>)
                 })}
             </Timeline>
-        </Stack>}
+        </ScrollArea>}
         
         {!loading && error && <Center className='w-full h-36'>
             <p className='text-muted text-lg'>Audit Trail cannot be loaded at the moment. Try again later!</p>

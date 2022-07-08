@@ -112,6 +112,7 @@ export interface InputField {
     page: number;
     signer: number;
     signerName: string;
+    declined: boolean;
 }
 
 export type GetAgreementResponse = {

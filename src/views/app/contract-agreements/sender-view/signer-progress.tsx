@@ -12,6 +12,7 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import { ContractHelper } from '../../../../helpers/ContractHelper';
 import { toast } from 'react-toastify';
 import SignerPopover from '../signer-popover';
+import { MdCheck, MdClear, MdError, MdSearch } from 'react-icons/md';
 
 type Props = {
     signer: Signer;
@@ -50,9 +51,59 @@ const getSignerStatus = (status: string, completed: boolean, type: string) => {
     }
 }
 
+
+const getSignerStatusAndIcon = (signer: Signer) => {
+    if (signer.status === 'error') {
+        return {
+            status: 'Document could not be sent',
+            icon: <MdError className='text-danger text-2xl' /> ,
+        } 
+    }
+    if (signer.type === 'viewer') {
+        if (signer.last_seen) {
+            return {
+                status: signer.name + ' viewed the document',
+                icon: <div className='text-white rounded-full bg-blue-500' style={{padding: 2}}><MdSearch className='text-lg' /></div>,
+            }
+        }
+    }
+    if (signer.declined) {
+        const action = signer.type === 'approver' ? 'approver' : 'sign';
+        return {
+            status: signer.name + ' declined to ' + action + ' the document' ,
+            icon: <div className='text-white rounded-full bg-red-500' style={{padding: 2}}><MdClear className='text-lg' /></div>,
+        }
+    }
+
+    if (signer.type === 'approver') {
+        if (signer.approved) {
+            return {
+                icon: <div className='text-white rounded-full bg-success' style={{padding: 2}}><MdCheck className='text-lg' /></div>,
+                status: signer.name + ' approved the document',
+            }
+        }
+    }
+
+    if (signer.type === 'signer') {
+        if (signer.status === 'completed') {
+            return {
+                icon: <div className='text-white rounded-full bg-success' style={{padding: 2}}><MdCheck className='text-lg' /></div>,
+                status: signer.name + ' signed the document',
+            }
+        }
+    }
+    
+    return {
+        status: '',
+        icon: null,
+    }
+}
+
 const SignerProgress: React.FC<Props> = ({ signer, contractHelper, onDocumentSent, signerProgress, label }) => {
     const [sendAgainModal, sendAgainHandlers] = useDisclosure(false);
     const [sending, setSending] = React.useState(false);
+
+    const [{status: signerStatus, icon: signerIcon }] = React.useState(getSignerStatusAndIcon(signer));
 
     const sendAgainSchema = Yup.object().shape({
         name: Yup.string().required('Please provide the name of the recipient'),
@@ -91,12 +142,15 @@ const SignerProgress: React.FC<Props> = ({ signer, contractHelper, onDocumentSen
                         'px-3 py-3',
                         getBgColorLight(signer.color),
                     )}>
+                        {signerStatus.length > 0 && <div className='absolute' style={{ top: 5, right: 5 }}>
+                            <Tooltip label={signerStatus}>
+                                {signerIcon}
+                            </Tooltip>
+                        </div>}
                         {!collapsed && (
                             <Stack spacing={'md'}>
                                 <div className='text-center text-lg'>
                                     <span>{signer.name}</span>
-                                    {signer.status === 'completed' && <Tooltip label='Completed'><i className='simple-icon-check text-success ml-1 relative' style={{top: 1}} /></Tooltip>}
-                                    {signer.status === 'error' && <Tooltip label='Document could not be sent'><i className='simple-icon-exclamation text-danger ml-1 relative' style={{top: 1}} /></Tooltip>}
                                 </div>
                                 <Center className='cursor-pointer' onClick={() => {
                                     setCollapsed(true)
@@ -109,8 +163,6 @@ const SignerProgress: React.FC<Props> = ({ signer, contractHelper, onDocumentSen
                             <Stack spacing='md'>
                                 <div className='text-center text-lg'>
                                     <span>{signer.name}</span>
-                                    {signer.status === 'completed' && <Tooltip label='Completed'><i className='simple-icon-check text-success ml-1 relative' style={{top: 1}} /></Tooltip>}
-                                    {signer.status === 'error' && <Tooltip label='Document count not be sent'><i className='simple-icon-exclamation text-danger ml-1 relative' style={{top: 1}} /></Tooltip>}
                                 </div>
                                 {signer.status === 'error' && <p className='text-danger text-xs'>
                                     Document could not be sent. Please check the email address entered and try again.

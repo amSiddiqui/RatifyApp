@@ -82,6 +82,7 @@ const SenderAgreement: React.FC = () => {
     const inputRef = React.useRef<HTMLInputElement>(null);
     const [showAuditTrail, setShowAuditTrail] = React.useState(false);
     const [[overallProgress, overallTotalProgress], setOverallProgress] = React.useState<[number, number]>([0, 0]);
+    const [progressSections, setProgressSections] = React.useState<{value: number, color: string}[]>([]);
 
     const onPreviousPage = () => {
         setPageNumber((prev) => {
@@ -218,19 +219,33 @@ const SenderAgreement: React.FC = () => {
                         setSignerProgress(dt);
                         let tp = 0;
                         let p = 0;
+                        let sections: {value: number, color: string}[] = [];
+                        let total = data.signers.filter((s) => s.type !== 'signer').length;
+                        total += Object.values(dt).reduce((acc, val) => acc + val.total, 0);
                         data.signers.forEach((s) => {
                             if (s.type === 'signer') {
-                                return;
+                                if (s.declined) {
+                                    sections.push({value: 100 * dt[s.id].total / total, color: 'red' });
+                                } else {
+                                    sections.push({value: 100 * dt[s.id].completed / total, color: s.color });
+                                }
                             }
                             tp += 1;
                             if (s.type === 'viewer') {
                                 if (s.last_seen) {
                                     p += 1;
+                                    sections.push({ value: 100 / total, color: 'green' });
                                 }
                             }
                             if (s.type === 'approver') {
                                 if (s.declined || s.approved) {
                                     p += 1;
+                                }
+                                if (s.declined) {
+                                    sections.push({ value: 100 / total, color: 'red' });
+                                }
+                                if (s.approved) {
+                                    sections.push({ value: 100 / total, color: 'green' });
                                 }
                             }
                         });
@@ -239,6 +254,7 @@ const SenderAgreement: React.FC = () => {
                             p += val.completed;
                         });
                         setOverallProgress([p, tp]);
+                        setProgressSections(sections);
                         
                     }).catch(err => {
                         console.log(err);
@@ -363,7 +379,7 @@ const SenderAgreement: React.FC = () => {
                                 <Stack>
                                     <Group position='right'>
                                         <div>
-                                            <Progress style={{ width: 300 }} className='h-3' value={overallTotalProgress === 0 ? 0 : overallProgress * 100 / overallTotalProgress} color='green'/>
+                                            <Progress style={{ width: 300 }} className='h-3' sections={progressSections}/>
                                             <Group style={{ width: 300 }} position='apart'>
                                                 <p className='text-muted text-xs'>Actions completed:</p>
                                                 <p className='text-muted text-xs'>{overallProgress}/{overallTotalProgress}</p>
@@ -462,6 +478,7 @@ const SenderAgreement: React.FC = () => {
                                                                 <SenderInputView
                                                                     key={element.id}
                                                                     inputField={element}
+                                                                    declined={element.declined}
                                                                 />
                                                             );
                                                         } else {
@@ -555,7 +572,7 @@ const SenderAgreement: React.FC = () => {
                                         <ScrollArea
                                             style={{
                                                 height: 290,
-                                                overflowY: 'scroll',
+                                                overflow: 'hidden',
                                                 width: '70%',
                                             }}
                                             className="rounded-md">
@@ -629,7 +646,7 @@ const SenderAgreement: React.FC = () => {
             
             <Modal
                 size='lg'
-                overflow='inside'
+                style={{overflow: 'hidden'}}
                 opened={showAuditTrail}
                 onClose={() => setShowAuditTrail(false)}
                 centered
