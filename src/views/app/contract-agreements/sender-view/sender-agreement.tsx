@@ -39,6 +39,8 @@ import { AuthHelper } from '../../../../helpers/AuthHelper';
 import SignerComments from '../agreement-sign/signer-comments';
 import SignerProgress from './signer-progress';
 import AuditTrail from '../audit-trail';
+import { IoWarningOutline } from 'react-icons/io5';
+import AuditTrailButton from '../audit-trail/audit-trail-button';
 
 const GRID_TOTAL = 20;
 const GRID_SIDE = 3;
@@ -354,45 +356,35 @@ const SenderAgreement: React.FC = () => {
                                         <p>Download Document</p>
                                         </Group>
                                     )}
-                                    <Stack spacing={2}>
-                                        {agreement && agreement.signed_before && <div className="flex items-center">
-                                            <i className="simple-icon-calendar mr-2 text-lg text-info" />
-                                            <p>
-                                                This document must be signed by <span className='text-rose-400'>{getFormatDateFromIso(agreement.signed_before)}</span>
-                                            </p>
-                                        </div>}
-                                        {agreement && agreement.start_date && <div className='flex items-center'>
-                                            <i className="simple-icon-calendar mr-2 text-lg text-info" />
-                                            <p>Document start date: <span className='text-rose-400'>{getFormatDateFromIso(agreement.start_date)}</span></p>
-                                        </div>}
-                                        {agreement && agreement.end_date && <div className='flex items-center'>
-                                            <i className="simple-icon-calendar mr-2 text-lg text-info" />
-                                            <p>Document end date: <span className='text-rose-400'>{getFormatDateFromIso(agreement.end_date)}</span></p>
-                                        </div>}
-                                    </Stack>
+                                    
                                 </Group>
                             </div>
                             <div>
-                                <div>
-                                    <Progress style={{ width: 300 }} className='h-3' value={overallTotalProgress === 0 ? 0 : overallProgress * 100 / overallTotalProgress} color='green'/>
-                                    <Group position='apart'>
-                                        <p className='text-muted text-xs'>Actions completed:</p>
-                                        <p className='text-muted text-xs'>{overallProgress}/{overallTotalProgress}</p>
+                                <Stack>
+                                    <Group position='right'>
+                                        <div>
+                                            <Progress style={{ width: 300 }} className='h-3' value={overallTotalProgress === 0 ? 0 : overallProgress * 100 / overallTotalProgress} color='green'/>
+                                            <Group style={{ width: 300 }} position='apart'>
+                                                <p className='text-muted text-xs'>Actions completed:</p>
+                                                <p className='text-muted text-xs'>{overallProgress}/{overallTotalProgress}</p>
+                                            </Group>
+                                        </div>
+
                                     </Group>
-                                </div>
+                                    {agreement && agreement.signed_before && <div className="flex items-center">
+                                        <IoWarningOutline className='text-warning text-xl relative' style={{top: -1}} />
+                                        <p className='ml-2'>
+                                            Document is required to be signed before <span className='text-rose-400'>{getFormatDateFromIso(agreement.signed_before)}</span>
+                                        </p>
+                                    </div>}
+                                </Stack>
                                 
                             </div>
                         </Group>
                     </Grid.Col>
                     <Grid.Col span={GRID_SIDE}>
                         <Center>
-                            <span onClick={() => setShowAuditTrail(true)}>
-                                <Button
-                                    className="agreement-button"
-                                    color="primary">
-                                    Audit Trail
-                                </Button>
-                            </span>
+                            <AuditTrailButton onAuditClick={() => setShowAuditTrail(true)} agreement={agreement} />
                         </Center>
                     </Grid.Col>
                 </Grid>

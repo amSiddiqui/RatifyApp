@@ -24,6 +24,7 @@ import SenderInputView from '../form-elements/SenderInputView';
 import { MdPendingActions } from 'react-icons/md';
 import { IoWarningOutline } from 'react-icons/io5';
 import AuditTrail from '../audit-trail';
+import AuditTrailButton from '../audit-trail/audit-trail-button';
 
 
 const GRID_TOTAL = 16;
@@ -396,27 +397,31 @@ const AgreementSign: React.FC = () => {
                             
                             <div>
                             {basicInfo && basicInfo.signerType === 'signer' && 
+                            <Group position='right'>
                                 <div>
                                     <Progress style={{ width: 300 }} className=' h-3' value={totalFields === 0 ? 0: completedFields * 100 / totalFields} color='green'/>
-                                    <Group position='apart'>
+                                    <Group style={{ width: 300 }} position='apart'>
                                         <p className='text-muted text-xs'>Actions completed:</p>
                                         <p className='text-muted text-xs'>{completedFields} of {totalFields}</p>
                                     </Group>
                                 </div>
+                            </Group>
                             }
                             {basicInfo && basicInfo.signerType !== 'signer' && 
+                            <Group position='right'>
                                 <div>
                                     <Progress style={{ width: 300 }} className='h-3' value={totalProgress === 0 ? 0: completedProgress * 100 / totalProgress} color='green'/>
-                                    <Group position='apart'>
+                                    <Group style={{ width: 300 }} position='apart'>
                                         <p className='text-muted text-xs'>Actions completed:</p>
                                         <p className='text-muted text-xs'>{completedProgress} of {totalProgress}</p>
                                     </Group>
                                 </div>
+                            </Group>
                             }
                             {agreement && agreement.signed_before && 
                                 <div style={{top: '15px'}} className='flex justify-center items-center relative'>     
-                                    <IoWarningOutline className='text-warning text-xl' />
-                                    <p className='ml-2'>This document is required to be signed before {agreement && agreement.signed_before ? getFormatDateFromIso(agreement.signed_before) : ''}.</p>
+                                    <IoWarningOutline className='text-warning text-xl relative' style={{ top: -1}} />
+                                    <p className='ml-2'>Document is required to be signed before <span className='text-rose-400'>{agreement && agreement.signed_before ? getFormatDateFromIso(agreement.signed_before) : ''}</span></p>
                                 </div>
                             }
                             </div>
@@ -424,7 +429,9 @@ const AgreementSign: React.FC = () => {
                     </Grid.Col>
                     <Grid.Col span={GRID_SIDE}>
                         <Center>
-                            {basicInfo && basicInfo.signerType !== 'signer' && <span onClick={() => setShowAuditTrail(true)}><Button className='agreement-button' color='primary'>Audit Trail</Button></span>}
+                            {basicInfo && basicInfo.signerType !== 'signer' && 
+                                <AuditTrailButton agreement={agreement} onAuditClick={() => setShowAuditTrail(true)} />
+                            }
                         </Center>
                     </Grid.Col>
                 </Grid>
@@ -622,22 +629,6 @@ const AgreementSign: React.FC = () => {
                                 <div style={{ height: '475px' }}>
                                     {!!basicInfo && <SignerComments type='signer' token={token} signerId={basicInfo.signerId} contractHelper={contractHelper} />}
                                 </div>
-                                <Divider />
-                                <div className='py-4 bg-gray-50'>
-                                    <h5 className='text-center'>Information</h5>
-                                </div>
-                                <Divider className='mb-4' />
-                                <Stack spacing='xl' className='px-4'>
-                                    {agreement && agreement.start_date && <div className='items-center flex'>
-                                        <i className='text-lg simple-icon-calendar mr-3 text-info' />
-                                        <p>Document start date: <span className='text-rose-400'>{getFormatDateFromIso(agreement.start_date)}</span></p>
-                                    </div>}
-                                    {agreement && agreement.end_date && <div className='items-center flex'>
-                                        <i className='text-lg simple-icon-calendar mr-3 text-info' />
-                                        <p>Document end date: <span className='text-rose-400'>{getFormatDateFromIso(agreement.end_date)}</span></p>
-                                    </div>}
-                                    {agreement && !agreement.start_date && !agreement.end_date && <p className='text-muted italic'>No extra information associated with this document</p>}
-                                </Stack>
                             </CardBody>
                         </Card>
                     </Grid.Col>
@@ -768,12 +759,11 @@ const AgreementSign: React.FC = () => {
                 opened={showDecline}
                 onClose={() => setShowDecline(false)}
                 centered
-                title={<p className='font-bold text-lg'>Confirm Decline?</p>}
             >
                 <Stack>
-                    <p className='text-lg font-bold'>Are you sure you want to decline this document?</p>
+                    <p className='text-lg font-bold'>Are you sure you want to decline {basicInfo && basicInfo.signerType === 'approver' ? 'approval of this document?' : 'signing of this document?'}</p>
                     <Center className='w-full'>
-                        <Textarea className='w-full' autosize minRows={3} value={declineMessage} onChange={(event) => setDeclineMessage(event.target.value)} label='Reason for decline' />
+                        <Textarea className='w-full' autosize minRows={3} value={declineMessage} onChange={(event) => setDeclineMessage(event.target.value)} label='Reason for decline:' />
                     </Center>
                     <Group position='right'>
                         <span onClick={() => setShowDecline(false)}><Button color='light'>Close</Button></span>

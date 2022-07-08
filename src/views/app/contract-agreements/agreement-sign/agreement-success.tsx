@@ -40,21 +40,23 @@ const AgreementSuccess: React.FC = () => {
         <div style={{ backgroundColor: '#F8F8F8' }}>
             <SimpleGrid className='h-screen' cols={2} breakpoints={[{ maxWidth: 600, cols: 1 }]}>
                 <Center className="px-10 mb-36 h-100 mt-10 sm:mt-0">
-                    <Stack>
+                    <Stack spacing='xl'>
                         <Center>
                             <Image className='mb-4 w-[120px] sm:w-[150px] relative' style={{ right: 15 }} src='/static/logos/black.svg' alt='Ratify' />
                         </Center>
-                        <h4 className="text-2xl text-center font-bold">
-                            You've filled and signed the document
-                        </h4>
-                        <p className="text-center text-muted">
-                            The sender will be notified and will receive the
-                            signed document
-                        </p>
-                        <Group position="center">
+                        <div>
+                            <h4 className="text-2xl  font-bold">
+                                You've filled and signed the document
+                            </h4>
+                            <p className=" text-muted">
+                                The sender will be notified and will receive the
+                                signed document
+                            </p>
+                        </div>
+                        <Group className='mt-3' position="center">
                             <span>
                                 <Button color="light">
-                                    Get My Document Copy
+                                    Get a Copy of Document
                                 </Button>
                             </span>
                             <span onClick={() => {

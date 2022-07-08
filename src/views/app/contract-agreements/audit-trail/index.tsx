@@ -4,7 +4,7 @@ import { ContractHelper } from '../../../../helpers/ContractHelper';
 import { AuditTrailActionType, AuditTrailData } from '../../../../types/ContractTypes';
 import { Center, Loader, Stack, Timeline } from '@mantine/core';
 import { MdClear, MdCreate, MdErrorOutline, MdSearch, MdSend } from 'react-icons/md';
-import { BsTrash } from 'react-icons/bs';
+import { BiUndo } from 'react-icons/bi';
 import { TbWritingSign } from 'react-icons/tb';
 import { DateTime } from 'luxon';
 
@@ -14,13 +14,40 @@ type Props = {
     token?: string;
 }
 
+// TODO: create' | 'sent' | 'error' | 'deleted' | 'viewed' | 'submit' | 'decline';
+// colors:
+// create: Blue
+// sent: Blue and view
+// decline red
+// withdraw: orange
+// submit: green
+
+function timelineColorFromType(type: AuditTrailActionType) {
+    switch (type) {
+        case 'create':
+            return 'blue';
+        case 'deleted':
+            return 'orange';
+        case 'error':
+            return 'red';
+        case 'sent':
+            return 'blue';
+        case 'submit':
+            return 'green';
+        case 'decline':
+            return 'red';
+        default:
+            return 'blue';
+    }
+}
+
 
 function timelineIconFromType(type: AuditTrailActionType) {
     switch (type) {
         case 'create':
             return <MdCreate />;
         case 'deleted':
-            return <BsTrash />;
+            return <BiUndo />;
         case 'error':
             return <MdErrorOutline />;
         case 'sent':
@@ -39,7 +66,7 @@ function timelineTitleFromType(type: AuditTrailActionType, signer_type: string |
         case 'create':
             return 'Document Created';
         case 'deleted':
-            return 'Document Deleted';
+            return 'Document Withdrawn';
         case 'error':
             return 'Error Sending Document';
         case 'sent':
@@ -63,45 +90,45 @@ function timelineTitleFromType(type: AuditTrailActionType, signer_type: string |
 function timelineDescriptionFromType(data: AuditTrailData) {
     if (data.action_type === 'create') {
         if (data.user) {
-            return `${data.user} created the document ${data.agreement}`;
+            return <p><span className='text-rose-400'>{data.user}</span> created the document <span className='italic'>{data.agreement}</span></p>;
         }
-        return `Document ${data.agreement} was created`;
+        return <p>Document <span className='italic'>{data.agreement}</span> was created</p>;
     }
     if (data.action_type === 'deleted') {
         if (data.user) {
-            return `${data.user} deleted the document ${data.agreement}`;
+            return <p><span className='text-rose-400'>{data.user}</span> withdrew the document <span className='italic'>{data.agreement}</span></p>;
         }
-        return `Document ${data.agreement} was deleted`;
+        return <p>Document <span className='italic'>{data.agreement}</span> was deleted</p>;
     }
     if (data.action_type === 'error') {
         if (data.user) {
-            return `${data.user} had an error sending the document ${data.agreement} to ${data.signer}`;
+            return <p><span className='text-rose-400'>{data.user}</span> had an error sending the document <span className='italic'>{data.agreement}</span> to {data.signer} {!!data.signer_email ? <span className='text-muted'>{`[${data.signer_email}]`}</span> : ``}</p>;
         }
-        return `Document ${data.agreement} had an error sending to ${data.signer}`;
+        return <p>Document <span className='italic'>{data.agreement}</span> had an error sending to {data.signer}</p>;
     }
     if (data.action_type === 'sent') {
         if (data.user) {
-            return `${data.user} send the document ${data.agreement} to ${data.signer}`;
+            return <p><span className='text-rose-400'>{data.user}</span> send the document <span className='italic'>{data.agreement}</span> to {data.signer} {!!data.signer_email ? <span className='text-muted'>{`[${data.signer_email}]`}</span> : ``}</p>;
         }
-        return `Document ${data.agreement} was sent to ${data.signer}`;
+        return <p>Document <span className='italic'>{data.agreement}</span> was sent to {data.signer}</p>;
     }
     if (data.action_type === 'submit') {
         if (data.signer_type === 'signer') {
-            return `${data.signer} signed the document ${data.agreement}`;
+            return <p><span className='text-rose-400'>{data.signer}</span> signed the document <span className='italic'>{data.agreement}</span></p>;
         }
         if (data.signer_type === 'viewer') {
-            return `${data.signer} viewed the document ${data.agreement}`;
+            return <p><span className='text-rose-400'>{data.signer}</span> viewed the document <span className='italic'>{data.agreement}</span></p>;
         }
         if (data.signer_type === 'approver') {
-            return `${data.signer} approved the document ${data.agreement}`;
+            return <p><span className='text-rose-400'>{data.signer}</span> approved the document <span className='italic'>{data.agreement}</span></p>;
         }
         return 'Document Submitted';
     }
     if (data.action_type === 'viewed') {
-        return `${data.signer} viewed the document ${data.agreement}`;
+        return <p><span className='text-rose-400'>{data.signer}</span> viewed the document <span className='italic'>{data.agreement}</span></p>;
     }
     if (data.action_type === 'decline') {
-        return `${data.signer} declined the document ${data.agreement}`;
+        return <p><span className='text-rose-400'>{data.signer}</span> declined the document <span className='italic'>{data.agreement}</span></p>;
     }
 }
 
@@ -154,10 +181,11 @@ const AuditTrail:React.FC<Props> = ({ contractHelper, contractId, token }) => {
                 {auditTrail.map((item, index) => {
                     return (
                     <Timeline.Item 
+                    color={timelineColorFromType(item.action_type)}
                     key={item.id} 
                     bullet={timelineIconFromType(item.action_type)} 
                     title={<p className='capitalize font-bold text-md mb-0'>{timelineTitleFromType(item.action_type, item.signer_type)}</p>}>
-                        <p>{timelineDescriptionFromType(item)}</p>
+                        {timelineDescriptionFromType(item)}
                         <p className='text-xs'>{timelineDate(item.date)}</p>
                     </Timeline.Item>)
                 })}

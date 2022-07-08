@@ -182,4 +182,5 @@ export interface AuditTrailData {
     signer: string;
     signer_id: number | null;
     signer_type: string | null;
+    signer_email: string | null;
 }
