@@ -1,8 +1,7 @@
-import { Center, Checkbox, Grid, Loader, Stack, Table, Badge } from '@mantine/core';
+import { Center, Grid, Loader, Badge } from '@mantine/core';
 import React from 'react';
-import { MdOpenInNew } from 'react-icons/md';
 import { useDispatch } from 'react-redux';
-import { Link, useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { Button, Card, CardBody, Row } from 'reactstrap';
 import {
@@ -14,26 +13,47 @@ import { ContractHelper } from '../../../../helpers/ContractHelper';
 import { getFormatDateFromIso } from '../../../../helpers/Utils';
 import { AppDispatch } from '../../../../redux';
 import { AgreementRowData } from '../../../../types/ContractTypes';
+import { AgGridReact } from 'ag-grid-react';
+import 'ag-grid-community/styles/ag-grid.css'; 
+import 'ag-grid-community/styles/ag-theme-material.css';
+import { AgGridEvent, ColDef, ColGroupDef, GridOptions, ICellRendererParams } from 'ag-grid-community';
+import { DateTime } from 'luxon';
 
 const getBadgeColorFromStatus = (status: string) => {
     switch(status) {
-        case 'in progress':
+        case 'sent':
             return 'blue';
         case 'error':
             return 'red';
         case 'completed':
             return 'green';
+        case 'withdraw':
+            return 'orange';
+        case 'decline':
+            return 'red';
         default:
             return 'gray';
     }
 }
 
-const columns = ['Agreement ID',
-'Agreement title',
-'Sent on',
-'Sent to',
-'Sender',
-'Status']
+const getStatusText = (status: string) => {
+    switch (status) {
+        case  'complete':
+            return 'Completed';
+        case 'sent':
+            return 'In Progress';
+        case 'error':
+            return 'Error';
+        case 'withdraw':
+            return 'Withdrawn';
+        case 'delete':
+            return 'Deleted';
+        case 'decline':
+            return 'Declined';
+        default:
+            return 'draft';
+    }
+}
 
 const AgreementDashboard: React.FC = () => {
 
@@ -43,13 +63,70 @@ const AgreementDashboard: React.FC = () => {
     const [agreements, setAgreements] = React.useState<AgreementRowData[]>([]);
     const [loading, setLoading] = React.useState(true);
     const [error, setError] = React.useState(false);
-    const [showColumns, setShowColumns] = React.useState<boolean[]>(new Array(columns.length).fill(true));
     
     const dispatchFn = useDispatch<AppDispatch>();
     const contractHelper = React.useMemo(
         () => new ContractHelper(dispatchFn),
         [dispatchFn],
     );
+
+    const gridRef = React.useRef<AgGridReact>(null);
+    
+    const [columnDefs] = React.useState<(ColDef | ColGroupDef)[]>([
+        { headerName: 'Agreement ID', field: 'id', width: 170, onCellClicked: (e) => {
+            navigate( `/agreements/${e.data.id}`);
+        }, cellClass: 'dashboard-title-cell' },
+        { headerName: 'Agreement title', field: 'title', onCellClicked: (e) => {
+            navigate( `/agreements/${e.data.id}`);
+        }, cellClass: 'dashboard-title-cell' },
+        { headerName: 'Sent On', field: 'sent_on', cellRenderer: (params: ICellRendererParams) => {
+            return getFormatDateFromIso(params.value);
+        }},
+        { headerName: 'Signers / Approver', field: 'signers', cellRenderer: (params: ICellRendererParams) => {
+            return <div className='w-full h-full flex items-center' style={{ maxWidth: 220 }}><p>{params.value.join(', ')}</p></div>
+        }},
+        { headerName: 'Sender', field: 'user_name' },
+        { headerName: 'Status', field: 'status', cellRenderer: (params: ICellRendererParams) => {
+            return <Badge color={getBadgeColorFromStatus(params.value)}>{getStatusText(params.value)} </Badge>
+        }},
+        { headerName: '', field: 'sent_on', cellRenderer: (params: ICellRendererParams) => {
+            // 
+            const dt = DateTime.fromISO(params.value);
+            const today = DateTime.local();
+            let diff = today.diff(dt, 'days');
+            let lessThanADay = false;
+            if (diff.days < 1) {
+                lessThanADay = true;
+                diff = today.diff(dt, 'hours');
+            }
+            if (params.data.status !== 'sent') {
+                return '';
+            } else {
+                return <Center className='h-full'><div className='mt-[2px] flex flex-col justify-center items-center'>
+                    <p className='m-0'>{lessThanADay ? diff.hours.toFixed(0) : diff.days.toFixed(0)}</p>
+                    <p className='m-0'>{lessThanADay ? 'Hours' : 'Days'}</p>
+                </div></Center>;
+            }
+        }}
+    ]);
+
+    const gridOptions = React.useMemo<GridOptions>(() => {
+        return {
+            suppressRowClickSelection: true,
+            domLayout: 'autoHeight',  
+        }
+    }, []);
+
+    const onGridReady = (e:AgGridEvent<AgreementRowData>) => {
+        e.api.sizeColumnsToFit();
+    }
+
+    const defaultColDef = React.useMemo(() => ({
+        sortable: true,
+        filter: true,
+        floatingFilter: true,
+        resizable: true,
+    }), []);
 
     React.useEffect(() => {
         contractHelper.getAllAgreements().then(data => {
@@ -130,16 +207,7 @@ const AgreementDashboard: React.FC = () => {
                 <Grid.Col span={2}>
                     <Card className=''>
                         <CardBody>
-                            <h5 className='mb-4'>Select Columns</h5>
-                            <Stack spacing={'lg'}>
-                                {columns.map((column, index) => (
-                                    <Checkbox size='xs' className='cursor-pointer' checked={showColumns[index]} onChange={(ckd) => {
-                                        const newShowColumns = [...showColumns];
-                                        newShowColumns[index] = ckd.currentTarget.checked;
-                                        setShowColumns(newShowColumns);
-                                    }} key={index} label={column} />
-                                ))}
-                            </Stack>
+                            
                         </CardBody>
                     </Card>
                 </Grid.Col>
@@ -154,50 +222,20 @@ const AgreementDashboard: React.FC = () => {
                         No agreements found. Please click on create new button to create a new agreement.
                     </p>}
                     {!loading && !error && agreements.length > 0 && <div>
-
                         <Card>
                             <CardBody>
                                 <h5 className='mb-4'>Contracts & Agreements</h5>
-                                <Table verticalSpacing={'lg'}>
-                                    <thead>
-                                        <tr>
-                                            {showColumns[0] && <th>ID</th>}
-                                            {showColumns[1] && <th>Title</th>}
-                                            {showColumns[2] && <th>Sent On</th>}
-                                            {showColumns[3] && <th>Signer / Approver</th>}
-                                            {showColumns[4] && <th>Sender</th>}
-                                            {showColumns[5] && <th>Status</th>}
-                                            {showColumns[5] && <th></th>}
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        {agreements.map(agreement => (
-                                            <tr key={agreement.id}>
-                                                {showColumns[0] && <th scope='row'>{agreement.id}</th>}
-                                                {showColumns[1] && <td>
-                                                    <Link to={agreement.sent ? `/agreements/${agreement.id}` : `/agreements/add-signers/${agreement.id}`}>
-                                                        {agreement.title}    
-                                                    </Link>
-                                                </td>}
-                                                {showColumns[2] && <td>{getFormatDateFromIso(agreement.sent_on)}</td>}
-                                                {showColumns[3] && <td className='w-44'>
-                                                    <p className='w-full'>{agreement.signers.join(', ')}</p>
-                                                </td>}
-                                                {showColumns[4] && <td>{agreement.user_name}</td>}
-                                                {showColumns[5] && <td>
-                                                    <Badge color={
-                                                        getBadgeColorFromStatus(agreement.status)
-                                                    }>
-                                                        {agreement.status}
-                                                    </Badge>
-                                                </td>}
-                                                {showColumns[5] && <td>
-                                                    <MdOpenInNew className='text-lg cursor-pointer' onClick={() => navigate(agreement.sent ? `/agreements/${agreement.id}` : `/agreements/add-signers/${agreement.id}`)} />
-                                                </td>}
-                                            </tr>
-                                        ))}
-                                    </tbody>
-                                </Table>
+                                <div className='ag-theme-material w-full'>
+                                    <AgGridReact
+                                        rowHeight={50}
+                                        columnDefs={columnDefs}
+                                        onGridReady={onGridReady}
+                                        ref={gridRef}
+                                        rowData={agreements}
+                                        defaultColDef={defaultColDef}
+                                        gridOptions={gridOptions}
+                                    />
+                                </div>
                             </CardBody>
                         </Card>
                     </div>}

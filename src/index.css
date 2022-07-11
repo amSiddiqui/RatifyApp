@@ -146,3 +146,7 @@ input {
     font-size: 22px;
     font-weight: bold;
 }
+
+.dashboard-title-cell {
+    @apply cursor-pointer hover:text-blue-500 hover:scale-110 transition-all;
+}
