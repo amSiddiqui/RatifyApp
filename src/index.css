@@ -73,6 +73,10 @@ label {
     right: 7px;
 }
 
+.mantine-Modal-header {
+    margin-bottom: 18px;
+}
+
 input {
     color: black !important;
 }

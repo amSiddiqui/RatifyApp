@@ -381,7 +381,7 @@ const AgreementSign: React.FC = () => {
                     <Grid.Col span={GRID_CENTER}>
                         <Group position='apart'>
                             <div>
-                                <Group spacing={'xs'} className='text-primary'><span><MdPendingActions className='text-xl' /></span><p className=' text-lg'>Please <span>{!basicInfo ? 'sign': basicInfo.signerType.substring(0, basicInfo.signerType.length - 2)}</span> the following document!</p></Group>
+                                <Group spacing={'xs'} className='text-primary'><span><MdPendingActions className='text-xl' /></span><p className=' text-lg'>Please <span>{!basicInfo ? 'sign':  (basicInfo.signerType === 'approver' ? 'approve' : basicInfo.signerType.substring(0, basicInfo.signerType.length - 2))}</span> the following document!</p></Group>
                                 <Group className='relative' style={{top: '15px'}} spacing={'xl'}>
                                     {pdfLoading && <Loader size='xs' />}
                                     {!pdfLoading && <Group spacing='xs'>    
@@ -700,7 +700,7 @@ const AgreementSign: React.FC = () => {
                         <Divider />
                         <p>
                             {basicInfo.organizationName} has invited you to{' '}
-                            {basicInfo.signerType.substring(
+                            {basicInfo.signerType === 'approver' ? 'approve' :  basicInfo.signerType.substring(
                                 0,
                                 basicInfo.signerType.length - 2,
                             )}{' '}

@@ -22,30 +22,36 @@ type Props = {
     label: string;
 };
 
-const getSignerStatus = (status: string, completed: boolean, type: string) => {
-    if (status === 'error') {
+const getSignerStatus = (signer:Signer, signerProgress: {total: number, completed: number} | null) => {
+    if (signer.status === 'error') {
         return 'Error Sending';
     }
-    if (type === 'viewer') {
-        if (status === 'completed') {
+    if (signer.type === 'viewer') {
+        if (signer.last_seen) {
             return 'Viewed';
         } else {
             return 'Not Viewed';
         }
-    } else if (type === 'approver') {
-        if (status === 'completed') {
+    } else if (signer.type === 'approver') {
+        if (signer.approved) {
             return 'Approved';
+        } 
+        else if (signer.declined) {
+            return 'Declined';
         } else {
             return 'In progress';
         }
     }  else {
-        if (status === 'completed') {
-            return 'Completed';
+        if (signer.declined) {
+            return 'Declined';
+        }
+        if (signer.status === 'completed') {
+            return 'Filled and Signed';
         }   
-        if (status === 'sent' && !completed) {
+        if (signer.status === 'sent' && signerProgress !== null && signerProgress.completed !== signerProgress.total) {
             return 'In Progress';
         }
-        if (status === 'sent' && completed) {
+        if (signer.status === 'sent' && (signerProgress === null || signerProgress.completed === signerProgress.total)) {
             return 'Not submitted';
         }
     }
@@ -180,9 +186,9 @@ const SignerProgress: React.FC<Props> = ({ signer, contractHelper, onDocumentSen
                                 </div>}
                                 <div>
                                     <p className='text-muted'>Status</p>
-                                    <p>{getSignerStatus(signer.status, !!signerProgress && signerProgress.total === signerProgress.completed, signer.type)}</p>
+                                    <p>{getSignerStatus(signer, signerProgress)}</p>
                                 </div>
-                                {signerProgress && <div className='w-full'>
+                                {signerProgress && !signer.declined && <div className='w-full'>
                                     <Progress className='w-full h-2' value={signerProgress.total === 0 ? 100 : signerProgress.completed * 100 / signerProgress.total} />
                                     <Group position='apart' className='text-gray-600'>
                                         <p className='text-xs'>Completed</p>
@@ -202,7 +208,7 @@ const SignerProgress: React.FC<Props> = ({ signer, contractHelper, onDocumentSen
                                     <p className='text-muted'>Last Reminder</p>
                                     <p>not sent</p>
                                 </div>
-                                {signer.status === 'sent' &&<span><Button size='xs' color='primary'>
+                                {!signer.declined && (signer.type === 'viewer' ? !signer.last_seen : signer.status === 'sent') &&<span><Button size='xs' color='primary'>
                                     Send Reminder    
                                 </Button></span>}
                                 {signer.status === 'error' && <span onClick={() => {

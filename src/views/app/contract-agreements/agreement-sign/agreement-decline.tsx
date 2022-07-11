@@ -17,6 +17,8 @@ const AgreementDecline:React.FC = () => {
     );
     const [searchParams] = useSearchParams();
     const [token, setToken] = React.useState('');
+    const [signerType, setSignerType] = React.useState('');
+    const [senderName, setSenderName] = React.useState('');
 
     React.useEffect(() => {
         const tokenStr = searchParams.get('token');
@@ -27,11 +29,13 @@ const AgreementDecline:React.FC = () => {
 
     React.useEffect(() => {
         if (token) {
-            contractHelper.getSignerDeclineMessage(token).then(data => {
+            contractHelper.getSignerDeclineInfo(token).then(data => {
                 setDeclineMessage(data.data.declineMessage);
+                setSenderName(data.data.senderName);
+                setSignerType(data.data.signerType);
             }).catch(err => {
                 console.log(err);
-            })
+            });
         }
     }, [contractHelper, token]);
 
@@ -46,15 +50,14 @@ const AgreementDecline:React.FC = () => {
                         </Center>
                         <Stack spacing={'md'}>
                             <h4 className="text-2xl text-center font-bold">
-                                You've declined the document.
+                                {signerType.length > 0 ? (`You've declined to ${signerType === 'approver' ? 'approve' : 'sign'} the document`) : `You've declined the document.` }
                             </h4>
                             {declineMessage && <div>
                                 <p className='text-muted'>Reason for decline:</p>
                                 <p>{declineMessage}</p>
                             </div>}
                             <p className="text-muted">
-                                {/* TODO: Add sender name */}
-                                Sender, ____ of the document has been notified.
+                                Sender, {senderName} of the document has been notified.
                             </p>
                         </Stack>
                         <Group className='mt-4' position="right">

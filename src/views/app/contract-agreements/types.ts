@@ -38,7 +38,6 @@ export const SIGN_POSITION_OFFSET_Y = SIGN_INPUT_HEIGHT / 2;
 
 export const colors = [
     'blue',
-    'red',
     'green',
     'purple',
     'pink',
@@ -47,7 +46,8 @@ export const colors = [
     'cyan',
     'teal',
     'slate',
-    'gray'
+    'gray',
+    'violet'
 ]
 
 export const getBgColorLight = (color:string) => {
@@ -72,6 +72,8 @@ export const getBgColorLight = (color:string) => {
             return 'bg-teal-100';
         case 'slate':
             return 'bg-slate-100';
+        case 'violet':
+            return 'bg-violet-100';
         default:
             return 'bg-gray-100';
     }
@@ -100,6 +102,8 @@ export const getBgColorBold = (color:string) => {
             return 'bg-teal-400';
         case 'slate':
             return 'bg-slate-400';
+        case 'violet':
+            return 'bg-violet-400';
         default:
             return 'bg-gray-400';
     }
@@ -128,6 +132,8 @@ export const getBorderColorBold = (color:string) => {
             return 'border-teal-400';
         case 'slate':
             return 'border-slate-400';
+        case 'violet':
+            return 'border-violet-400';
         default:
             return 'border-gray-400';
     }

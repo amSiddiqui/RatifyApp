@@ -506,9 +506,16 @@ export class ContractHelper extends ApiHelper {
         return response.data;
     }
 
-    async getSignerDeclineMessage(token: string) {
-        let response: AxiosResponse<{ status: string, valid: boolean, data: { declined: boolean, declineMessage: string } }> = await axios.get(
+    async getSignerDeclineInfo(token: string) {
+        let response: AxiosResponse<{ status: string, valid: boolean, data: { declined: boolean, declineMessage: string, signerType: string, senderName: string } }> = await axios.get(
             `contracts/signer/decline/?token=${token}`,
+        );
+        return response.data;
+    }
+
+    async getSignerSuccessInfo(token: string) {
+        let response: AxiosResponse<{ status: string, valid: boolean, data: { signerType: string, senderName: string }}> = await axios.get(
+            `contracts/signer/success/?token=${token}`,
         );
         return response.data;
     }

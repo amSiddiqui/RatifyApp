@@ -222,13 +222,14 @@ const SenderAgreement: React.FC = () => {
                         let sections: {value: number, color: string}[] = [];
                         let total = data.signers.filter((s) => s.type !== 'signer').length;
                         total += Object.values(dt).reduce((acc, val) => acc + val.total, 0);
-                        data.signers.forEach((s) => {
+                        data.signers.forEach((s) => {                            
                             if (s.type === 'signer') {
                                 if (s.declined) {
                                     sections.push({value: 100 * dt[s.id].total / total, color: 'red' });
                                 } else {
-                                    sections.push({value: 100 * dt[s.id].completed / total, color: s.color });
+                                    sections.push({value: 100 * dt[s.id].completed / total, color: s.color === 'green' ? 'teal' : 'green' });
                                 }
+                                return;
                             }
                             tp += 1;
                             if (s.type === 'viewer') {
@@ -236,6 +237,7 @@ const SenderAgreement: React.FC = () => {
                                     p += 1;
                                     sections.push({ value: 100 / total, color: 'green' });
                                 }
+                                return;
                             }
                             if (s.type === 'approver') {
                                 if (s.declined || s.approved) {

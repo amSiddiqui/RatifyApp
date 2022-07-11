@@ -5,22 +5,35 @@ import {
     Group,
     SimpleGrid,
     Stack,
-    Image
+    Image,
+    Modal
 } from '@mantine/core';
 import { Button } from 'reactstrap';
 import {  useNavigate, useSearchParams } from 'react-router-dom';
 import Confetti from 'react-confetti';
 import { useViewportSize } from '@mantine/hooks';
 import SignupForm from '../../../user/signup-form';
+import { useDispatch } from 'react-redux';
+import { ContractHelper } from '../../../../helpers/ContractHelper';
 
 const AgreementSuccess: React.FC = () => {
     const navigate = useNavigate();
+    const dispatchFn = useDispatch();
+    const contractHelper = React.useMemo(
+        () => new ContractHelper(dispatchFn),
+        [dispatchFn],
+    );
     const { height, width } = useViewportSize();
     const [showConfetti, setShowConfetti] = React.useState(false);
     const [searchParams] = useSearchParams();
+    const [token, setToken] = React.useState('');
+    const [signerType, setSignerType] = React.useState('');
+    const [senderName, setSenderName] = React.useState('');
+    const [showDocumentCopy, setShowDocumentCopy] = React.useState(false);
 
     React.useEffect(() => {
         const confetti = searchParams.get('confetti');
+        const tokenStr = searchParams.get('token');
         let timeout: NodeJS.Timeout | null = null; 
         if (confetti) {
             setShowConfetti(true);
@@ -28,12 +41,26 @@ const AgreementSuccess: React.FC = () => {
                 setShowConfetti(false);
             }, 1400);
         }
+        if (tokenStr) {
+            setToken(tokenStr);
+        }
         return () => {
             if (timeout) {
                 clearTimeout(timeout);
             }
         }
     }, [searchParams]);
+
+    React.useEffect(() => {
+        if (token) {
+            contractHelper.getSignerSuccessInfo(token).then(data => {
+                setSenderName(data.data.senderName);
+                setSignerType(data.data.signerType);
+            }).catch(err => {
+                console.log(err);
+            });
+        }
+    }, [token, contractHelper]);
 
     return (
         <>
@@ -45,16 +72,16 @@ const AgreementSuccess: React.FC = () => {
                             <Image className='mb-4 w-[120px] sm:w-[150px] relative' style={{ right: 15 }} src='/static/logos/black.svg' alt='Ratify' />
                         </Center>
                         <div>
-                            <h4 className="text-2xl  font-bold">
-                                You've filled and signed the document
+                            <h4 className="text-2xl font-bold">
+                                {signerType.length > 0 ? `You have successfully ${signerType === 'signer' ? 'signed and filled' : 'approved'} the document.` : 'You have completed the document.'}
                             </h4>
-                            <p className=" text-muted">
-                                The sender will be notified and will receive the
-                                signed document
+                            <p className="text-center text-muted">
+                                Sender, {senderName} will be notified and will receive the
+                                {signerType === 'approver' ? ' approved' : ' signed'} document
                             </p>
                         </div>
                         <Group className='mt-3' position="center">
-                            <span>
+                            <span onClick={() => setShowDocumentCopy(true)}>
                                 <Button color="light">
                                     Get a Copy of Document
                                 </Button>
@@ -75,6 +102,25 @@ const AgreementSuccess: React.FC = () => {
             </SimpleGrid>
         </div>
         <Confetti gravity={0.1} width={width} numberOfPieces={showConfetti ? 200 : 0} height={height} />
+        <Modal
+            opened={showDocumentCopy}
+            onClose={() => setShowDocumentCopy(false)}
+            title={<p className='font-bold'>Document Copy</p>}
+            centered
+        >
+            <Center>
+                <div>
+                    <p className='text-lg'>The document is not yet complete. You will receive a copy of the document on your email once all the signers and approvers have completed the document.</p>
+                    <Group position='right'>
+                        <span onClick={() => setShowDocumentCopy(false)}>
+                            <Button>
+                                Ok
+                            </Button>
+                        </span>
+                    </Group>
+                </div>
+            </Center>
+        </Modal>
         </>
     );
 };
