@@ -1004,7 +1004,7 @@ const AgreementCreator: React.FC = () => {
                 opened={showSaveTemplate}
                 onClose={saveTemplateHandlers.close}
             >
-                {!templateSaved && <Stack>
+                {!templateSaved && <Stack spacing={'lg'}>
                     <TextInput value={templateName} onChange={(e) => {setTemplateProps(prev => ({
                         ...prev,
                         templateName: e.currentTarget.value

@@ -359,7 +359,7 @@ const SenderAgreement: React.FC = () => {
                         <Center>
                             {agreement && <Stack spacing={5}>
                                 <p className='text-xs text-muted'>Status</p>
-                                <Badge variant='filled' size='lg' color={getAgreementBadgeColorFromStatus(agreement.status)}>{getAgreementStatusText(agreement.status)} </Badge>
+                                <Badge variant='outline' size='lg' color={getAgreementBadgeColorFromStatus(agreement.status)}>{getAgreementStatusText(agreement.status)} </Badge>
                             </Stack>}
                         </Center>
                     </Grid.Col>
@@ -402,7 +402,7 @@ const SenderAgreement: React.FC = () => {
                                     {agreement && agreement.signed_before && <div className="flex items-center">
                                         <IoWarningOutline className='text-warning text-xl relative' style={{top: -1}} />
                                         <p className='ml-2'>
-                                            Document is required to be signed before <span className='text-rose-400'>{getFormatDateFromIso(agreement.signed_before)}</span>
+                                            Must be completed before <span className='text-rose-400'>{getFormatDateFromIso(agreement.signed_before)}</span>
                                         </p>
                                     </div>}
                                 </Stack>
@@ -688,7 +688,7 @@ const SenderAgreement: React.FC = () => {
                         </span>
                         <div className='text-center'>
                             <p className='text-lg'>Are you sure you want to withdraw this document?</p>
-                            <p className='text-muted'>Note: Withdrawing the document will notify signer(s) and approver(s) and they will no longer be able to view this document.</p>
+                            <p className='text-muted'>Note: Withdrawing the document will notify signer(s) and approver(s). They will no longer be able to view this document.</p>
                             <Textarea className='mt-4' placeholder='Message' value={withdrawMessage} onChange={val => setWithdrawMessage(val.target.value)} autosize minRows={3} label='Add a message for Signers and Approvers' />
                         </div>
                         <Group position='right' className='mt-3'>

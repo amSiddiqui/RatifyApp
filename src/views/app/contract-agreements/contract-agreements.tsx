@@ -313,7 +313,7 @@ const ContractAgreements: React.FC = () => {
                 centered
             >
                 <Stack className='text-center' style={{marginBottom: (28 + 16)}}>
-                    <h5 className='mb-0'>Create agreement from template</h5>
+                    <h5 className='mb-0'>Create document from template</h5>
                     <div className='mb-3'>
                         <h5>{selectedTemplate && selectedTemplate.name}</h5>
                         <p className='mb-0 text-gray-600'>{selectedTemplate && selectedTemplate.description}</p>

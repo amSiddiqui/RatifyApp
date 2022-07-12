@@ -41,7 +41,7 @@ const AgreementDashboard: React.FC = () => {
         { headerName: 'ID', field: 'id', width: 180, onCellClicked: (e) => {
             navigate( `/agreements/${e.data.id}`);
         }, cellClass: 'dashboard-title-cell' },
-        { headerName: 'Agreement title', field: 'title', width: 280, onCellClicked: (e) => {
+        { headerName: 'Document title', field: 'title', width: 280, onCellClicked: (e) => {
             navigate( `/agreements/${e.data.id}`);
         }, cellClass: 'dashboard-title-cell' },
         { headerName: 'Sent On', field: 'sent_on', cellRenderer: (params: ICellRendererParams) => {
@@ -52,7 +52,7 @@ const AgreementDashboard: React.FC = () => {
         }},
         { headerName: 'Sender', field: 'user_name' },
         { headerName: 'Status', width: 220, field: 'status', cellRenderer: (params: ICellRendererParams) => {
-            return <Badge color={getAgreementBadgeColorFromStatus(params.value)}>{getAgreementStatusText(params.value)} </Badge>
+            return <Badge variant='outline' color={getAgreementBadgeColorFromStatus(params.value)}>{getAgreementStatusText(params.value)} </Badge>
         }},
         { headerName: '', field: 'sent_on', cellRenderer: (params: ICellRendererParams) => {
             // 
@@ -184,7 +184,7 @@ const AgreementDashboard: React.FC = () => {
                         Cannot fetch data right now. Please try again later.    
                     </p>}
                     {!loading && !error && agreements.length === 0 && <p className='text-2xl text-center text-muted'>
-                        No agreements found. Please click on create new button to create a new agreement.
+                        Currently you do not have any documents. Please click on 'Create New' button to proceed.
                     </p>}
                     {!loading && !error && agreements.length > 0 && <div>
                         <Card>

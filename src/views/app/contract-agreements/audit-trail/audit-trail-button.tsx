@@ -1,6 +1,5 @@
 import { Group, Popover, Stack } from '@mantine/core';
 import React from 'react';
-import { MdInfoOutline, MdTimeline } from 'react-icons/md';
 import { getFormatDateFromIso } from '../../../../helpers/Utils';
 import { Agreement } from '../../../../types/ContractTypes';
 
@@ -14,7 +13,8 @@ const AuditTrailButton:React.FC<Prop> = ({ onAuditClick, agreement }) => {
 
     return <Stack>
         <Group spacing={10} className='cursor-pointer' onClick={onAuditClick}>
-            <MdTimeline className='text-lg' />
+            
+            <i className='simple-icon-speedometer text-lg'></i>
             <p className='underline text-blue-400'>Audit Trail</p>
         </Group>
         <Popover
@@ -26,8 +26,8 @@ const AuditTrailButton:React.FC<Prop> = ({ onAuditClick, agreement }) => {
             onClose={() => setShowInfo(false)}
             target={
             <Group spacing={10} onClick={() => setShowInfo(true)} className='cursor-pointer'>
-                <MdInfoOutline className='text-lg' />
-                <p className='underline text-blue-400'>Other Information</p>
+                <i className='simple-icon-info text-lg' />
+                <p className='underline text-blue-400'>Additional Info</p>
             </Group>
             }
         >
