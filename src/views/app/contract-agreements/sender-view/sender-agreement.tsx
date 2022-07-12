@@ -11,6 +11,8 @@ import {
     ScrollArea,
     Modal,
     Progress,
+    Badge,
+    Textarea,
 } from '@mantine/core';
 import { useDispatch, useSelector } from 'react-redux';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
@@ -24,7 +26,7 @@ import {
 } from '../../../../components/common/CustomBootstrap';
 import Breadcrumb from '../../../../containers/navs/Breadcrumb';
 import { Button, Card, CardBody } from 'reactstrap';
-import { generateSignerLabels, getFormatDateFromIso } from '../../../../helpers/Utils';
+import { generateSignerLabels, getAgreementBadgeColorFromStatus, getAgreementStatusText, getFormatDateFromIso } from '../../../../helpers/Utils';
 import { Document, Page } from 'react-pdf/dist/esm/entry.webpack5';
 import {
     HiChevronLeft,
@@ -83,6 +85,7 @@ const SenderAgreement: React.FC = () => {
     const [showAuditTrail, setShowAuditTrail] = React.useState(false);
     const [[overallProgress, overallTotalProgress], setOverallProgress] = React.useState<[number, number]>([0, 0]);
     const [progressSections, setProgressSections] = React.useState<{value: number, color: string}[]>([]);
+    const [withdrawMessage, setWithdrawMessage] = React.useState('');
 
     const onPreviousPage = () => {
         setPageNumber((prev) => {
@@ -352,7 +355,14 @@ const SenderAgreement: React.FC = () => {
                             <h1>{agreement && agreement.title}</h1>
                         </Center>
                     </Grid.Col>
-                    <Grid.Col span={GRID_SIDE}></Grid.Col>
+                    <Grid.Col span={GRID_SIDE}>
+                        <Center>
+                            {agreement && <Stack spacing={5}>
+                                <p className='text-xs text-muted'>Status</p>
+                                <Badge variant='filled' size='lg' color={getAgreementBadgeColorFromStatus(agreement.status)}>{getAgreementStatusText(agreement.status)} </Badge>
+                            </Stack>}
+                        </Center>
+                    </Grid.Col>
                 </Grid>
                 <Grid columns={GRID_TOTAL}>
                     <Grid.Col span={GRID_SIDE}></Grid.Col>
@@ -679,12 +689,13 @@ const SenderAgreement: React.FC = () => {
                         <div className='text-center'>
                             <p className='text-lg'>Are you sure you want to withdraw this document?</p>
                             <p className='text-muted'>Note: Withdrawing the document will notify signer(s) and approver(s) and they will no longer be able to view this document.</p>
+                            <Textarea className='mt-4' placeholder='Message' value={withdrawMessage} onChange={val => setWithdrawMessage(val.target.value)} autosize minRows={3} label='Add a message for Signers and Approvers' />
                         </div>
                         <Group position='right' className='mt-3'>
                             <span onClick={() => setShowConfirmWithdraw(false)}><Button color='light'>Cancel</Button></span>
                             <span onClick={() => {
                                 if (contractId) {
-                                    contractHelper.deleteAgreement(contractId).then(() => {
+                                    contractHelper.deleteAgreement(contractId, withdrawMessage).then(() => {
                                         setShowConfirmWithdraw(false);
                                         if (agreement) {
                                             toast.success(`${agreement.title} withdrawn!`);
@@ -698,7 +709,7 @@ const SenderAgreement: React.FC = () => {
                                         console.log(err);
                                     });   
                                 }
-                            }}><Button color='danger'>Delete</Button></span>
+                            }}><Button color='danger'>Withdraw</Button></span>
                         </Group>
                     </Stack>
                 </Center>

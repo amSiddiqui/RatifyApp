@@ -51,6 +51,8 @@ const errorTypeToText = (errorType: SignerErrorTypes) => {
             return 'Looks like the document was removed by the sender.';
         case 'EXPIRED':
             return 'Looks like the document has expired.';
+        case 'DECLINED':
+            return 'Looks like the document was declined by one of the signers or approvers.';
         case 'SEQUENCE':
             return 'Looks like the signer before you has not signed yet.';
         case 'UNAUTHORIZED':

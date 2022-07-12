@@ -239,3 +239,39 @@ export const generateSignerLabels = (order: number[], signers: Array<{uid: strin
     }
     return labels;
 }
+
+export const getAgreementBadgeColorFromStatus = (status: string) => {
+    switch(status) {
+        case 'sent':
+            return 'blue';
+        case 'error':
+            return 'red';
+        case 'completed':
+            return 'green';
+        case 'withdraw':
+            return 'orange';
+        case 'decline':
+            return 'red';
+        default:
+            return 'gray';
+    }
+}
+
+export const getAgreementStatusText = (status: string) => {
+    switch (status) {
+        case  'complete':
+            return 'Completed';
+        case 'sent':
+            return 'In Progress';
+        case 'error':
+            return 'Error';
+        case 'withdraw':
+            return 'Withdrawn';
+        case 'delete':
+            return 'Deleted';
+        case 'decline':
+            return 'Declined';
+        default:
+            return 'draft';
+    }
+}

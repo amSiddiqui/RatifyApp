@@ -25,12 +25,12 @@ export interface Agreement {
     documents: number[],
     created_at: string;
     updated_at: string;
+    status: string;
 }
 
 export interface AgreementRowData extends Agreement {
     user_name: string;
     signers: string[];
-    status: 'error' | 'completed' | 'sent' | 'draft';
 }
 
 export interface AgreementTemplate {
@@ -151,7 +151,7 @@ export type SignerInputElements = {
     data: InputField[];
 }
 
-export type SignerErrorTypes =  'DELETED' | 'EXPIRED' | 'SEQUENCE' | 'UNAUTHORIZED' | 'SERVER';
+export type SignerErrorTypes =  'DELETED' | 'EXPIRED' | 'SEQUENCE' | 'UNAUTHORIZED' | 'SERVER' | 'DECLINED';
 
 export type SignerComment = {
     id: number;

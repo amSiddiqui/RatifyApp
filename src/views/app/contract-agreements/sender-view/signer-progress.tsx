@@ -143,7 +143,7 @@ const SignerProgress: React.FC<Props> = ({ signer, contractHelper, onDocumentSen
             <SignerPopover
                 color={signer.color}
                 target={(<div
-                    style={{ width: 145 }}
+                    style={{ minWidth: 145 }}
                     className={classNames(
                         'px-3 py-3',
                         getBgColorLight(signer.color),

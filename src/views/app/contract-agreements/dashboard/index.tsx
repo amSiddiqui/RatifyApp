@@ -10,7 +10,7 @@ import {
 } from '../../../../components/common/CustomBootstrap';
 import Breadcrumb from '../../../../containers/navs/Breadcrumb';
 import { ContractHelper } from '../../../../helpers/ContractHelper';
-import { getFormatDateFromIso } from '../../../../helpers/Utils';
+import { getAgreementBadgeColorFromStatus, getAgreementStatusText, getFormatDateFromIso } from '../../../../helpers/Utils';
 import { AppDispatch } from '../../../../redux';
 import { AgreementRowData } from '../../../../types/ContractTypes';
 import { AgGridReact } from 'ag-grid-react';
@@ -19,41 +19,6 @@ import 'ag-grid-community/styles/ag-theme-material.css';
 import { AgGridEvent, ColDef, ColGroupDef, GridOptions, ICellRendererParams } from 'ag-grid-community';
 import { DateTime } from 'luxon';
 
-const getBadgeColorFromStatus = (status: string) => {
-    switch(status) {
-        case 'sent':
-            return 'blue';
-        case 'error':
-            return 'red';
-        case 'completed':
-            return 'green';
-        case 'withdraw':
-            return 'orange';
-        case 'decline':
-            return 'red';
-        default:
-            return 'gray';
-    }
-}
-
-const getStatusText = (status: string) => {
-    switch (status) {
-        case  'complete':
-            return 'Completed';
-        case 'sent':
-            return 'In Progress';
-        case 'error':
-            return 'Error';
-        case 'withdraw':
-            return 'Withdrawn';
-        case 'delete':
-            return 'Deleted';
-        case 'decline':
-            return 'Declined';
-        default:
-            return 'draft';
-    }
-}
 
 const AgreementDashboard: React.FC = () => {
 
@@ -73,10 +38,10 @@ const AgreementDashboard: React.FC = () => {
     const gridRef = React.useRef<AgGridReact>(null);
     
     const [columnDefs] = React.useState<(ColDef | ColGroupDef)[]>([
-        { headerName: 'Agreement ID', field: 'id', width: 170, onCellClicked: (e) => {
+        { headerName: 'ID', field: 'id', width: 180, onCellClicked: (e) => {
             navigate( `/agreements/${e.data.id}`);
         }, cellClass: 'dashboard-title-cell' },
-        { headerName: 'Agreement title', field: 'title', onCellClicked: (e) => {
+        { headerName: 'Agreement title', field: 'title', width: 280, onCellClicked: (e) => {
             navigate( `/agreements/${e.data.id}`);
         }, cellClass: 'dashboard-title-cell' },
         { headerName: 'Sent On', field: 'sent_on', cellRenderer: (params: ICellRendererParams) => {
@@ -86,8 +51,8 @@ const AgreementDashboard: React.FC = () => {
             return <div className='w-full h-full flex items-center' style={{ maxWidth: 220 }}><p>{params.value.join(', ')}</p></div>
         }},
         { headerName: 'Sender', field: 'user_name' },
-        { headerName: 'Status', field: 'status', cellRenderer: (params: ICellRendererParams) => {
-            return <Badge color={getBadgeColorFromStatus(params.value)}>{getStatusText(params.value)} </Badge>
+        { headerName: 'Status', width: 220, field: 'status', cellRenderer: (params: ICellRendererParams) => {
+            return <Badge color={getAgreementBadgeColorFromStatus(params.value)}>{getAgreementStatusText(params.value)} </Badge>
         }},
         { headerName: '', field: 'sent_on', cellRenderer: (params: ICellRendererParams) => {
             // 

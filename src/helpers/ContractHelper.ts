@@ -293,12 +293,14 @@ export class ContractHelper extends ApiHelper {
         return response.data;
     }
 
-    async deleteAgreement(id: string) {
+    async deleteAgreement(id: string, message?: string) {
         let token = await this.getToken();
         if (token === null) {
             throw new NoTokenError('No token');
         }
-        await axios.post(`/contracts/${id}/delete/`, {}, {
+        await axios.post(`/contracts/${id}/delete/`, {
+            message: message || '',
+        }, {
             headers: { Authorization: `Bearer ${token}` },
         });
     }
