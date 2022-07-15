@@ -644,7 +644,7 @@ const SenderAgreement: React.FC = () => {
                     </Grid.Col>
                 </Grid>
             </div>
-            <Grid className='mt-12 mb-12' columns={GRID_TOTAL}>
+            <Grid className='mt-4 mb-12' columns={GRID_TOTAL}>
                 <Grid.Col span={GRID_SIDE}></Grid.Col>
                 <Grid.Col span={GRID_CENTER}>
                     <Group position='left'>

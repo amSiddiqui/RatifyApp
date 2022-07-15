@@ -1,4 +1,4 @@
-import { Center, Collapse, Group, Loader, Modal, Progress, Stack, TextInput, Tooltip } from '@mantine/core';
+import { Center, Collapse, Group, Indicator, Loader, Modal, Popover, Progress, Stack, TextInput, Tooltip } from '@mantine/core';
 import classNames from 'classnames';
 import React from 'react';
 import { getFormatDateFromIso } from '../../../../helpers/Utils';
@@ -117,6 +117,7 @@ const SignerProgress: React.FC<Props> = ({ signer, contractHelper, onDocumentSen
     });
 
     const [collapsed, setCollapsed] = React.useState(false);
+    const [showDeclineMessage, setShowDeclineMessage] = React.useState(false);
 
     const { register, handleSubmit, formState: { errors } } = useForm({
         resolver: yupResolver(sendAgainSchema),
@@ -184,10 +185,31 @@ const SignerProgress: React.FC<Props> = ({ signer, contractHelper, onDocumentSen
                                     <p className='text-muted'>Last seen</p>
                                     <p>{getFormatDateFromIso(signer.last_seen)}</p>
                                 </div>}
-                                <div>
-                                    <p className='text-muted'>Status</p>
-                                    <p>{getSignerStatus(signer, signerProgress)}</p>
-                                </div>
+                                <Group position='apart'>
+                                    <div>
+                                        <p className='text-muted'>Status</p>
+                                        <p>{getSignerStatus(signer, signerProgress)}</p>
+                                    </div>
+                                    {signer.decline_message.length > 0 && <div className='flex items-end'>
+                                        <Popover
+                                            position='right'
+                                            placement='center'
+                                            opened={showDeclineMessage}
+                                            onClose={() => setShowDeclineMessage(false)}
+                                            withArrow withCloseButton
+                                            target={
+                                                <Indicator onClick={() => setShowDeclineMessage(true)} className='cursor-pointer' color='red'>
+                                                    <i className='simple-icon-speech' />
+                                                </Indicator>
+                                            }
+                                        >
+                                            <div style={{ maxWidth: 300 }}>
+                                                <p className='text-muted text-ms'>Message:</p>
+                                                <p>{signer.decline_message}</p>
+                                            </div>
+                                        </Popover>
+                                    </div>}
+                                </Group>
                                 {signerProgress && !signer.declined && <div className='w-full'>
                                     <Progress className='w-full h-2' value={signerProgress.total === 0 ? 100 : signerProgress.completed * 100 / signerProgress.total} />
                                     <Group position='apart' className='text-gray-600'>

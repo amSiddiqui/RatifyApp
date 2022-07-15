@@ -62,6 +62,7 @@ export interface Signer {
     deleted: boolean;
     status: 'completed' | 'error' | 'sent';
     agreement: number;
+    decline_message: string;
     signed: boolean;
     signed_on: string | null;
     updated_at: string;
