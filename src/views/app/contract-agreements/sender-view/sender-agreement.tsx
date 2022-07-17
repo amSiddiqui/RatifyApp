@@ -10,7 +10,6 @@ import {
     Skeleton,
     ScrollArea,
     Modal,
-    Progress,
     Badge,
     Textarea,
 } from '@mantine/core';
@@ -18,7 +17,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { ContractHelper } from '../../../../helpers/ContractHelper';
 import { AppDispatch, RootState } from '../../../../redux';
-import { Agreement, InputField, Signer, SignerProgressType } from '../../../../types/ContractTypes';
+import { Agreement, AgreementProgressSectionType, InputField, Signer } from '../../../../types/ContractTypes';
 import { Row } from 'reactstrap';
 import {
     Colxx,
@@ -43,6 +42,7 @@ import SignerProgress from './signer-progress';
 import AuditTrail from '../audit-trail';
 import { IoWarningOutline } from 'react-icons/io5';
 import AuditTrailButton from '../audit-trail/audit-trail-button';
+import AgreementProgressBar from './agreement-progress-bar';
 
 const GRID_TOTAL = 20;
 const GRID_SIDE = 3;
@@ -66,7 +66,6 @@ const SenderAgreement: React.FC = () => {
     const [agreement, setAgreement] = React.useState<Agreement | null>(null);
     const [signers, setSigners] = React.useState<Signer[]>([]);
     const [labels, setLabels] = React.useState<{uid: string, label: string}[]>([]);
-    const [signerProgress, setSignerProgress] = React.useState<SignerProgressType>();
     const [inputElements, setInputElements] = React.useState<InputField[]>([]);
 
     const [pdf, setPdf] = React.useState('');
@@ -83,8 +82,7 @@ const SenderAgreement: React.FC = () => {
     const [showConfirmWithdraw, setShowConfirmWithdraw] = React.useState(false);
     const inputRef = React.useRef<HTMLInputElement>(null);
     const [showAuditTrail, setShowAuditTrail] = React.useState(false);
-    const [[overallProgress, overallTotalProgress], setOverallProgress] = React.useState<[number, number]>([0, 0]);
-    const [progressSections, setProgressSections] = React.useState<{value: number, color: string}[]>([]);
+    const [progressSections, setProgressSections] = React.useState<AgreementProgressSectionType[]>([]);
     const [withdrawMessage, setWithdrawMessage] = React.useState('');
 
     const onPreviousPage = () => {
@@ -157,6 +155,10 @@ const SenderAgreement: React.FC = () => {
         });
     }
 
+    const getSections = React.useCallback((sections: AgreementProgressSectionType[]) => {
+        setProgressSections(sections);
+    }, []);
+
     React.useEffect(() => {
         if (contractId) {
             contractHelper
@@ -217,53 +219,6 @@ const SenderAgreement: React.FC = () => {
                     );
                     setLabels(generateSignerLabels([], data.signers.map((s) => ({ uid: s.id.toString(), type: s.type, step: s.step })), true));
                     setInputElements(data.input_fields);
-
-                    contractHelper.getSignerSenderProgress(contractId).then((dt) => {
-                        setSignerProgress(dt);
-                        let tp = 0;
-                        let p = 0;
-                        let sections: {value: number, color: string}[] = [];
-                        let total = data.signers.filter((s) => s.type !== 'signer').length;
-                        total += Object.values(dt).reduce((acc, val) => acc + val.total, 0);
-                        data.signers.forEach((s) => {                            
-                            if (s.type === 'signer') {
-                                if (s.declined) {
-                                    sections.push({value: 100 * dt[s.id].total / total, color: 'red' });
-                                } else {
-                                    sections.push({value: 100 * dt[s.id].completed / total, color: s.color === 'green' ? 'teal' : 'green' });
-                                }
-                                return;
-                            }
-                            tp += 1;
-                            if (s.type === 'viewer') {
-                                if (s.last_seen) {
-                                    p += 1;
-                                    sections.push({ value: 100 / total, color: 'green' });
-                                }
-                                return;
-                            }
-                            if (s.type === 'approver') {
-                                if (s.declined || s.approved) {
-                                    p += 1;
-                                }
-                                if (s.declined) {
-                                    sections.push({ value: 100 / total, color: 'red' });
-                                }
-                                if (s.approved) {
-                                    sections.push({ value: 100 / total, color: 'green' });
-                                }
-                            }
-                        });
-                        Object.values(dt).forEach(val => {
-                            tp += val.total;
-                            p += val.completed;
-                        });
-                        setOverallProgress([p, tp]);
-                        setProgressSections(sections);
-                        
-                    }).catch(err => {
-                        console.log(err);
-                    });
                 })
                 .catch((err) => {
                     // check if error is 404
@@ -390,14 +345,7 @@ const SenderAgreement: React.FC = () => {
                             <div>
                                 <Stack>
                                     <Group position='right'>
-                                        <div>
-                                            <Progress style={{ width: 300 }} className='h-3' sections={progressSections}/>
-                                            <Group style={{ width: 300 }} position='apart'>
-                                                <p className='text-muted text-xs'>Actions completed:</p>
-                                                <p className='text-muted text-xs'>{overallProgress}/{overallTotalProgress}</p>
-                                            </Group>
-                                        </div>
-
+                                        <AgreementProgressBar contractHelper={contractHelper} contractId={contractId} getSections={getSections} />
                                     </Group>
                                     {agreement && agreement.signed_before && <div className="flex items-center">
                                         <IoWarningOutline className='text-warning text-xl relative' style={{top: -1}} />
@@ -433,6 +381,12 @@ const SenderAgreement: React.FC = () => {
                                 <ScrollArea style={{ height: 850 }}>
                                     <Stack spacing="xl" className="px-3">
                                         {signers.map((signer) => {
+                                            let signerProgress = null;
+                                            // find signer in sections
+                                            let signerSection = progressSections.find(sec => sec.id === signer.id);
+                                            if (signerSection) {
+                                                signerProgress = { total: signerSection.total, completed: signerSection.completed };
+                                            }
                                             return (
                                                 <SignerProgress
                                                     label={function() {
@@ -443,7 +397,7 @@ const SenderAgreement: React.FC = () => {
                                                             return '';
                                                         }
                                                     }()}
-                                                    signerProgress={signerProgress ? signerProgress[signer.id] : null}
+                                                    signerProgress={signerProgress}
                                                     onDocumentSent={setSignerDocumentSuccess}
                                                     contractHelper={contractHelper}
                                                     key={signer.id}

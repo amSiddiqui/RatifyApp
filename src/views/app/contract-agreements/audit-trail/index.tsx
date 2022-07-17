@@ -8,12 +8,6 @@ import { BiUndo } from 'react-icons/bi';
 import { TbWritingSign } from 'react-icons/tb';
 import { DateTime } from 'luxon';
 
-type Props = {
-    contractHelper: ContractHelper;
-    contractId?: string;
-    token?: string;
-}
-
 function timelineColorFromType(type: AuditTrailActionType) {
     switch (type) {
         case 'create':
@@ -128,7 +122,14 @@ function timelineDate(date: string) {
     return DateTime.fromISO(date).toLocaleString(DateTime.DATETIME_FULL);
 }
 
-const AuditTrail:React.FC<Props> = ({ contractHelper, contractId, token }) => {
+type Props = {
+    contractHelper: ContractHelper;
+    contractId?: string;
+    token?: string;
+    height?: string;
+}
+
+const AuditTrail:React.FC<Props> = ({ contractHelper, contractId, token, height }) => {
 
     const [auditTrail, setAuditTrail] = React.useState<AuditTrailData[]>([]);
     const [loading, setLoading] = React.useState(true);
@@ -168,7 +169,7 @@ const AuditTrail:React.FC<Props> = ({ contractHelper, contractId, token }) => {
         {loading && <Center className='w-full h-36'>
             <Loader size='lg' />    
         </Center>}
-        {!loading && !error && <ScrollArea style={{ height: 500 }}>
+        {!loading && !error && <ScrollArea offsetScrollbars style={{ height: height ? height : 500 }}>
             <Timeline active={auditTrail.length} bulletSize={24} lineWidth={2}>
                 {auditTrail.map((item, index) => {
                     return (

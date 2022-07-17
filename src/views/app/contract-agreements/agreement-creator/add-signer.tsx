@@ -102,7 +102,7 @@ const SignerRow:React.FC<SignerRowProps> = ({ index, color, step, onDragEnd, onD
                             <Stack spacing={2}>
                                 <p className='mb-0 text-center'>Step {step}</p>
                                 <Center className='text-2xl'>
-                                    <AiOutlineDrag />
+                                    <Tooltip position='bottom' label='Move up and down'><AiOutlineDrag /></Tooltip>
                                 </Center>
                             </Stack>
                         </div>
@@ -340,7 +340,9 @@ const AddSigner:React.FC<AddSignerProps> = ({ onConfirmAddSigner, onCancelAddSig
             ))}
         </div>
         <Divider className='my-3' />
-        <p className='text-right text-xs italic'>Drag and drop to change the sequence of workflow steps</p>
+        <Group position='right'>
+            <div className='text-right flex flex-row text-sm'><span>Drag</span><span className='mx-2 relative text-lg' style={{ top: 1 }}><AiOutlineDrag /></span><span>up and down to change the sequence of workflow steps</span></div>
+        </Group>
         <Group>
             <Button onClick={() => onAddSigner('signer')} className='flex justify-center items-center' >
                 <i className="mr-2">

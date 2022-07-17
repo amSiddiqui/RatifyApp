@@ -25,6 +25,7 @@ import { MdPendingActions } from 'react-icons/md';
 import { IoWarningOutline } from 'react-icons/io5';
 import AuditTrail from '../audit-trail';
 import AuditTrailButton from '../audit-trail/audit-trail-button';
+import AgreementProgressBar from '../sender-view/agreement-progress-bar';
 
 
 const GRID_TOTAL = 16;
@@ -114,7 +115,6 @@ const AgreementSign: React.FC = () => {
     const [completedFields, setCompletedFields] = React.useState(0);
     const [shouldUpdate, setShouldUpdate] = React.useState(false);
     const [showAuditTrail, setShowAuditTrail] = React.useState(false);
-    const [{ totalProgress, completedProgress }, setProgress] = React.useState({ totalProgress: 0, completedProgress: 0 });
     const [showDecline, setShowDecline] = React.useState(false);
     const [declineMessage, setDeclineMessage] = React.useState('');
 
@@ -316,14 +316,6 @@ const AgreementSign: React.FC = () => {
             console.log(err);
         });
 
-        contractHelper.getSignerProgress(token).then(data => {
-            if (data.valid) {
-                setProgress({ totalProgress: data.data.totalProgress, completedProgress: data.data.completedProgress });
-            }
-        }).catch(err => {
-            console.log(err);
-        });
-
     }, [token, tokenValid, contractHelper]);
 
     React.useEffect(() => {
@@ -411,13 +403,7 @@ const AgreementSign: React.FC = () => {
                             }
                             {basicInfo && basicInfo.signerType !== 'signer' && 
                             <Group position='right'>
-                                <div>
-                                    <Progress style={{ width: 300 }} className='h-3' value={totalProgress === 0 ? 0: completedProgress * 100 / totalProgress} color='green'/>
-                                    <Group style={{ width: 300 }} position='apart'>
-                                        <p className='text-muted text-xs'>Actions completed:</p>
-                                        <p className='text-muted text-xs'>{completedProgress} of {totalProgress}</p>
-                                    </Group>
-                                </div>
+                                <AgreementProgressBar contractHelper={contractHelper} token={token} />
                             </Group>
                             }
                             {agreement && agreement.signed_before && 

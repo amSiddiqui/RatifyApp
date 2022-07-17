@@ -4,19 +4,20 @@ import { NoTokenError } from '../types/ErrorTypes';
 import axios from './axiosInstance';
 import {
     Agreement,
+    AgreementProgressType,
     AgreementRowData,
     AgreementTemplate,
     AuditTrailData,
     ContractCreateResponseType,
     DocumentsResponseType,
     GetAgreementResponse,
+    Signer,
     SignerAgreementData,
     SignerComment,
     SignerErrorTypes,
     SignerInputElements,
     SignerPdfResponse,
     SignerPdfThumbnails,
-    SignerProgressType,
     SyncSignerResponse,
 } from '../types/ContractTypes';
 import { BaseResponse } from '../types/AuthTypes';
@@ -193,6 +194,16 @@ export class ContractHelper extends ApiHelper {
             `/contracts/${contract_id}/inputs/`,
             { input_fields },
             { headers: { Authorization: `Bearer ${token}` } },
+        );
+        return response.data;
+    }
+
+    async getSigners(
+        contract_id: string
+    ) {
+        let response: AxiosResponse<{'signers': Signer[]}> = await axios.get(
+            `/contracts/${contract_id}/signers/`,
+            { headers: { Authorization: `Bearer ${await this.getToken()}` } },
         );
         return response.data;
     }
@@ -452,11 +463,7 @@ export class ContractHelper extends ApiHelper {
     }
 
     async getSignerProgress(token: string) {
-        let response: AxiosResponse<{ status: 'success' | 'error', valid: boolean, data: {
-            totalProgress: number,
-            completedProgress: number,
-            completed: boolean
-        }}> = await axios.get(
+        let response: AxiosResponse<AgreementProgressType> = await axios.get(
             `contracts/signer/progress/?token=${token}`,
         );
         return response.data;
@@ -471,7 +478,7 @@ export class ContractHelper extends ApiHelper {
     }
 
     async getSignerSenderProgress(id: string) {
-        let response: AxiosResponse<SignerProgressType> = await axios.get(
+        let response: AxiosResponse<AgreementProgressType> = await axios.get(
             `contracts/${id}/signers/progress/`,
             { headers: { Authorization: `Bearer ${await this.getToken()}` } },
         );

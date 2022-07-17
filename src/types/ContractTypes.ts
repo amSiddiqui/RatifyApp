@@ -73,9 +73,6 @@ export interface SyncSignerResponse {
     ids: {[uid: string]: number};
 }
 
-export type SignerProgressType = {
-    [id: number]: {completed: number, total: number}
-}
 
 export interface SingerElementStyleProps {
     step: number;
@@ -186,3 +183,18 @@ export interface AuditTrailData {
     signer_type: string | null;
     signer_email: string | null;
 }
+
+export type AgreementProgressSectionType = {
+    value: number; 
+    color: string; 
+    id: number; 
+    total: number; 
+    completed: number;
+}
+
+export type AgreementProgressType = {
+    total: number;
+    progress: number;
+    sections: AgreementProgressSectionType[];
+};
+

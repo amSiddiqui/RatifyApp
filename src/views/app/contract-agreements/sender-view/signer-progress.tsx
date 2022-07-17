@@ -22,7 +22,7 @@ type Props = {
     label: string;
 };
 
-const getSignerStatus = (signer:Signer, signerProgress: {total: number, completed: number} | null) => {
+export const getSignerStatus = (signer:Signer, signerProgress: {total: number, completed: number} | null) => {
     if (signer.status === 'error') {
         return 'Error Sending';
     }
@@ -58,18 +58,18 @@ const getSignerStatus = (signer:Signer, signerProgress: {total: number, complete
 }
 
 
-const getSignerStatusAndIcon = (signer: Signer) => {
+export const getSignerStatusAndIcon = (signer: Signer, size?: string) => {
     if (signer.status === 'error') {
         return {
             status: 'Document could not be sent',
-            icon: <MdError className='text-danger text-2xl' /> ,
+            icon: <MdError className={classNames('text-danger', { 'text-2xl' : !size, 'text-lg': size === 'sm' })} /> ,
         } 
     }
     if (signer.type === 'viewer') {
         if (signer.last_seen) {
             return {
                 status: signer.name + ' viewed the document',
-                icon: <div className='text-white rounded-full bg-blue-500' style={{padding: 2}}><MdSearch className='text-lg' /></div>,
+                icon: <div className='text-white rounded-full bg-blue-500' style={{padding: size === 'sm' ? 1 : 2}}><MdSearch className={size === 'sm' ? 'text-xs' : 'text-lg'} /></div>,
             }
         }
     }
@@ -77,14 +77,14 @@ const getSignerStatusAndIcon = (signer: Signer) => {
         const action = signer.type === 'approver' ? 'approver' : 'sign';
         return {
             status: signer.name + ' declined to ' + action + ' the document' ,
-            icon: <div className='text-white rounded-full bg-red-500' style={{padding: 2}}><MdClear className='text-lg' /></div>,
+            icon: <div className='text-white rounded-full bg-red-500' style={{padding: size === 'sm' ? 1 : 2}}><MdClear className={size === 'sm' ? 'text-xs' : 'text-lg'} /></div>,
         }
     }
 
     if (signer.type === 'approver') {
         if (signer.approved) {
             return {
-                icon: <div className='text-white rounded-full bg-success' style={{padding: 2}}><MdCheck className='text-lg' /></div>,
+                icon: <div className='text-white rounded-full bg-success' style={{padding: size === 'sm' ? 1 : 2}}><MdCheck className={size === 'sm' ? 'text-xs' : 'text-lg'} /></div>,
                 status: signer.name + ' approved the document',
             }
         }
@@ -93,15 +93,22 @@ const getSignerStatusAndIcon = (signer: Signer) => {
     if (signer.type === 'signer') {
         if (signer.status === 'completed') {
             return {
-                icon: <div className='text-white rounded-full bg-success' style={{padding: 2}}><MdCheck className='text-lg' /></div>,
+                icon: <div className='text-white rounded-full bg-success' style={{padding: size === 'sm' ? 1 : 2}}><MdCheck className={size === 'sm' ? 'text-xs' : 'text-lg'} /></div>,
                 status: signer.name + ' signed the document',
             }
         }
     }
     
-    return {
-        status: '',
-        icon: null,
+    if (size) {
+        return {
+            status: 'No Action Taken.',
+            icon: <div style={{ padding: size === 'sm' ? 6 : 10, border: size === 'sm' ? '1px solid blue' : '2px solid blue', top: -1 }} className='rounded-full relative'></div>,
+        }
+    } else {
+        return {
+            status: '',
+            icon: null
+        }
     }
 }
 

@@ -1,4 +1,4 @@
-import { Center, Grid, Loader, Badge, Stack, Group, Popover, Checkbox, Tooltip } from '@mantine/core';
+import { Center, Grid, Loader, Badge, Stack, Group, Popover, Checkbox, Tooltip, Modal, List } from '@mantine/core';
 import React from 'react';
 import { useDispatch } from 'react-redux';
 import { useNavigate, useLocation, NavigateFunction } from 'react-router-dom';
@@ -12,7 +12,7 @@ import Breadcrumb from '../../../../containers/navs/Breadcrumb';
 import { ContractHelper } from '../../../../helpers/ContractHelper';
 import { getAgreementBadgeColorFromStatus, getAgreementStatusText, getFormatDateFromIso } from '../../../../helpers/Utils';
 import { AppDispatch } from '../../../../redux';
-import { AgreementRowData } from '../../../../types/ContractTypes';
+import { AgreementRowData, Signer } from '../../../../types/ContractTypes';
 import { AgGridReact } from 'ag-grid-react';
 import 'ag-grid-community/styles/ag-grid.css'; 
 import 'ag-grid-community/styles/ag-theme-material.css';
@@ -21,6 +21,9 @@ import { DateTime } from 'luxon';
 import { useHover, useLocalStorage } from '@mantine/hooks';
 import classNames from 'classnames';
 import { MdClose } from 'react-icons/md';
+import AuditTrail from '../audit-trail';
+import { getSignerStatusAndIcon } from '../sender-view/signer-progress';
+import AgreementProgressBar from '../sender-view/agreement-progress-bar';
 
 const AllColumns = [
     'ID',
@@ -32,7 +35,7 @@ const AllColumns = [
     'Actions'
 ]
 
-const columnBuilder = (columns: boolean[], navigate: NavigateFunction):(ColDef | ColGroupDef)[] => {
+const columnBuilder = (columns: boolean[], navigate: NavigateFunction, onMoreDetailsClicked: (id: number) => void):(ColDef | ColGroupDef)[] => {
     const columnDefs:(ColDef | ColGroupDef)[] = [];
     if (columns.length > 0 && columns[0]) {
         columnDefs.push({ headerName: 'ID', field: 'id', width: 180, onCellClicked: (e) => {
@@ -99,7 +102,7 @@ const columnBuilder = (columns: boolean[], navigate: NavigateFunction):(ColDef |
                             <p className='m-0 text-sm'>{ lessThanADay ? diff.hours.toFixed(0) : diff.days.toFixed(0) }</p>
                             <p className='m-0 text-sm'>{ lessThanADay ? 'Hours' : 'Days' }</p>
                         </div>}</Center>
-                        <Center><i className={classNames('text-xl cursor-pointer', 'iconsminds-arrow-inside')} /></Center>
+                        {params.data.status !== 'draft' && <Center><Tooltip label='Details'><i onClick={() => onMoreDetailsClicked(params.data.id)} className={classNames('text-xl cursor-pointer', 'iconsminds-arrow-inside')} /></Tooltip></Center>}
                     </Group>
                 </Center>
         
@@ -127,17 +130,35 @@ const AgreementDashboard: React.FC = () => {
     );
 
     const [showColumnSettings, setShowColumnSettings] = React.useState(false);
+    const [moreDetailModal, setMoreDetailModal] = React.useState(false);
+    const [moreDetailsAgreement, setMoreDetailsAgreement] = React.useState<AgreementRowData>();
 
     const { hovered: tile1Hovered, ref: tile1Ref } = useHover();
     const { hovered: tile2Hovered, ref: tile2Ref } = useHover();
     const { hovered: tile3Hovered, ref: tile3Ref } = useHover();
+
+    const onShowDetailClick = React.useCallback((id: number) => {
+        const ag = agreements.find(a => a.id === id);
+        setMoreDetailsAgreement(ag);
+        if (ag) {
+            contractHelper.getSigners(ag.id.toString()).then(data => {
+                setSigners(data.signers);
+            }).catch(err => {
+                toast.error('Error fetching document data. Please try again later.');
+                setSigners([]);
+            });
+        }
+        setMoreDetailModal(true);
+    }, [agreements, contractHelper]);
 
 
     const gridRef = React.useRef<AgGridReact>(null);
 
     const [showColumns, setShowColumns] = useLocalStorage<boolean[]>({key: 'agreement-table-columns', defaultValue: Array(7).fill(true)});
     
-    const [columnDefs, setColumnDef] = React.useState<(ColDef | ColGroupDef)[]>(columnBuilder(showColumns, navigate));
+    const [columnDefs, setColumnDef] = React.useState<(ColDef | ColGroupDef)[]>([]);
+
+    const [signers, setSigners] = React.useState<Signer[]>([]);
 
     const gridOptions = React.useMemo<GridOptions>(() => {
         return {
@@ -168,7 +189,6 @@ const AgreementDashboard: React.FC = () => {
         return true;
     };
 
-
     const defaultColDef = React.useMemo(() => ({
         sortable: true,
         filter: true,
@@ -178,7 +198,7 @@ const AgreementDashboard: React.FC = () => {
 
     React.useEffect(() => {
         contractHelper.getAllAgreements().then(data => {
-            setAgreements(data);
+            setAgreements(data);            
             setLoading(false);
         }).catch(err => {
             console.log(err);
@@ -188,6 +208,10 @@ const AgreementDashboard: React.FC = () => {
         });
     }, [contractHelper]);
 
+
+    React.useEffect(() => {
+        setColumnDef(columnBuilder(showColumns, navigate, onShowDetailClick));
+    }, [showColumns, navigate, onShowDetailClick]);
 
     return (
         <>
@@ -278,7 +302,6 @@ const AgreementDashboard: React.FC = () => {
                                 </CardBody>
                             </Card>
                         </Center>
-                        
                     </div>
                 </Grid.Col>
             </Grid>            
@@ -329,7 +352,7 @@ const AgreementDashboard: React.FC = () => {
                                             <Checkbox key={index} size='sm' checked={showColumns[index]} disabled={index === 6} onChange={index  === 6 ? undefined : (event) => setShowColumns(prev => {
                                                 const newCols = [...prev];
                                                 newCols[index] = event.currentTarget.checked;
-                                                setColumnDef(columnBuilder(newCols, navigate));                                                
+                                                setColumnDef(columnBuilder(newCols, navigate, onShowDetailClick));                                                
                                                 gridRef.current!.api.redrawRows();
                                                 return newCols;
                                             })} label={col} />
@@ -363,6 +386,103 @@ const AgreementDashboard: React.FC = () => {
                     </div>}
                 </CardBody>
             </Card>
+            <Modal
+                opened={moreDetailModal}
+                onClose={() => setMoreDetailModal(false)}
+                centered
+                size='xl'
+                title={<p className='text-lg font-bold'>{!!moreDetailsAgreement ? moreDetailsAgreement.title : 'Details'}</p>}
+            >
+                <Grid style={{ height: '80vh' }}>
+                    <Grid.Col sm={6} className='border-r-2 border-gray-200'>
+                        <div className='px-2'>
+                            {moreDetailsAgreement &&  <AuditTrail height={'75vh'} contractHelper={contractHelper} contractId={moreDetailsAgreement.id.toString()} />}
+                        </div>
+                    </Grid.Col>
+                    <Grid.Col sm={6}>
+                        <div className='px-2 flex flex-col h-full'>
+                            <div className='flex-grow'>
+                                {moreDetailsAgreement && <Stack spacing='xl'>
+                                    <Group>
+                                        <p style={{ width: 100 }} className='text-muted'>Status</p>
+                                        <Badge variant='outline' color={getAgreementBadgeColorFromStatus(moreDetailsAgreement.status)}>{getAgreementStatusText(moreDetailsAgreement.status)} </Badge>
+                                    </Group>
+                                    {signers.filter(s => s.type === 'signer').length > 0 && <Group align={'start'}>
+                                        <p style={{ width: 100 }} className='text-muted'>Signers</p>
+                                        <div>
+                                            <List>
+                                                {signers.filter(s => s.type === 'signer').map((s) => {
+                                                    const {status, icon} = getSignerStatusAndIcon(s, 'sm');
+                                                    return <List.Item icon={
+                                                    <Tooltip label={status}>
+                                                        {icon}
+                                                    </Tooltip>} key={s.id}>
+                                                        <p>{s.name}</p>
+                                                    </List.Item>
+                                                })}
+                                            </List>
+                                        </div>
+                                    </Group>}
+                                    {signers.filter(s => s.type === 'approver').length > 0 && <Group align='start'>
+                                        <p style={{ width: 100 }} className='text-muted'>Approvers</p>
+                                        <div>
+                                            <List>
+                                                {signers.filter(s => s.type === 'approver').map((s) => {
+                                                    const {status, icon} = getSignerStatusAndIcon(s, 'sm');
+                                                    return <List.Item icon={
+                                                    <Tooltip label={status}>
+                                                        {icon}
+                                                    </Tooltip>} key={s.id}>
+                                                        <p>{s.name}</p>
+                                                    </List.Item>
+                                                })}
+                                            </List>
+                                        </div>
+                                    </Group>}
+                                    {signers.filter(s => s.type === 'viewer').length > 0 &&  <Group align={'start'}>
+                                        <p style={{ width: 100 }} className='text-muted'>Viewers</p>
+                                        <div>
+                                            <List>
+                                                {signers.filter(s => s.type === 'viewer').map((s) => {
+                                                    const {status, icon} = getSignerStatusAndIcon(s, 'sm');
+                                                    return <List.Item icon={
+                                                    <Tooltip label={status}>
+                                                        {icon}
+                                                    </Tooltip>} key={s.id}>
+                                                        <p>{s.name}</p>
+                                                    </List.Item>
+                                                })}
+                                            </List>
+                                        </div>
+                                    </Group>}
+                                    <AgreementProgressBar contractHelper={contractHelper} contractId={moreDetailsAgreement.id.toString()}  />
+                                    {moreDetailsAgreement.sequence && <Group>
+                                        <i className='text-success simple-icon-check' />
+                                        <p>Approval (where applicable) and signing will be completed in a sequence.</p>
+                                    </Group>}
+                                    {moreDetailsAgreement.signed_before && <Group>
+                                        <i className='text-primary simple-icon-calendar'></i>
+                                        <p>Must be signed before: <span className='text-rose-500'>{getFormatDateFromIso(moreDetailsAgreement.signed_before)}</span></p>
+                                    </Group>}
+                                    {moreDetailsAgreement.start_date && <Group>
+                                        <i className='text-primary simple-icon-calendar'></i>
+                                        <p>Document start date: <span className='text-rose-500'>{getFormatDateFromIso(moreDetailsAgreement.start_date)}</span></p>
+                                    </Group>}
+                                    {moreDetailsAgreement.end_date && <Group>
+                                        <i className='text-primary simple-icon-calendar'></i>
+                                        <p>Document end date: <span className='text-rose-500'>{getFormatDateFromIso(moreDetailsAgreement.end_date)}</span></p>
+                                    </Group>}
+                                </Stack>}
+                            </div>
+                            <Group position='right'>
+                                {moreDetailsAgreement && <span onClick={() => {
+                                    navigate(`/agreements/${moreDetailsAgreement.id}`);
+                                }}><Button color='primary'>Open</Button></span>}
+                            </Group>
+                        </div>
+                    </Grid.Col>
+                </Grid>
+            </Modal>
         </>
     );
 };
