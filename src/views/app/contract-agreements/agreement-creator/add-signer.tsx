@@ -44,6 +44,7 @@ const SignerRow:React.FC<SignerRowProps> = ({ index, color, step, onDragEnd, onD
     const [text_field, setTextField] = React.useState(signerData.text_field ? signerData.text_field : false);
     const [every, setEvery] = React.useState(signerData.every ? signerData.every : 1);
     const [every_unit, setEveryUnit] = React.useState<'days' | 'weeks' | 'months' | 'years' | '0' | string>(signerData.every_unit ? signerData.every_unit : 'months');
+    const [dragging, setDragging] = React.useState(false);
 
     React.useEffect(() => {
         onDataChange(i, {
@@ -98,11 +99,17 @@ const SignerRow:React.FC<SignerRowProps> = ({ index, color, step, onDragEnd, onD
                         ]} defaultValue={'days'} />
                     </Group>}
                     <Center className='h-full' style={{width: 75}}>
-                        <div onMouseDown={onDragStart} onMouseUp={onDragEnd} className='dragger cursor-pointer' style={{width: '70%'}}>
+                        <div onMouseDown={() => {
+                            onDragStart();
+                            setDragging(true);
+                        }} onMouseUp={() => {
+                            setDragging(false);
+                            onDragEnd();
+                        }} className='dragger cursor-pointer' style={{width: '70%'}}>
                             <Stack spacing={2}>
                                 <p className='mb-0 text-center'>Step {step}</p>
                                 <Center className='text-2xl'>
-                                    <Tooltip position='bottom' label='Move up and down'><AiOutlineDrag /></Tooltip>
+                                    <Tooltip disabled={dragging}  position='bottom' label='Move up and down'><AiOutlineDrag /></Tooltip>
                                 </Center>
                             </Stack>
                         </div>

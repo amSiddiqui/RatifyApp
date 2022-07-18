@@ -8,7 +8,7 @@ import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import './contract-agreements.css';
 import CATopBar from './topbar';
 import DocumentCarousel from './document_carousel';
-import { Modal, Progress, Divider, Tooltip, Group, Center, Stack, Collapse, TextInput } from '@mantine/core';
+import { Modal, Progress, Divider, Group, Center, Stack, TextInput, Select } from '@mantine/core';
 import { ContractHelper } from '../../../helpers/ContractHelper';
 import { AppDispatch, RootState } from '../../../redux';
 import { useDispatch, useSelector } from 'react-redux';
@@ -45,12 +45,11 @@ const ContractAgreements: React.FC = () => {
     const [templateCategories, setTemplateCategories] = React.useState<string[]>([]);
     const [selectedTemplate, setSelectedTemplate] = React.useState<AgreementTemplate | null>(null);
     const [openTemplateConfirm, templateConfirmHandlers] = useDisclosure(false);
-    const [openedTemplates, handlersTemplates] = useDisclosure(true);
     const [searchTerm, setSearchTerm] = React.useState('');
     const auth = useSelector((root: RootState) => root.auth);
     const [organization, setOrganization] = React.useState<OrganizationNameResponse>();
     const [showUnverifiedModal, setShowUnverifiedModal] = React.useState(false);
-    
+    const [selectedCategory, setSelectedCategory] = React.useState('');
 
     const uploadProgress = React.useCallback((progressEvent: any) => {
         setProgress(progressEvent.loaded / progressEvent.total);
@@ -174,59 +173,65 @@ const ContractAgreements: React.FC = () => {
                 labelPosition="center"
             />
             
-
-            <Group position='apart' className="mb-2 cursor-pointer">
-                <Group onClick={() => {handlersTemplates.toggle()}}  spacing={'xs'}>
-                    <span className='relative' style={{top: '-3px'}}> {!openedTemplates && <i className="simple-icon-arrow-right"></i>} {openedTemplates && <i className="simple-icon-arrow-down"></i>} </span>
+            <Stack>
+                <Group position='apart' className="mb-2 cursor-pointer">
                     <h1 className="text-2xl mb-0">Select from saved templates</h1>
+                    <Group>
+                        {templates.length === 0 && (
+                            <p>No templates found</p>
+                        )}
+                        {templates.length > 0 && (
+                            <p>
+                                {templates.filter(d => d.name.toLowerCase().search(searchTerm.toLocaleLowerCase()) !== -1).length}{' '}
+                                {templates.filter(d => d.name.toLowerCase().search(searchTerm.toLocaleLowerCase()) !== -1).length > 1
+                                    ? 'templates'
+                                    : 'template'}{' '}
+                                found
+                            </p>
+                        )}
+                        <TextInput value={searchTerm} onChange={(event) => {
+                            setSearchTerm(event.target.value.trim());
+                        }} placeholder='Search' style={{width: 200}} rightSection={searchTerm.length > 0 ? <span onClick={() => {
+                            setSearchTerm('');
+                        }} className='text-danger'><MdClose /></span> : ''} icon={<i className='simple-icon-magnifier' />}  />
+                        <Select style={{ maxWidth: 200, position: 'relative', top: -12 }} label='Select Category' placeholder='Category' data={[
+                            { value: '', label: 'All' },
+                            ...templateCategories.map(c => ({ value: c, label: c }))
+                            ]} value={selectedCategory} onChange={val => setSelectedCategory(val ? val : '')} />
+                    </Group>
                 </Group>
-                <Group>
-                    {templates.length === 0 && (
-                        <p>No templates found</p>
-                    )}
-                    {templates.length > 0 && (
-                        <p>
-                            {templates.filter(d => d.name.toLowerCase().search(searchTerm.toLocaleLowerCase()) !== -1).length}{' '}
-                            {templates.filter(d => d.name.toLowerCase().search(searchTerm.toLocaleLowerCase()) !== -1).length > 1
-                                ? 'templates'
-                                : 'template'}{' '}
-                            found
-                        </p>
-                    )}
-                    {openedTemplates && <TextInput value={searchTerm} onChange={(event) => {
-                        setSearchTerm(event.target.value.trim());
-                    }} placeholder='Search' radius={'xl'} style={{width: 200}} rightSection={searchTerm.length > 0 ? <span onClick={() => {
-                        setSearchTerm('');
-                    }} className='text-danger'><MdClose /></span> : ''} icon={<i className='simple-icon-magnifier' />}  />}
-                </Group>
-            </Group>
-            <Collapse in={openedTemplates}>
-                <Stack>
-                    {templateCategories.map((category, index) => {
-                        const cat = category === '' ? 'Default' : category;
-                        return (
-                        <Stack key={cat} spacing={'xs'}>
-                            <Tooltip label='Template Category' className='w-fit'><h5 className='font-bold w-fit capitalize'>{index + 1}. {cat}</h5></Tooltip>
-                            <DocumentCarousel onTemplateDelete={(id) => {
-                                setTemplates(prev => {
-                                    const newTemplates = prev.filter(t => t.id !== id);
-                                    const categories = new Set(newTemplates.map(t => t.category));
-                                    setTemplateCategories(Array.from(categories));
-                                    return newTemplates;
-                                });
-                            }} onTemplateUpdate={onAgreementUpdate} contractHelper={contractHelper}  categories={templateCategories} templates={templates.filter(d => d.name.toLowerCase().search(searchTerm.toLocaleLowerCase()) !== -1 && d.category === category)} intl={intl} onClick={(id, blank) => {
-                                // get template using id from templates
-                                const ts = templates.filter(t => t.id === id);
-                                if (ts.length > 0) {
-                                    const tp = ts[0];
-                                    setSelectedTemplate(tp);
-                                    templateConfirmHandlers.open();
-                                }
-                            }} />
-                        </Stack>
-                    )})}
+                <Stack spacing={'xs'}>
+                    <div className='text-lg w-fit py-1 px-3 border-2 border-gray-300 rounded-full'>
+                        <Group position='apart'>
+                            <span className='capitalize text-primary'>{selectedCategory === '' ? 'All Templates' : selectedCategory}</span>
+                            {selectedCategory !== '' && <MdClose className='cursor-pointer' onClick={() => setSelectedCategory('')} />}
+                        </Group>
+                    </div>
+                    <DocumentCarousel 
+                    onTemplateDelete={(id) => {
+                        setTemplates(prev => {
+                            const newTemplates = prev.filter(t => t.id !== id);
+                            const categories = new Set(newTemplates.map(t => t.category));
+                            setTemplateCategories(Array.from(categories));
+                            return newTemplates;
+                        });
+                    }}
+                    onTemplateUpdate={onAgreementUpdate} 
+                    contractHelper={contractHelper}  
+                    categories={templateCategories} 
+                    templates={templates.filter(d => d.name.toLowerCase().search(searchTerm.toLocaleLowerCase()) !== -1 && (!selectedCategory || d.category === selectedCategory))}
+                    intl={intl} 
+                    onClick={(id, blank) => {
+                        // get template using id from templates
+                        const ts = templates.filter(t => t.id === id);
+                        if (ts.length > 0) {
+                            const tp = ts[0];
+                            setSelectedTemplate(tp);
+                            templateConfirmHandlers.open();
+                        }
+                    }} />
                 </Stack>
-            </Collapse>
+            </Stack>
             
             <Modal
                 closeOnEscape={false}
