@@ -240,18 +240,20 @@ const AgreementDashboard: React.FC = () => {
                         <Center className='m-3'>
                             <Card>
                                 <CardBody className='p-4'>
-                                    <Center ref={tile1Ref} onClick={() => {
-                                        tileFilter = 1;
-                                        setRenderTileFilter(tileFilter);
-                                        gridRef.current!.api.onFilterChanged();
-                                    }} className='cursor-pointer' style={{ minWidth: 200 }}>
-                                        <Stack className='w-full'>
-                                            <p className='font-bold'>Drafts</p>
+                                    <Center className='cursor-pointer' onClick={() => {
+                                            tileFilter = 1;
+                                            setRenderTileFilter(tileFilter);
+                                            gridRef.current!.api.onFilterChanged();
+                                        }} ref={tile1Ref} style={{ minWidth: 210 }}>
+                                        <Stack spacing={4} className='w-full'>
                                             <Group position='apart'>
-                                                <div className={classNames('text-primary transition-all text-5xl', { 'scale-125': tile1Hovered })}>
-                                                    {agreements.filter(a => a.status === 'draft').length}
-                                                </div>
-                                                <span><i className={classNames('iconsminds-folder-edit text-4xl text-primary transition-all', { 'text-5xl': tile1Hovered })} /></span>
+                                                <span><i style={{ fontSize: 42 }} className={classNames('iconsminds-folder-edit text-primary transition-all')} /></span>
+                                                <p style={{ padding: '12px 22px' }} 
+                                                    className={classNames('text-5xl transition-all rounded-full border-2 border-gray-300', 
+                                                    {'text-primary': !tile1Hovered, 'text-white bg-primary': tile1Hovered })}>{agreements.filter(a => a.status === 'draft').length}</p>
+                                            </Group>
+                                            <Group>
+                                                <p style={{ marginLeft: 12 }}>Draft</p>
                                             </Group>
                                         </Stack>
                                     </Center>
@@ -263,39 +265,43 @@ const AgreementDashboard: React.FC = () => {
                             <Card>
                                 <CardBody className='p-4'>
                                     <Center className='cursor-pointer' onClick={() => {
-                                        tileFilter = 2;
-                                        setRenderTileFilter(tileFilter);
-                                        gridRef.current!.api.onFilterChanged();
-                                    }} ref={tile2Ref} style={{ minWidth: 200 }}>
-                                        <Stack className='w-full'>
-                                            <p className='font-bold'>Completed in last 30 days</p>
+                                            tileFilter = 2;
+                                            setRenderTileFilter(tileFilter);
+                                            gridRef.current!.api.onFilterChanged();
+                                        }} ref={tile2Ref} style={{ minWidth: 210 }}>
+                                        <Stack spacing={4} className='w-full'>
                                             <Group position='apart'>
-                                                <div className={classNames('text-primary transition-all text-5xl', { 'scale-125': tile2Hovered })}>
-                                                    {agreements.filter(a => a.status === 'complete').length}
-                                                </div>
-                                                <span><i className={classNames('iconsminds-box-with-folders text-4xl text-primary transition-all', { 'text-5xl': tile2Hovered })} /></span>
+                                                <span><i style={{ fontSize: 42 }} className={classNames('iconsminds-box-with-folders text-primary transition-all')} /></span>
+                                                <p style={{ padding: '12px 22px' }} 
+                                                    className={classNames('text-5xl transition-all rounded-full border-2 border-gray-300', 
+                                                    {'text-primary': !tile2Hovered, 'text-white bg-primary': tile2Hovered })}>{agreements.filter(a => a.status === 'complete').length}</p>
+                                            </Group>
+                                            <Group>
+                                                <p style={{ marginLeft: 12 }}>Completed in last 30 days</p>
                                             </Group>
                                         </Stack>
                                     </Center>
                                 </CardBody>
                             </Card>
                         </Center>
-                        
+
                         <Center className='m-3'>
                             <Card>
-                                <CardBody className='py-4'>
+                                <CardBody className='p-4'>
                                     <Center className='cursor-pointer' onClick={() => {
-                                        tileFilter = 3;
-                                        setRenderTileFilter(tileFilter);
-                                        gridRef.current!.api.onFilterChanged();
-                                    }} ref={tile3Ref} style={{ minWidth: 200 }}>
-                                        <Stack className='w-full'>
-                                            <p className='font-bold'>In Progress</p>
+                                            tileFilter = 3;
+                                            setRenderTileFilter(tileFilter);
+                                            gridRef.current!.api.onFilterChanged();
+                                        }} ref={tile3Ref} style={{ minWidth: 210 }}>
+                                        <Stack spacing={4} className='w-full'>
                                             <Group position='apart'>
-                                                <div className={classNames('text-primary transition-all text-5xl', { 'scale-125': tile3Hovered })}>
-                                                    {agreements.filter(a => a.status === 'sent').length}
-                                                </div>
-                                                <span><i className={classNames('iconsminds-bird-delivering-letter text-4xl text-primary transition-all', { 'text-5xl': tile3Hovered })} /></span>
+                                                <span><i style={{ fontSize: 42 }} className={classNames('iconsminds-bird-delivering-letter text-primary transition-all')} /></span>
+                                                <p style={{ padding: '12px 22px' }} 
+                                                    className={classNames('text-5xl transition-all rounded-full border-2 border-gray-300', 
+                                                    {'text-primary': !tile3Hovered, 'text-white bg-primary': tile3Hovered })}>{agreements.filter(a => a.status === 'sent').length}</p>
+                                            </Group>
+                                            <Group>
+                                                <p style={{ marginLeft: 12 }}>In Progress</p>
                                             </Group>
                                         </Stack>
                                     </Center>

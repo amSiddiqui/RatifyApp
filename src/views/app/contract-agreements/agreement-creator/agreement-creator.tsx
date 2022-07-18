@@ -1041,7 +1041,7 @@ const AgreementCreator: React.FC = () => {
             opened = {prepareSend} onClose = {prepareSendHandler.close} centered
             >
                 <PrepareSend 
-                    startDate={startDate}
+                    startDate={showStartDate ? startDate : null}
                     onCancel={() => {
                         prepareSendHandler.close();
                     }} 
