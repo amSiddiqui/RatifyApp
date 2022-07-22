@@ -447,7 +447,7 @@ const BusinessDetails: React.FC<{
                                     </p>
                                 </Grid.Col>
                                 <Grid.Col xs={9} md={10}>
-                                    <Group spacing={'xl'}>
+                                    {!org.sameBillingContact && <Group spacing={'xl'}>
                                         <p>
                                             {org.sameBillingContact
                                                 ? org.primaryContact?.name
@@ -475,7 +475,11 @@ const BusinessDetails: React.FC<{
                                                 ? org.primaryContact?.phone
                                                 : org.billingContact?.phone}
                                         </p>
-                                    </Group>
+                                    </Group>}
+                                    {org.sameBillingContact && <p>
+                                        Same as Primary Contact
+                                    </p>
+                                    }
                                 </Grid.Col>
                             </Grid>
                         </>

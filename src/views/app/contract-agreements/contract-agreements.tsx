@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Row } from 'reactstrap';
 import { useIntl } from 'react-intl';
@@ -19,6 +18,7 @@ import { useDisclosure } from '@mantine/hooks';
 import { MdClose } from 'react-icons/md';
 import { OrganizationNameResponse } from '../../../types/AuthTypes';
 import { AuthHelper } from '../../../helpers/AuthHelper';
+import PdfViewer from './pdf-viewer';
 
 const ContractAgreements: React.FC = () => {
     const match = useLocation();
@@ -50,6 +50,7 @@ const ContractAgreements: React.FC = () => {
     const [organization, setOrganization] = React.useState<OrganizationNameResponse>();
     const [showUnverifiedModal, setShowUnverifiedModal] = React.useState(false);
     const [selectedCategory, setSelectedCategory] = React.useState('');
+    const [showPdfView, setShowPdfView] = React.useState(false);
 
     const uploadProgress = React.useCallback((progressEvent: any) => {
         setProgress(progressEvent.loaded / progressEvent.total);
@@ -72,7 +73,6 @@ const ContractAgreements: React.FC = () => {
             contractHelper
                 .uploadDocument(files[0], uploadProgress)
                 .then((data) => {
-                    toast.success('Document uploaded');
                     contractHelper
                         .createAgreement(data.id)
                         .then((resp) => {
@@ -221,15 +221,24 @@ const ContractAgreements: React.FC = () => {
                     categories={templateCategories} 
                     templates={templates.filter(d => d.name.toLowerCase().search(searchTerm.toLocaleLowerCase()) !== -1 && (!selectedCategory || d.category === selectedCategory))}
                     intl={intl} 
-                    onClick={(id, blank) => {
+                    onViewClick={(id) => {
                         // get template using id from templates
+                        const ts = templates.filter(t => t.id === id);
+                        if (ts.length > 0) {
+                            const tp = ts[0];
+                            setSelectedTemplate(tp);
+                            setShowPdfView(true);
+                        }
+                    }}
+                    onCreateClick={(id) => {
                         const ts = templates.filter(t => t.id === id);
                         if (ts.length > 0) {
                             const tp = ts[0];
                             setSelectedTemplate(tp);
                             templateConfirmHandlers.open();
                         }
-                    }} />
+                    }}
+                    />
                 </Stack>
             </Stack>
             
@@ -241,8 +250,10 @@ const ContractAgreements: React.FC = () => {
                 onClose={() => setShowPdfConfirm(false)}>
                 <div className="flex flex-col items-center justify-between">
                     <div className="w-full text-center">
-                        <h5>Uploading Document</h5>
+                    {uploading && <h5>Uploading Document</h5>}
+                    {!uploading && <h5>Document Uploaded</h5>}
                     </div>
+                    
                     <div className="my-4 w-full">
                         <Center style={{ width: '100%', height: '5rem' }}>
                             {uploadError.length > 0 && (
@@ -275,7 +286,7 @@ const ContractAgreements: React.FC = () => {
                                     <span className="text-success text-center text-3xl">
                                         <i className="simple-icon-check"></i>
                                     </span>
-                                    <p>Your document is uploaded and ready!</p>
+                                    <p>Your document is uploaded and ready to use!</p>
                                 </Stack>
                             )}
                         </Center>
@@ -345,6 +356,16 @@ const ContractAgreements: React.FC = () => {
                         <span onClick={() => {navigate(`/account/business-profile`)}}><Button color='primary'>Business Profile</Button></span>
                     </Stack>}
                 </>}
+            </Modal>
+            <Modal
+                opened={showPdfView}
+                onClose={() => {setShowPdfView(false)}}
+                size='xl'
+                overflow='inside'
+                style={{ height: '100vh' }}
+                title={<p className='font-bold text-lg'>PDF Title</p>}
+            >
+                {selectedTemplate && <PdfViewer contractHelper={contractHelper} documentId={selectedTemplate.documents[0].toString()} />}
             </Modal>
         </>
     );
