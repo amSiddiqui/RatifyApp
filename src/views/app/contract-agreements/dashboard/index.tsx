@@ -277,7 +277,7 @@ const AgreementDashboard: React.FC = () => {
                                                     {'text-primary': !tile2Hovered, 'text-white bg-primary': tile2Hovered })}>{agreements.filter(a => a.status === 'complete').length}</p>
                                             </Group>
                                             <Group>
-                                                <p style={{ marginLeft: 12 }}>Completed in last 30 days</p>
+                                                <p style={{ marginLeft: 12 }}>Completed in the last 30 days</p>
                                             </Group>
                                         </Stack>
                                     </Center>

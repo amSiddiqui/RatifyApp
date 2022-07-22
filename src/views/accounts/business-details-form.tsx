@@ -2,6 +2,7 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import {
     Checkbox,
     Group,
+    Select,
     SimpleGrid,
     Stack,
     Textarea,
@@ -15,12 +16,13 @@ import { Address, LegalEntity, Organization, OrganizationBasicInfo } from '../..
 import { Button } from 'reactstrap';
 import { toast } from 'react-toastify';
 import classNames from 'classnames';
+import Country from '../../assets/data/country.json';
 
 const addressSchema = Yup.object().shape({
     address1: Yup.string().required('Please enter an address'),
     address2: Yup.string().optional(),
     city: Yup.string().required('Please enter a city'),
-    state: Yup.string().required('Please enter a state'),
+    state: Yup.string().optional(),
     zipcode: Yup.string().required('Please enter a zip code'),
     country: Yup.string().required('Please enter a country'),
 });
@@ -67,7 +69,7 @@ const BusinessDetailsForm: React.FC<{
     } = useForm<OrganizationBasicInfo>({
         resolver: yupResolver(schema),
         defaultValues: {
-            name: organization.name,
+            name: organization.name === 'Default' ? '' : organization.name,
             description: organization.description,
             website: organization.website,
             companyAddressSame: organization.companyAddressSame,
@@ -120,6 +122,7 @@ const BusinessDetailsForm: React.FC<{
                                 placeholder="Business Name"
                                 label="Business Name"
                                 {...register('name')}
+                                required={true}
                                 error={errors.name ? errors.name.message : ''}
                             />
                             <TextInput
@@ -153,8 +156,7 @@ const BusinessDetailsForm: React.FC<{
                         breakpoints={[{ maxWidth: 600, cols: 1 }]}>
                         <Stack className="p-4">
                             <h4 className={classNames('font-bold', {'text-lg': size==='xs', 'text-xl my-2': size === 'md' })}>
-                                Billing Address{' '}
-                                <span className="text-danger">*</span>
+                                Billing Address
                             </h4>
                             <TextInput
                                 size={size}
@@ -164,6 +166,7 @@ const BusinessDetailsForm: React.FC<{
                                         ? errors.billingAddress.address1.message
                                         : ''
                                 }
+                                required={true}
                                 placeholder="Address"
                                 label="Address Line 1"
                             />
@@ -183,35 +186,8 @@ const BusinessDetailsForm: React.FC<{
                             <SimpleGrid cols={2}>
                                 <TextInput
                                     size={size}
-                                    {...register('billingAddress.country')}
-                                    error={
-                                        errors.billingAddress?.country
-                                            ? errors.billingAddress.country
-                                                  .message
-                                            : ''
-                                    }
-                                    placeholder="Country"
-                                    label="Country"
-                                />
-
-                                <TextInput
-                                    size={size}
-                                    {...register('billingAddress.zipcode')}
-                                    error={
-                                        errors.billingAddress?.zipcode
-                                            ? errors.billingAddress.zipcode
-                                                  .message
-                                            : ''
-                                    }
-                                    placeholder="Zip"
-                                    label="Zip Code / Postcode"
-                                />
-                            </SimpleGrid>
-
-                            <SimpleGrid cols={2}>
-                                <TextInput
-                                    size={size}
                                     {...register('billingAddress.city')}
+                                    required={true}
                                     error={
                                         errors.billingAddress?.city
                                             ? errors.billingAddress.city.message
@@ -232,6 +208,40 @@ const BusinessDetailsForm: React.FC<{
                                     }
                                     placeholder="State"
                                     label="State"
+                                />
+                            </SimpleGrid>
+
+                            <SimpleGrid cols={2}>
+
+                                <Select
+                                    required={true}
+                                    size={size}
+                                    placeholder='Country'
+                                    label='Country'
+                                    {...register('billingAddress.country')}
+                                    onChange={(e) => {
+                                        register('billingAddress.country').onChange({
+                                            target: e
+                                        });
+                                    }}
+                                    data={Country.map(d => ({
+                                        label: d,
+                                        value: d,
+                                    }))}
+                                />
+
+                                <TextInput
+                                    required={true}
+                                    size={size}
+                                    {...register('billingAddress.zipcode')}
+                                    error={
+                                        errors.billingAddress?.zipcode
+                                            ? errors.billingAddress.zipcode
+                                                  .message
+                                            : ''
+                                    }
+                                    placeholder="Zip"
+                                    label="Zip Code / Postcode"
                                 />
                             </SimpleGrid>
                         </Stack>
@@ -261,6 +271,7 @@ const BusinessDetailsForm: React.FC<{
                                 />
                             </Group>
                             <TextInput
+                                required={true}
                                 size={size}
                                 disabled={sameAddress}
                                 {...register('companyAddress.address1')}
@@ -288,36 +299,7 @@ const BusinessDetailsForm: React.FC<{
 
                             <SimpleGrid cols={2}>
                                 <TextInput
-                                    size={size}
-                                    disabled={sameAddress}
-                                    {...register('companyAddress.country')}
-                                    error={
-                                        errors.companyAddress?.country
-                                            ? errors.companyAddress.country
-                                                  .message
-                                            : ''
-                                    }
-                                    placeholder="Country"
-                                    label="Country"
-                                />
-
-                                <TextInput
-                                    size={size}
-                                    {...register('companyAddress.zipcode')}
-                                    disabled={sameAddress}
-                                    error={
-                                        errors.companyAddress?.zipcode
-                                            ? errors.companyAddress.zipcode
-                                                  .message
-                                            : ''
-                                    }
-                                    placeholder="Zip code / Postcode"
-                                    label="Zip code / Postcode"
-                                />
-                            </SimpleGrid>
-
-                            <SimpleGrid cols={2}>
-                                <TextInput
+                                    required={true}
                                     size={size}
                                     {...register('companyAddress.city')}
                                     disabled={sameAddress}
@@ -344,6 +326,39 @@ const BusinessDetailsForm: React.FC<{
                                     label="State"
                                 />
                             </SimpleGrid>
+
+                            <SimpleGrid cols={2}>
+                                <TextInput
+                                    required={true}
+                                    size={size}
+                                    disabled={sameAddress}
+                                    {...register('companyAddress.country')}
+                                    error={
+                                        errors.companyAddress?.country
+                                            ? errors.companyAddress.country
+                                                  .message
+                                            : ''
+                                    }
+                                    placeholder="Country"
+                                    label="Country"
+                                />
+
+                                <TextInput
+                                    size={size}
+                                    required={true}
+                                    {...register('companyAddress.zipcode')}
+                                    disabled={sameAddress}
+                                    error={
+                                        errors.companyAddress?.zipcode
+                                            ? errors.companyAddress.zipcode
+                                                  .message
+                                            : ''
+                                    }
+                                    placeholder="Zip code / Postcode"
+                                    label="Zip code / Postcode"
+                                />
+                            </SimpleGrid>
+
                         </Stack>
                     </SimpleGrid>
                 </Stack>

@@ -75,46 +75,46 @@ function timelineTitleFromType(type: AuditTrailActionType, signer_type: string |
 
 function timelineDescriptionFromType(data: AuditTrailData) {
     if (data.action_type === 'create') {
-        if (data.user) {
-            return <p><span className='text-rose-400'>{data.user}</span> created the document <span className='italic'>{data.agreement}</span></p>;
+        if (data.user && data.user.trim()) {
+            return <p><span className='text-rose-400'>{data.user}</span> created the document '<span>{data.agreement}</span>'</p>;
         }
-        return <p>Document <span className='italic'>{data.agreement}</span> was created</p>;
+        return <p>Document '<span>{data.agreement}</span>' was created</p>;
     }
     if (data.action_type === 'deleted') {
-        if (data.user) {
-            return <p><span className='text-rose-400'>{data.user}</span> withdrew the document <span className='italic'>{data.agreement}</span></p>;
+        if (data.user && data.user.trim()) {
+            return <p><span className='text-rose-400'>{data.user}</span> withdrew the document '<span>{data.agreement}</span>'</p>;
         }
-        return <p>Document <span className='italic'>{data.agreement}</span> was deleted</p>;
+        return <p>Document '<span>{data.agreement}</span>' was deleted</p>;
     }
     if (data.action_type === 'error') {
-        if (data.user) {
-            return <p><span className='text-rose-400'>{data.user}</span> had an error sending the document <span className='italic'>{data.agreement}</span> to {data.signer} {!!data.signer_email ? <span className='text-muted'>{`[${data.signer_email}]`}</span> : ``}</p>;
+        if (data.user && data.user.trim()) {
+            return <p><span className='text-rose-400'>{data.user}</span> had an error sending the document '<span>{data.agreement}</span>' to {data.signer} {!!data.signer_email ? <span className='text-muted'>{`[${data.signer_email}]`}</span> : ``}</p>;
         }
-        return <p>Document <span className='italic'>{data.agreement}</span> had an error sending to {data.signer}</p>;
+        return <p>Document '<span>{data.agreement}</span>' had an error sending to {data.signer}</p>;
     }
     if (data.action_type === 'sent') {
-        if (data.user) {
-            return <p><span className='text-rose-400'>{data.user}</span> send the document <span className='italic'>{data.agreement}</span> to {data.signer} {!!data.signer_email ? <span className='text-muted'>{`[${data.signer_email}]`}</span> : ``}</p>;
+        if (data.user && data.user.trim()) {
+            return <p><span className='text-rose-400'>{data.user}</span> sent the document '<span>{data.agreement}</span>' to {data.signer} {!!data.signer_email ? <span className='text-muted'>{`[${data.signer_email}]`}</span> : ``}</p>;
         }
-        return <p>Document <span className='italic'>{data.agreement}</span> was sent to {data.signer}</p>;
+        return <p>Document '<span>{data.agreement}</span>' was sent to {data.signer}</p>;
     }
     if (data.action_type === 'submit') {
         if (data.signer_type === 'signer') {
-            return <p><span className='text-rose-400'>{data.signer}</span> signed the document <span className='italic'>{data.agreement}</span></p>;
+            return <p><span className='text-rose-400'>{data.signer}</span> signed the document '<span>{data.agreement}</span>'</p>;
         }
         if (data.signer_type === 'viewer') {
-            return <p><span className='text-rose-400'>{data.signer}</span> viewed the document <span className='italic'>{data.agreement}</span></p>;
+            return <p><span className='text-rose-400'>{data.signer}</span> viewed the document '<span>{data.agreement}</span>'</p>;
         }
         if (data.signer_type === 'approver') {
-            return <p><span className='text-rose-400'>{data.signer}</span> approved the document <span className='italic'>{data.agreement}</span></p>;
+            return <p><span className='text-rose-400'>{data.signer}</span> approved the document '<span>{data.agreement}</span>'</p>;
         }
         return 'Document Submitted';
     }
     if (data.action_type === 'viewed') {
-        return <p><span className='text-rose-400'>{data.signer}</span> viewed the document <span className='italic'>{data.agreement}</span></p>;
+        return <p><span className='text-rose-400'>{data.signer}</span> viewed the document '<span>{data.agreement}</span>'</p>;
     }
     if (data.action_type === 'decline') {
-        return <p><span className='text-rose-400'>{data.signer}</span> declined the document <span className='italic'>{data.agreement}</span></p>;
+        return <p><span className='text-rose-400'>{data.signer}</span> declined the document '<span>{data.agreement}</span>'</p>;
     }
 }
 

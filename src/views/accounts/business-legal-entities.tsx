@@ -6,6 +6,7 @@ import { useMediaQuery } from '@mantine/hooks';
 import { BusinessFunction, LegalEntity } from '../../types/AuthTypes';
 import { AuthHelper } from '../../helpers/AuthHelper';
 import { toast } from 'react-toastify';
+import { BsTrash } from 'react-icons/bs';
 
 export const AutoCompleteFunctionalData = [
     'Legal',
@@ -57,11 +58,11 @@ const BusinessLegalEntities:React.FC<{ prevStep: () => void, defaultLegalEntity?
                                     <Stack spacing={'sm'}>
                                         <Group position='apart'>
                                             <h4>Entity {index + 1}</h4>
-                                            {index !== 0 && <Tooltip label={'Delete Entity ' + (index + 1)}><i onClick={() => {
+                                            {index !== 0 && <Tooltip label={'Delete Entity ' + (index + 1)}><BsTrash onClick={() => {
                                                 const les = [...legalEntities];
                                                 les.splice(index, 1);
                                                 setLegalEntities(les);
-                                            }} className='simple-icon-trash text-danger cursor-pointer' /></Tooltip>}
+                                            }} className='text-danger cursor-pointer' /></Tooltip>}
                                         </Group>
                                         <TextInput error={
                                             showError && legalEntities[index].name === '' ? 'Please provide a name' : ''
@@ -103,13 +104,6 @@ const BusinessLegalEntities:React.FC<{ prevStep: () => void, defaultLegalEntity?
                             {businessFunctions.map((func, index) => (
                                 <List.Item key={func.id}>
                                     <SimpleGrid cols={2}>
-                                        <Autocomplete error={
-                                            showError && func.label === '' ? 'Please provide a business function' : ''
-                                        } data={AutoCompleteFunctionalData} value={func.label} onChange={(value) => {
-                                            const newBF = [...businessFunctions];
-                                            newBF[index].label = value;
-                                            setBusinessFunctions(newBF);
-                                        }} placeholder='Function type' />
                                         <Grid columns={12}>
                                             <Grid.Col span={11}>
                                                 <Select error={
@@ -120,18 +114,25 @@ const BusinessLegalEntities:React.FC<{ prevStep: () => void, defaultLegalEntity?
                                                         newBF[index].entity = value;
                                                         setBusinessFunctions(newBF);
                                                     }
-                                                }} placeholder='Entity' data={legalEntities.map(e => e.name)} />
+                                                }} placeholder='Select an Entity' data={legalEntities.map(e => e.name)} />
                                             </Grid.Col>
                                             <Grid.Col span={1}>
                                                 <Center className='h-full'>
-                                                    <i onClick={() => {
+                                                    <BsTrash onClick={() => {
                                                         const newBF = [...businessFunctions];
                                                         newBF.splice(index, 1);
                                                         setBusinessFunctions(newBF);
-                                                    }} className='simple-icon-trash text-danger cursor-pointer' />
+                                                    }} className='text-danger cursor-pointer' />
                                                 </Center>
                                             </Grid.Col>
                                         </Grid>
+                                        <Autocomplete error={
+                                            showError && func.label === '' ? 'Please provide a business function' : ''
+                                        } data={AutoCompleteFunctionalData} value={func.label} onChange={(value) => {
+                                            const newBF = [...businessFunctions];
+                                            newBF[index].label = value;
+                                            setBusinessFunctions(newBF);
+                                        }} placeholder='Add function type' />
                                     </SimpleGrid>
                                 </List.Item>
                             ))}

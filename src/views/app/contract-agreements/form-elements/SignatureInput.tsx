@@ -152,11 +152,11 @@ const SignatureInput:React.FC<Props> = ({placeholder, onSignComplete, initialVal
                         </div>
                     </Group>
                     <Grid columns={12}>
-                        <Grid.Col span={8}>
-                            <TextInput placeholder='Last Name' value={lastName} onChange={setLastName} />
+                        <Grid.Col>
+                            <TextInput placeholder='First Name' value={lastName} onChange={setLastName} />
                         </Grid.Col>
-                        <Grid.Col span={4}>
-                            <TextInput placeholder='First Name' value={firstName} onChange={setFirstName} />
+                        <Grid.Col>
+                            <TextInput placeholder='Last Name' value={firstName} onChange={setFirstName} />
                         </Grid.Col>
                     </Grid>
                     <Center style={{height: 120}} className='w-full bg-gray-100'>

@@ -24,13 +24,13 @@ type Props = {
 
 export const getSignerStatus = (signer:Signer, signerProgress: {total: number, completed: number} | null) => {
     if (signer.status === 'error') {
-        return 'Error Sending';
+        return 'Error sending';
     }
     if (signer.type === 'viewer') {
         if (signer.last_seen) {
             return 'Viewed';
         } else {
-            return 'Not Viewed';
+            return 'Not viewed';
         }
     } else if (signer.type === 'approver') {
         if (signer.approved) {
@@ -46,7 +46,7 @@ export const getSignerStatus = (signer:Signer, signerProgress: {total: number, c
             return 'Declined';
         }
         if (signer.status === 'completed') {
-            return 'Filled and Signed';
+            return 'Completed and signed';
         }   
         if (signer.status === 'sent' && signerProgress !== null && signerProgress.completed !== signerProgress.total) {
             return 'In Progress';
@@ -101,7 +101,7 @@ export const getSignerStatusAndIcon = (signer: Signer, size?: string) => {
     
     if (size) {
         return {
-            status: 'No Action Taken.',
+            status: 'No action taken.',
             icon: <div style={{ padding: size === 'sm' ? 6 : 10, border: size === 'sm' ? '1px solid blue' : '2px solid blue', top: -1 }} className='rounded-full relative'></div>,
         }
     } else {
@@ -235,7 +235,7 @@ const SignerProgress: React.FC<Props> = ({ signer, contractHelper, onDocumentSen
                                 )}
                                 <div>
                                     <p className='text-muted'>Last Reminder</p>
-                                    <p>not sent</p>
+                                    <p>Not sent</p>
                                 </div>
                                 {!signer.declined && (signer.type === 'viewer' ? !signer.last_seen : signer.status === 'sent') &&<span><Button size='xs' color='primary'>
                                     Send Reminder    

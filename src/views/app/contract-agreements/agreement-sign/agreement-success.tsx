@@ -73,10 +73,10 @@ const AgreementSuccess: React.FC = () => {
                         </Center>
                         <div>
                             <h4 className="text-2xl font-bold">
-                                {signerType.length > 0 ? `You have successfully ${signerType === 'signer' ? 'signed and filled' : 'approved'} the document.` : 'You have completed the document.'}
+                                {signerType.length > 0 ? `You have successfully ${signerType === 'signer' ? 'signed and sent' : 'approved'} the document.` : 'You have completed the document.'}
                             </h4>
                             <p className="text-center text-muted">
-                                Sender, {senderName} will be notified and will receive the
+                                Sender {senderName === '' ? '' : ', '+senderName} will be notified and will receive the
                                 {signerType === 'approver' ? ' approved' : ' signed'} document
                             </p>
                         </div>

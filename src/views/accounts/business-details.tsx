@@ -13,6 +13,7 @@ import {
     Tooltip,
 } from '@mantine/core';
 import React from 'react';
+import { BsTrash } from 'react-icons/bs';
 import { MdAdd, MdEdit } from 'react-icons/md';
 import { toast } from 'react-toastify';
 import { Button } from 'reactstrap';
@@ -102,7 +103,7 @@ const BusinessDetails: React.FC<{
     }
 
     return (
-        <Stack className="w-full">
+        <Stack className="w-full" spacing={'xl'}>
             <Grid columns={12}>
                 <Grid.Col xs={2}></Grid.Col>
                 <Grid.Col xs={8}>
@@ -515,7 +516,7 @@ const BusinessDetails: React.FC<{
                     )}
                 </Stack>
             </Card>
-            <Grid>
+            <Grid gutter={'xl'}>
                 <Grid.Col md={6}>
                     <Card shadow="md" className="p-4 w-full h-full">
                         {!leEditMode && (
@@ -590,7 +591,7 @@ const BusinessDetails: React.FC<{
                                                                     'Delete Entity ' +
                                                                     (index + 1)
                                                                 }>
-                                                                <i
+                                                                <BsTrash
                                                                     onClick={() => {
                                                                         const les =
                                                                             [
@@ -604,7 +605,7 @@ const BusinessDetails: React.FC<{
                                                                             les,
                                                                         );
                                                                     }}
-                                                                    className="simple-icon-trash text-danger text-sm cursor-pointer hover:scale-110 transition-all"
+                                                                    className="text-danger text-sm cursor-pointer hover:scale-110 transition-all"
                                                                 />
                                                             </Tooltip>
                                                         )}
@@ -758,11 +759,11 @@ const BusinessDetails: React.FC<{
                                                     </Grid.Col>
                                                     <Grid.Col span={1}>
                                                         <Center className='h-full'>
-                                                            <i onClick={() => {
+                                                            <BsTrash onClick={() => {
                                                                 const newBF = [...businessFunctions];
                                                                 newBF.splice(index, 1);
                                                                 setBusinessFunctions(newBF);
-                                                            }} className='simple-icon-trash text-danger cursor-pointer' />
+                                                            }} className='text-danger cursor-pointer' />
                                                         </Center>
                                                     </Grid.Col>
                                                 </Grid>

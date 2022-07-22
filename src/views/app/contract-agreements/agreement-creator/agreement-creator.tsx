@@ -972,7 +972,7 @@ const AgreementCreator: React.FC = () => {
                             </Button></span>
                         </Group>
                         <Group position='right'>
-                            <span onClick={() => {onPrepareSend()}}><Button color='success' className='agreement-button' >Prepare To Send</Button></span>
+                            <span onClick={() => {onPrepareSend()}}><Button color='success' className='agreement-button' >Review &amp; Send</Button></span>
                         </Group>
                     </Group>
                 </Grid.Col>

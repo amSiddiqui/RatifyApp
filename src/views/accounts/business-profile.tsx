@@ -22,8 +22,9 @@ const BusinessProfile: React.FC = () => {
     const [businessProfile, setBusinessProfile] = React.useState<Organization>();
     const [loading, setLoading] = React.useState(true);
     const [error, setError] = React.useState(false);
+    const [showLoading, setShowLoading] = React.useState(false);
 
-    React.useEffect(() => {
+    const fetchData = React.useCallback(() => {
         authHelper.getOrganization().then(org => {
             setBusinessProfile(org);
             setLoading(false);
@@ -35,33 +36,51 @@ const BusinessProfile: React.FC = () => {
         });
     }, [authHelper]);
 
-    return (
-        <>
-            <Row>
-                <Colxx xxs="12">
-                    <Breadcrumb
-                        heading="account.business-profile"
-                        match={match}
-                    />
-                    <Separator className="mb-5" />
-                </Colxx>
-            </Row>
-            <Center>
-                {!!businessProfile && stepperForm && !error && !loading && <Card style={{width: '100%'}} shadow={'md'}>
-                    <BusinessProfileStepperForm onComplete={() => {
-                        setStepperForm(false);
-                    }} organization={businessProfile} authHelper={authHelper} />
-                </Card>}
-                {!!businessProfile && !stepperForm && !error && !loading && <BusinessDetails authHelper={authHelper} organization={businessProfile} />}
-                {loading && <Center style={{height: 300}}>
-                    <Loader size={'lg'} />    
-                </Center>}
-                {!loading && (error || !businessProfile) && <h3 className='text-muted text-center'>
-                    Cannot fetch business profile at the moment try again later.
-                </h3>}
+    const refreshPage = React.useCallback(() => {
+        window.location.reload();
+    }, []);
+
+    React.useEffect(() => {
+        fetchData();
+    }, [fetchData]);
+
+    if (showLoading) {
+        return <>
+            <Center className='w-full h-[300px]'>
+                <Loader />
             </Center>
         </>
-    );
+    } else {
+        return (
+            <>
+                <Row>
+                    <Colxx xxs="12">
+                        <Breadcrumb
+                            heading="account.business-profile"
+                            match={match}
+                        />
+                        <Separator className="mb-5" />
+                    </Colxx>
+                </Row>
+                <Center>
+                    {!!businessProfile && stepperForm && !error && !loading && <Card style={{width: '100%'}} shadow={'md'}>
+                        <BusinessProfileStepperForm onComplete={() => {
+                            setStepperForm(false);
+                            setShowLoading(true);
+                            refreshPage();
+                        }} organization={businessProfile} authHelper={authHelper} />
+                    </Card>}
+                    {!!businessProfile && !stepperForm && !error && !loading && <BusinessDetails authHelper={authHelper} organization={businessProfile} />}
+                    {loading && <Center style={{height: 300}}>
+                        <Loader size={'lg'} />
+                    </Center>}
+                    {!loading && (error || !businessProfile) && <h3 className='text-muted text-center'>
+                        Cannot fetch business profile at the moment try again later.
+                    </h3>}
+                </Center>
+            </>
+        );
+    }
 };
 
 export default BusinessProfile;

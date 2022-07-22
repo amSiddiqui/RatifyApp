@@ -5,6 +5,7 @@ import { AgreementTemplate } from '../../../types/ContractTypes';
 import { Button } from 'reactstrap';
 import { toast } from 'react-toastify';
 import { ContractHelper } from '../../../helpers/ContractHelper';
+import { BsTrash } from 'react-icons/bs';
 
 type TemplateImageType = {
     doc_id: number;
@@ -115,7 +116,7 @@ const DocumentCarousel:React.FC<{intl: IntlShape, onTemplateUpdate: (id: number,
                                             <Menu.Item onClick={() => {
                                                 setDeletingTemplate({id: image.id, name: image.name, description: image.description});
                                                 setShowDeleteConfirm(true);
-                                            }} color='red' icon={ <i className='simple-icon-trash'></i> }>Delete</Menu.Item>
+                                            }} color='red' icon={ <BsTrash /> }>Delete</Menu.Item>
                                         </Menu>
                                     </div>
                                     <Tooltip label={image.description} hidden={image.description.length === 0}>
