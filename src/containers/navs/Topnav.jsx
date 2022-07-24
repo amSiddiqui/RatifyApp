@@ -23,8 +23,6 @@ import {
 
 import { MobileMenuIcon, MenuIcon } from '../../components/svg';
 import { getDirection, setDirection } from '../../helpers/Utils';
-import TopnavEasyAccess from './Topnav.EasyAccess';
-import TopnavNotifications from './Topnav.Notifications';
 import { useDispatch, useSelector } from 'react-redux';
 import { settingsActions } from '../../redux/settings-slice';
 import { menuActions } from '../../redux/menu-slice';
@@ -275,8 +273,6 @@ const TopNav = ({ intl }) => {
 
             <div className="navbar-right">
                 <div className="header-icons d-inline-block align-middle">
-                    <TopnavEasyAccess />
-                    <TopnavNotifications />
                     <button
                         className="header-icon btn btn-empty d-none d-sm-inline-block"
                         type="button"

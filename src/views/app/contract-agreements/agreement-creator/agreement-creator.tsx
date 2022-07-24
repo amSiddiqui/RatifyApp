@@ -127,6 +127,7 @@ const AgreementCreator: React.FC = () => {
     const [showAgreementErrors, setShowAgreementErrors] = React.useState(false);
 
     const [confirmDeleteModal, deleteModalHandlers] = useDisclosure(false);
+    const [showNameHelper, setShowNameHelper] = React.useState(true);
 
     const dispatchFn = useDispatch<AppDispatch>();
     const contractHelper = React.useMemo(
@@ -463,7 +464,7 @@ const AgreementCreator: React.FC = () => {
             <Center className="mb-14">
                 <TextInput
                     label={<p style={{fontSize: '1.1rem'}}>Document Name</p>}
-                    description={<p className='text-muted'>Give your document a short name, e.g. Employment Contract</p>}
+                    description={showNameHelper ? <p className='text-muted'>Give your document a short name, e.g. Employment Contract</p> : undefined}
                     style={{ minWidth: '300px', width: '40%', fontSize: '1.1rem' }}
                     size="xl"
                     error={showAgreementErrors && agreementName.length === 0 }
@@ -474,6 +475,9 @@ const AgreementCreator: React.FC = () => {
                     placeholder={intl.formatMessage({
                         id: 'agreement-creator.title-placeholder',
                     })}
+                    onFocus={() => {
+                        setShowNameHelper(false);
+                    }}
                 />
             </Center>
             <Grid columns={GRID_COLUMNS}>
@@ -1034,7 +1038,7 @@ const AgreementCreator: React.FC = () => {
             </Modal>
 
             <Modal 
-            size='lg'
+            size='xl'
             closeOnEscape={false}
             closeOnClickOutside={false}
             withCloseButton={false}

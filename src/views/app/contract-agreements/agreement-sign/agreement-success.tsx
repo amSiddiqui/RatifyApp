@@ -29,6 +29,7 @@ const AgreementSuccess: React.FC = () => {
     const [token, setToken] = React.useState('');
     const [signerType, setSignerType] = React.useState('');
     const [senderName, setSenderName] = React.useState('');
+    const [organizationName, setOrganizationName] = React.useState('');
     const [showDocumentCopy, setShowDocumentCopy] = React.useState(false);
 
     React.useEffect(() => {
@@ -56,6 +57,7 @@ const AgreementSuccess: React.FC = () => {
             contractHelper.getSignerSuccessInfo(token).then(data => {
                 setSenderName(data.data.senderName);
                 setSignerType(data.data.signerType);
+                setOrganizationName(data.data.organizationName);
             }).catch(err => {
                 console.log(err);
             });
@@ -76,7 +78,7 @@ const AgreementSuccess: React.FC = () => {
                                 {signerType.length > 0 ? `You have successfully ${signerType === 'signer' ? 'signed and sent' : 'approved'} the document.` : 'You have completed the document.'}
                             </h4>
                             <p className="text-center text-muted">
-                                Sender {senderName === '' ? '' : ', '+senderName} will be notified and will receive the
+                                Sender {senderName === '' ? '' : ', '+senderName}{organizationName === '' ? '' : ', '+organizationName} will be notified and will receive the
                                 {signerType === 'approver' ? ' approved' : ' signed'} document
                             </p>
                         </div>

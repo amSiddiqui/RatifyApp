@@ -162,7 +162,8 @@ const AgreementDashboard: React.FC = () => {
 
     const gridOptions = React.useMemo<GridOptions>(() => {
         return {
-            domLayout: 'autoHeight',  
+            domLayout: 'autoHeight', 
+            suppressCellFocus: true 
         }
     }, []);
 
@@ -402,7 +403,7 @@ const AgreementDashboard: React.FC = () => {
                 <Grid style={{ height: '80vh' }}>
                     <Grid.Col sm={6} className='border-r-2 border-gray-200'>
                         <div className='px-2'>
-                            {moreDetailsAgreement &&  <AuditTrail height={'75vh'} contractHelper={contractHelper} contractId={moreDetailsAgreement.id.toString()} />}
+                            {moreDetailsAgreement &&  <AuditTrail height={550} contractHelper={contractHelper} contractId={moreDetailsAgreement.id.toString()} />}
                         </div>
                     </Grid.Col>
                     <Grid.Col sm={6}>

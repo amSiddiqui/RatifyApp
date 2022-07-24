@@ -348,7 +348,7 @@ const AddSigner:React.FC<AddSignerProps> = ({ onConfirmAddSigner, onCancelAddSig
         </div>
         <Divider className='my-3' />
         <Group position='right'>
-            <div className='text-right flex flex-row text-sm'><span>Drag</span><span className='mx-2 relative text-lg' style={{ top: 1 }}><AiOutlineDrag /></span><span>up and down to change the sequence of workflow steps</span></div>
+            {springs.length > 0 && <div className='text-right flex flex-row text-sm'><span>Drag</span><span className='mx-2 relative text-lg' style={{ top: 1 }}><AiOutlineDrag /></span><span>up and down to change the sequence of workflow steps</span></div>}
         </Group>
         <Group>
             <Button onClick={() => onAddSigner('signer')} className='flex justify-center items-center' >

@@ -162,7 +162,6 @@ const ProfileSettings: React.FC = () => {
             userData.imgUpdated = true;
             newImg = userImage;
         }
-        console.log('Sending data: ', { userData });
         authHelper
             .updateUser(userData)
             .then(() => {

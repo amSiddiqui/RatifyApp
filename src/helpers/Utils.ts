@@ -246,7 +246,7 @@ export const getAgreementBadgeColorFromStatus = (status: string) => {
             return 'blue';
         case 'error':
             return 'red';
-        case 'completed':
+        case 'complete':
             return 'green';
         case 'withdraw':
             return 'orange';

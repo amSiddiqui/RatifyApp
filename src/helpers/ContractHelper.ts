@@ -523,7 +523,7 @@ export class ContractHelper extends ApiHelper {
     }
 
     async getSignerSuccessInfo(token: string) {
-        let response: AxiosResponse<{ status: string, valid: boolean, data: { signerType: string, senderName: string }}> = await axios.get(
+        let response: AxiosResponse<{ status: string, valid: boolean, data: { organizationName: string, signerType: string, senderName: string }}> = await axios.get(
             `contracts/signer/success/?token=${token}`,
         );
         return response.data;

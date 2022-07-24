@@ -1,4 +1,4 @@
-import { Group, List, Stack, Tooltip } from '@mantine/core';
+import { Grid, Group, List, Stack, Tooltip } from '@mantine/core';
 import { DateTime } from 'luxon';
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -69,53 +69,60 @@ const PrepareSend: React.FC<Props> = ({
                 {signers.map((signer) => (
                     <Card key={signer.uid}>
                         <CardBody>
-                            <Group position='apart'>
-                                <Group>
-                                    <p>
-                                        {signer.type.charAt(0).toUpperCase()}
-                                        {signer.type.substring(1)} {signer.step}
-                                        {')'}
-                                    </p>
-                                    <p>{signer.name}</p>
-                                    <p>{signer.email}</p>
-                                    {signer.every_unit === '0' && (
-                                        <p>No Reminder</p>
-                                    )}
-                                    {signer.every_unit !== '0' && (
+                            <Grid columns={24}>
+                                <Grid.Col span={20}>
+                                    <Group>
                                         <p>
-                                            Remind every {signer.every}{' '}
-                                            {signer.every_unit}
+                                            {signer.type.charAt(0).toUpperCase()}
+                                            {signer.type.substring(1)} {signer.step}
+                                            {')'}
                                         </p>
-                                    )}
-                                </Group>
-                                {signer.id in signerStatus &&
-                                    signerStatus[signer.id].length > 0 && (
-                                        <p>
-                                            {signerStatus[signer.id] ===
-                                            'sent' ? (
-                                                <Group>
-                                                    <i className="simple-icon-check text-xl text-success"></i>
-                                                    <span>Sent</span>
-                                                </Group>
-                                            ) : (
-                                                <Tooltip label='Error sending email to signer. Please check the email.'>
-                                                    <Group>
-                                                        <i className='simple-icon-close text-xl text-danger'></i>
-                                                        <span>Error</span>
+                                        <p>{signer.name}</p>
+                                        <p>{signer.email}</p>
+                                        {signer.every_unit === '0' && (
+                                            <p>No Reminder</p>
+                                        )}
+                                        {signer.every_unit !== '0' && (
+                                            <p>
+                                                Remind every {signer.every}{' '}
+                                                {signer.every_unit}
+                                            </p>
+                                        )}
+                                    </Group>
+                                </Grid.Col>
+                                <Grid.Col span={4}>
+                                    <div className='flex justify-end w-full'>
+                                    {signer.id in signerStatus &&
+                                        signerStatus[signer.id].length > 0 && (
+                                            <p>
+                                                {signerStatus[signer.id] ===
+                                                'sent' ? (
+                                                    <Group spacing={8}>
+                                                        <i className="simple-icon-check text-xl text-success"></i>
+                                                        <span>Sent</span>
                                                     </Group>
-                                                </Tooltip>
-                                            )}
+                                                ) : (
+                                                    <Tooltip label='Error sending email to signer. Please check the email.'>
+                                                        <Group spacing={8}>
+                                                            <i className='simple-icon-close text-xl text-danger'></i>
+                                                            <span>Error</span>
+                                                        </Group>
+                                                    </Tooltip>
+                                                )}
+                                            </p>
+                                    )}
+                                    {!(signer.id in signerStatus) && (
+                                        <p>
+                                            <Group spacing={8}>
+                                                <i className='simple-icon-close text-xl text-danger'></i>
+                                                <span>Error</span>
+                                            </Group>
                                         </p>
-                                )}
-                                {!(signer.id in signerStatus) && (
-                                    <p>
-                                        <Group>
-                                            <i className='simple-icon-close text-xl text-danger'></i>
-                                            <span>Error</span>
-                                        </Group>
-                                    </p>
-                                )}
-                            </Group>
+                                    )}
+
+                                    </div>
+                                </Grid.Col>
+                            </Grid>
                         </CardBody>
                     </Card>
                 ))}

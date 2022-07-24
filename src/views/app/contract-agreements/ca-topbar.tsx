@@ -1,6 +1,5 @@
 import React from 'react';
 import { Row, Button } from 'reactstrap';
-import { GoPlus } from 'react-icons/go';
 import { Colxx } from '../../../components/common/CustomBootstrap';
 import { IntlShape } from 'react-intl';
 import { Dropzone, PDF_MIME_TYPE } from '@mantine/dropzone';
@@ -46,7 +45,8 @@ const CATopBar: React.FC<{
                         </Dropzone>
                     </Grid.Col>
                     <Grid.Col span={2}>
-                        <Center className='h-36'>
+                        {/* TODO: Add document creator */}
+                        {/* <Center className='h-36'>
                             <Button
                                 className="contract-agreements-create-new flex h-14 items-center justify-between"
                                 size="lg"
@@ -56,7 +56,7 @@ const CATopBar: React.FC<{
                                 </i>
                                 <span>Create New</span>
                             </Button>
-                        </Center>
+                        </Center> */}
                     </Grid.Col>
                 </Grid>
             </Colxx>

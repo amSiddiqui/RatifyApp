@@ -126,15 +126,15 @@ type Props = {
     contractHelper: ContractHelper;
     contractId?: string;
     token?: string;
-    height?: string;
+    height?: number;
 }
 
-const AuditTrail:React.FC<Props> = ({ contractHelper, contractId, token, height }) => {
+const AuditTrail:React.FC<Props> = ({ contractHelper, contractId, token, height:h }) => {
 
     const [auditTrail, setAuditTrail] = React.useState<AuditTrailData[]>([]);
     const [loading, setLoading] = React.useState(true);
     const [error, setError] = React.useState(false);
-
+    const [height] = React.useState(h ? h: 500); 
 
     React.useEffect(() => {
         setError(false);
@@ -165,15 +165,16 @@ const AuditTrail:React.FC<Props> = ({ contractHelper, contractId, token, height 
         }
     }, [contractHelper, contractId, token]);
 
+
     return (<div>
         {loading && <Center className='w-full h-36'>
             <Loader size='lg' />    
         </Center>}
-        {!loading && !error && <ScrollArea offsetScrollbars style={{ height: height ? height : 500 }}>
+        {!loading && !error && <ScrollArea offsetScrollbars style={ auditTrail.length > 6 ? { height: height } : { maxHeight: height } }>    
             <Timeline active={auditTrail.length} bulletSize={24} lineWidth={2}>
                 {auditTrail.map((item, index) => {
                     return (
-                    <Timeline.Item 
+                        <Timeline.Item 
                     color={timelineColorFromType(item.action_type)}
                     key={item.id} 
                     bullet={timelineIconFromType(item.action_type)} 

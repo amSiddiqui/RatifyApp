@@ -199,7 +199,7 @@ const DocumentCarousel: React.FC<Props> = ({
                                                     icon={
                                                         <MdEdit />
                                                     }>
-                                                    Edit
+                                                    Edit Properties
                                                 </Menu.Item>
                                                 <Menu.Item
                                                     onClick={() => {
@@ -215,7 +215,7 @@ const DocumentCarousel: React.FC<Props> = ({
                                                     }}
                                                     color="red"
                                                     icon={<BsTrash />}>
-                                                    Delete
+                                                    Delete Template
                                                 </Menu.Item>
                                             </Menu>
                                         </div>
