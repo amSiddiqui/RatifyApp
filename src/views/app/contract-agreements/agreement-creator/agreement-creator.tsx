@@ -23,7 +23,6 @@ import {
 } from '@mantine/core';
 import { DatePicker } from '@mantine/dates';
 import { Card, CardBody } from 'reactstrap';
-import { Document, Page } from 'react-pdf/dist/esm/entry.webpack5';
 import { useDispatch } from 'react-redux';
 import { AppDispatch } from '../../../../redux';
 import { ContractHelper } from '../../../../helpers/ContractHelper';
@@ -49,6 +48,7 @@ import { generateSignerLabels, getRandomStringID } from '../../../../helpers/Uti
 import { useDebouncedValue, useDisclosure } from '@mantine/hooks';
 import PrepareSend from './prepare-send';
 import SignerPopover from '../signer-popover';
+import BaseDocumentViewer from '../base-document-viewer';
 
 // luxon today date
 const today = DateTime.local();
@@ -76,7 +76,7 @@ const AgreementCreator: React.FC = () => {
     const [agreementName, setAgreementName] = React.useState('');
     const [dbAgreementName] = useDebouncedValue(agreementName, 1000);
     
-    const [numPages, setNumPages] = React.useState(null);
+    const [numPages, setNumPages] = React.useState<number>();
     const [pageNumber, setPageNumber] = React.useState(1);
     const { contractId } = useParams();
     const [pdf, setPdf] = React.useState('');
@@ -128,6 +128,7 @@ const AgreementCreator: React.FC = () => {
 
     const [confirmDeleteModal, deleteModalHandlers] = useDisclosure(false);
     const [showNameHelper, setShowNameHelper] = React.useState(true);
+    
 
     const dispatchFn = useDispatch<AppDispatch>();
     const contractHelper = React.useMemo(
@@ -171,9 +172,9 @@ const AgreementCreator: React.FC = () => {
         prepareSendHandler.open();
     }, [agreementName, prepareSendHandler, signers]);
 
-    function onDocumentLoadSuccess({ numPages }: any) {
-        setNumPages(numPages);
-    }
+    const onDocumentLoadSuccess = React.useCallback((val: number) => {
+        setNumPages(val);
+    }, []);
 
     const onPreviousPage = () => {
         setPageNumber((prev) => {
@@ -204,7 +205,7 @@ const AgreementCreator: React.FC = () => {
     };
 
     const onLastPage = () => {
-        if (numPages === null) {
+        if (numPages === undefined) {
             setPageNumber(1);
         } else {
             setPageNumber(numPages);
@@ -644,19 +645,8 @@ const AgreementCreator: React.FC = () => {
                                     <Skeleton height={1024} style={{zIndex: 0}} width={613} />
                                 )}
                                 {!pdfLoading && (
-                                    <div>
-                                        <div
-                                            ref={canvasRef}
-                                            style={{
-                                                height: '1024px',
-                                                width: '791px',
-                                                position: 'absolute',
-                                                top: '28px',
-                                                zIndex: 1,
-                                            }}
-                                            className="bg-transparent"
-                                            id='pdf-form-input-container'
-                                        >
+                                    <BaseDocumentViewer pdf={pdf} ref={canvasRef} pageNumber={pageNumber} onDocLoadSuccess={onDocumentLoadSuccess}>
+                                        <>
                                             {inputElements.map(
                                                 (element, index) => {
                                                     if (element.page === pageNumber) {
@@ -704,30 +694,9 @@ const AgreementCreator: React.FC = () => {
                                                         return null;
                                                     }
                                                 },
-                                            )}
-                                        </div>
-                                        <Document
-                                            loading={<Skeleton height={1080} />}
-                                            options={{
-                                                workerSrc: '/pdf.worker.js',
-                                            }}
-                                            file={
-                                                'data:application/pdf;base64,' +
-                                                pdf
-                                            }
-                                            onLoadSuccess={
-                                                onDocumentLoadSuccess
-                                            }
-                                        >
-                                            <Page
-                                                loading={
-                                                    <Skeleton height={1080} />
-                                                }
-                                                pageNumber={pageNumber}
-                                                height={1024}
-                                            />
-                                        </Document>
-                                    </div>
+                                            )}   
+                                        </> 
+                                    </BaseDocumentViewer>
                                 )}
                             </Center>
                         </CardBody>

@@ -26,7 +26,6 @@ import {
 import Breadcrumb from '../../../../containers/navs/Breadcrumb';
 import { Button, Card, CardBody } from 'reactstrap';
 import { generateSignerLabels, getAgreementBadgeColorFromStatus, getAgreementStatusText, getFormatDateFromIso } from '../../../../helpers/Utils';
-import { Document, Page } from 'react-pdf/dist/esm/entry.webpack5';
 import {
     HiChevronLeft,
     HiChevronRight,
@@ -43,6 +42,7 @@ import AuditTrail from '../audit-trail';
 import { IoWarningOutline } from 'react-icons/io5';
 import AuditTrailButton from '../audit-trail/audit-trail-button';
 import AgreementProgressBar from './agreement-progress-bar';
+import BaseDocumentViewer from '../base-document-viewer';
 
 const GRID_TOTAL = 20;
 const GRID_SIDE = 3;
@@ -74,7 +74,7 @@ const SenderAgreement: React.FC = () => {
         [id: string]: string;
     }>({});
     const [thumbnailsLoading, setThumbnailsLoading] = React.useState(true);
-    const [numPages, setNumPages] = React.useState(null);
+    const [numPages, setNumPages] = React.useState<number>();
     const [pageNumber, setPageNumber] = React.useState(1);
     const canvasRef = React.useRef<HTMLDivElement>(null);
     const [organizationName, setOrganizationName] = React.useState<string>('');
@@ -97,9 +97,9 @@ const SenderAgreement: React.FC = () => {
         });
     };
 
-    function onDocumentLoadSuccess({ numPages }: any) {
-        setNumPages(numPages);
-    }
+    const onDocumentLoadSuccess = React.useCallback((val:number) => {
+        setNumPages(val);
+    }, []);
 
     const onNextPage = () => {
         setPageNumber((prev) => {
@@ -118,7 +118,7 @@ const SenderAgreement: React.FC = () => {
     };
 
     const onLastPage = () => {
-        if (numPages === null) {
+        if (numPages === undefined) {
             setPageNumber(1);
         } else {
             setPageNumber(numPages);
@@ -254,7 +254,7 @@ const SenderAgreement: React.FC = () => {
                 if (err.response && err.response.status === 404) {
                     return;
                 }
-                console.log(err.response);
+                console.log(err.response, err.response.status);
             });
     }, [authHelper]);
 
@@ -422,18 +422,8 @@ const SenderAgreement: React.FC = () => {
                                         />
                                     )}
                                     {!pdfLoading && (
-                                        <div>
-                                            <div
-                                                ref={canvasRef}
-                                                style={{
-                                                    height: '1024px',
-                                                    width: '791px',
-                                                    position: 'absolute',
-                                                    top: '28px',
-                                                    zIndex: 1,
-                                                }}
-                                                className="bg-transparent"
-                                                id="pdf-form-input-container">
+                                        <BaseDocumentViewer ref={canvasRef} pdf={pdf} pageNumber={pageNumber} onDocLoadSuccess={onDocumentLoadSuccess}>
+                                            <>
                                                 {inputElements.map(
                                                     (element, index) => {
                                                         if (
@@ -452,32 +442,8 @@ const SenderAgreement: React.FC = () => {
                                                         }
                                                     },
                                                 )}
-                                            </div>
-                                            <Document
-                                                loading={
-                                                    <Skeleton height={1080} />
-                                                }
-                                                options={{
-                                                    workerSrc: '/pdf.worker.js',
-                                                }}
-                                                file={
-                                                    'data:application/pdf;base64,' +
-                                                    pdf
-                                                }
-                                                onLoadSuccess={
-                                                    onDocumentLoadSuccess
-                                                }>
-                                                <Page
-                                                    loading={
-                                                        <Skeleton
-                                                            height={1080}
-                                                        />
-                                                    }
-                                                    pageNumber={pageNumber}
-                                                    height={1024}
-                                                />
-                                            </Document>
-                                        </div>
+                                            </>
+                                        </BaseDocumentViewer>
                                     )}
                                 </Center>
                             </CardBody>

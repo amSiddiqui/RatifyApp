@@ -15,7 +15,6 @@ import {
     HiChevronDoubleLeft,
     HiChevronDoubleRight,
 } from 'react-icons/hi';
-import { Document, Page } from 'react-pdf/dist/esm/entry.webpack5';
 import classNames from 'classnames';
 import SignerInput from '../form-elements/SignerInput';
 import SignerComments from './signer-comments';
@@ -26,6 +25,7 @@ import { IoWarningOutline } from 'react-icons/io5';
 import AuditTrail from '../audit-trail';
 import AuditTrailButton from '../audit-trail/audit-trail-button';
 import AgreementProgressBar from '../sender-view/agreement-progress-bar';
+import BaseDocumentViewer from '../base-document-viewer';
 
 
 const GRID_TOTAL = 16;
@@ -105,7 +105,7 @@ const AgreementSign: React.FC = () => {
     const [pdfLoading, setPdfLoading] = React.useState(true);
     const [pdfThumbnails, setThumbnails] = React.useState<{[id: string]: string}>({});
     const [thumbnailsLoading, setThumbnailsLoading] = React.useState(true);
-    const [numPages, setNumPages] = React.useState(null);
+    const [numPages, setNumPages] = React.useState<number>();
     const [pageNumber, setPageNumber] = React.useState(1);
     const canvasRef = React.useRef<HTMLDivElement>(null);
 
@@ -143,9 +143,9 @@ const AgreementSign: React.FC = () => {
     };
 
     
-    function onDocumentLoadSuccess({ numPages }: any) {
-        setNumPages(numPages);
-    }
+    const onDocumentLoadSuccess = React.useCallback((val:number) => {
+        setNumPages(val);
+    }, []);
 
     const onNextPage = () => {
         setPageNumber((prev) => {
@@ -164,7 +164,7 @@ const AgreementSign: React.FC = () => {
     };
 
     const onLastPage = () => {
-        if (numPages === null) {
+        if (numPages === undefined) {
             setPageNumber(1);
         } else {
             setPageNumber(numPages);
@@ -534,74 +534,42 @@ const AgreementSign: React.FC = () => {
                                         <Skeleton height={1024} style={{zIndex: 0}} width={613} />
                                     )}
                                     {!pdfLoading && (
-                                        <div>
-                                            <div
-                                                ref={canvasRef}
-                                                style={{
-                                                    height: '1024px',
-                                                    width: '791px',
-                                                    position: 'absolute',
-                                                    top: '28px',
-                                                    zIndex: 1,
-                                                }}
-                                                className="bg-transparent"
-                                                id='pdf-form-input-container'
-                                            >
+                                        <BaseDocumentViewer ref={canvasRef} onDocLoadSuccess={onDocumentLoadSuccess} pdf={pdf} pageNumber={pageNumber}>
+                                            <>
                                                 {inputElements.map(
-                                                    (element, index) => {
-                                                        if (element.page === pageNumber) {
-                                                            return (
-                                                                <SignerInput
-                                                                    id={element.id}
-                                                                    width={element.width}
-                                                                    height={element.height}
-                                                                    initialValue={element.value}
-                                                                    onFilled={onFilled}
-                                                                    key={element.id}
-                                                                    placeholder={element.placeholder}
-                                                                    x={element.x}
-                                                                    y={element.y}
-                                                                    color={element.color}
-                                                                    type={element.type} 
-                                                                />
-                                                            )
-                                                        }
-                                                        return null;
-                                                    }
-                                                )}
-                                                {otherInputElements.map(
-                                                    (element, index) => {
-                                                        if (element.page  === pageNumber) {
-                                                            return <SenderInputView key={element.id} inputField={element} declined={element.declined} />
-                                                        }
-                                                        else {
+                                                        (element, index) => {
+                                                            if (element.page === pageNumber) {
+                                                                return (
+                                                                    <SignerInput
+                                                                        id={element.id}
+                                                                        width={element.width}
+                                                                        height={element.height}
+                                                                        initialValue={element.value}
+                                                                        onFilled={onFilled}
+                                                                        key={element.id}
+                                                                        placeholder={element.placeholder}
+                                                                        x={element.x}
+                                                                        y={element.y}
+                                                                        color={element.color}
+                                                                        type={element.type} 
+                                                                    />
+                                                                )
+                                                            }
                                                             return null;
                                                         }
-                                                    }
-                                                )}
-                                            </div>
-                                            <Document
-                                                loading={<Skeleton height={1080} />}
-                                                options={{
-                                                    workerSrc: '/pdf.worker.js',
-                                                }}
-                                                file={
-                                                    'data:application/pdf;base64,' +
-                                                    pdf
-                                                }
-                                                onLoadSuccess={
-                                                    onDocumentLoadSuccess
-                                                }
-                                            >
-                                                <Page
-                                                    loading={
-                                                        <Skeleton height={1080} />
-                                                    }
-                                                    pageNumber={pageNumber}
-                                                    height={1024}
-                                                />
-                                            </Document>
-                                        </div>
+                                                    )}
+                                                    {otherInputElements.map(
+                                                        (element, index) => {
+                                                            if (element.page  === pageNumber) {
+                                                                return <SenderInputView key={element.id} inputField={element} declined={element.declined} />
+                                                            }
+                                                            else {
+                                                                return null;
+                                                            }
+                                                        }
+                                                    )}
+                                            </>
+                                        </BaseDocumentViewer>
                                     )}
                                 </Center>
                             </CardBody>

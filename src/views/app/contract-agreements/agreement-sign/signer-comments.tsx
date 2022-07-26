@@ -63,7 +63,6 @@ const SignerComments:React.FC<Props> = ({ contractHelper, token, signerId, userI
                 setComments(resp.data);
                 setLoading(false);
             }).catch(err => {
-                console.log(err);
                 setError(true);
                 setLoading(false);
             });
