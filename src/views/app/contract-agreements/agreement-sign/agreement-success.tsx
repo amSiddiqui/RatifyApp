@@ -16,6 +16,22 @@ import SignupForm from '../../../user/signup-form';
 import { useDispatch } from 'react-redux';
 import { ContractHelper } from '../../../../helpers/ContractHelper';
 
+const typeToMessage = (type: string) => {
+    if (type === 'many') {
+        return 'Your request has been received. You will be notified when the document is ready.';
+    }
+    if (type === 'agreement' || type === 'email' || type === 'error') {
+        return 'Looks like something went wrong. We cannot get the final copy of the document at the moment. Please contact the sender.'
+    }
+    if (type === 'sent') {
+        return 'The final document has been emailed to you. Please check your inbox.';
+    }
+    if (type === 'request') {
+        return 'The document is not ready yet. We will email you the final copy of the document once it is ready.';
+    }
+    return 'Your request has been received. You will be notified when the document is ready.';
+};
+
 const AgreementSuccess: React.FC = () => {
     const navigate = useNavigate();
     const dispatchFn = useDispatch();
@@ -31,6 +47,8 @@ const AgreementSuccess: React.FC = () => {
     const [senderName, setSenderName] = React.useState('');
     const [organizationName, setOrganizationName] = React.useState('');
     const [showDocumentCopy, setShowDocumentCopy] = React.useState(false);
+    const [error, setError] = React.useState(false);
+    const [respType, setRespType] = React.useState('');
 
     React.useEffect(() => {
         const confetti = searchParams.get('confetti');
@@ -64,6 +82,25 @@ const AgreementSuccess: React.FC = () => {
         }
     }, [token, contractHelper]);
 
+    const requestDocumentCopy = React.useCallback(() => {
+        if (token) {
+            setError(false);
+            contractHelper.requestFinalDocument(token).then(resp => {
+                setRespType(resp.type);
+                setShowDocumentCopy(true);
+            }).catch(err => {
+                setError(true);
+                console.log(err.response);
+                if (err && err.response && err.response.data) {
+                    setRespType(err.response.data.type);
+                } else {
+                    setRespType('error');
+                }
+                setShowDocumentCopy(true);
+            });
+        }
+    }, [contractHelper, token]);
+
     return (
         <>
         <div style={{ backgroundColor: '#F8F8F8' }}>
@@ -83,7 +120,7 @@ const AgreementSuccess: React.FC = () => {
                             </p>
                         </div>
                         <Group className='mt-3' position="center">
-                            <span onClick={() => setShowDocumentCopy(true)}>
+                            <span onClick={() => requestDocumentCopy()}>
                                 <Button color="light">
                                     Get a Copy of Document
                                 </Button>
@@ -112,7 +149,15 @@ const AgreementSuccess: React.FC = () => {
         >
             <Center>
                 <div>
-                    <p className='text-lg'>The document is not yet complete. You will receive a copy of the document on your email once all the signers and approvers have completed the document.</p>
+                    {error && <Center>
+                        <i className='simple-icon-exclamation text-5xl mb-4 text-danger'></i>
+                    </Center>}
+                    {!error && <Center>
+                        <i className='simple-icon-check text-5xl mb-4 text-success'></i>
+                    </Center>}
+                    <p className='text-lg'>
+                        {typeToMessage(respType)}
+                    </p>
                     <Group position='right'>
                         <span onClick={() => setShowDocumentCopy(false)}>
                             <Button>

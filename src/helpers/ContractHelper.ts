@@ -543,4 +543,11 @@ export class ContractHelper extends ApiHelper {
             { message: declineMessage },
         );
     }
+
+    async requestFinalDocument(token: string) {
+        let response:AxiosResponse<{ status: string, type: string }> = await axios.post(
+            `contracts/signer/request-document/?token=${token}`,
+        );
+        return response.data;
+    }
 } 
