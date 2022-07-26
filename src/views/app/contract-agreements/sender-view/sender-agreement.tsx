@@ -84,6 +84,8 @@ const SenderAgreement: React.FC = () => {
     const [showAuditTrail, setShowAuditTrail] = React.useState(false);
     const [progressSections, setProgressSections] = React.useState<AgreementProgressSectionType[]>([]);
     const [withdrawMessage, setWithdrawMessage] = React.useState('');
+    const [finalPdf, setFinalPdf] = React.useState('');
+    const [finalPdfLoading, setFinalPdfLoading] = React.useState(false);
 
     const onPreviousPage = () => {
         setPageNumber((prev) => {
@@ -143,6 +145,27 @@ const SenderAgreement: React.FC = () => {
             reader.readAsDataURL(file);
         }
     };
+
+    const onRequestFinalPdf = React.useCallback(() => {
+        if (contractId) {
+            setFinalPdfLoading(true);
+            contractHelper.getFinalPdf(contractId).then((pdf) => {
+                setFinalPdf(pdf);
+
+                const linkSource = 'data:application/pdf;base64,' + pdf;
+                const downloadLink = document.createElement('a');
+                const fileName = `${agreement ?  agreement.title : 'document'}.pdf`;
+                downloadLink.href = linkSource;
+                downloadLink.download = fileName;
+                downloadLink.click();
+                setFinalPdfLoading(false);
+            }).catch(err => {
+                console.log(err);
+                toast.error('Failed to download PDF. Try again later!');
+                setFinalPdfLoading(false);
+            });
+        }
+    }, [contractHelper, contractId, agreement]);
 
     const setSignerDocumentSuccess = (id: number) => {
         setSigners((prev) => {
@@ -328,13 +351,16 @@ const SenderAgreement: React.FC = () => {
                                     className="relative"
                                     style={{ top: '15px' }}
                                     spacing={'xl'}>
-                                    {pdfLoading && <Loader size="xs" />}
-                                    {!pdfLoading && (
+                                    {(pdfLoading || finalPdfLoading) && <Loader size="xs" />}
+                                    {!pdfLoading && !finalPdfLoading && (
                                         <Group spacing='xs'>    
                                         <Tooltip label='Download Document' className='cursor-pointer'>
-                                            <a href={"data:application/pdf;base64,"+pdf} download={agreement ? agreement.title + '.pdf' : 'document.pdf'}>
+                                            {!finalPdf && (
+                                                <i onClick={() => onRequestFinalPdf()} className='iconsminds-download-1 text-lg'/>
+                                            )}
+                                            {finalPdf && <a href={"data:application/pdf;base64,"+finalPdf} download={agreement ? agreement.title + '.pdf' : 'document.pdf'}>
                                                 <i className='iconsminds-download-1 text-lg'/>
-                                            </a>
+                                            </a>}
                                         </Tooltip>
                                         <p>Download Document</p>
                                         </Group>
@@ -567,11 +593,11 @@ const SenderAgreement: React.FC = () => {
             <Grid className='mt-4 mb-12' columns={GRID_TOTAL}>
                 <Grid.Col span={GRID_SIDE}></Grid.Col>
                 <Grid.Col span={GRID_CENTER}>
-                    <Group position='left'>
+                    {agreement?.status === 'sent' && <Group position='left'>
                         <span onClick={() => {
                             setShowConfirmWithdraw(true);
                         }}><Button color='danger'>Withdraw Document</Button></span>
-                    </Group>
+                    </Group>}
                 </Grid.Col>
                 <Grid.Col span={GRID_SIDE}></Grid.Col>
             </Grid>

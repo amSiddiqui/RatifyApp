@@ -37,6 +37,14 @@ export class ContractHelper extends ApiHelper {
         return response.data;
     }
 
+    async getFinalPdf(id: string) {
+        const response:AxiosResponse<string> = await axios.get(
+            `/contracts/${id}/final-pdf/`,
+            { headers: { Authorization: `Bearer ${await this.getToken()}` } },
+        );
+        return response.data;
+    }
+
     async getPdfThumbnails(id: string): Promise<{ [id: string]: string }> {
         let token = await this.getToken();
         if (token === null) {
