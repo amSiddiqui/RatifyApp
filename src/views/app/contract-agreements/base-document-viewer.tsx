@@ -10,30 +10,36 @@ type Props = {
 }; 
 
 const BaseDocumentViewer = React.forwardRef<HTMLDivElement, Props>(({ children, pdf, pageNumber, onDocLoadSuccess }, ref) => {
+    const [pageOriginalDim, setPageOriginalDim] = React.useState<{ width: number, height: number }>({ width: 0, height: 0 });
     const [pageDim, setPageDim] = React.useState<{ width: number, height: number }>({ width: 0, height: 0 });
 
     const onDocumentLoadSuccess = React.useCallback(async (pdfObject: any) => {
         onDocLoadSuccess(pdfObject.numPages);
         const page = await pdfObject.getPage(pageNumber);
         const viewBox = page.getViewport().viewBox;
-        
-        setPageDim({width: viewBox[2], height: viewBox[3]});
-        
+        const width = viewBox[2];
+        const height = viewBox[3];
+        setPageOriginalDim({width, height});
+        const aspect = width / height;
+        let newWidth = 791;
+        let newHeight = 791 / aspect;
+        // round off newHeight
+        newHeight = Math.floor(newHeight);
+        setPageDim({width: newWidth, height: newHeight});
     }, [pageNumber, onDocLoadSuccess]);
     
     React.useEffect(() => {
-        console.log(pageDim);
+        console.log(pageOriginalDim, pageDim);
         // if page width greater than 791px then get the scale factor
-    }, [pageDim]);
+    }, [pageOriginalDim, pageDim]);
 
     return <div>
         <div
             ref={ref}
             style={{
-                height: pageDim.width,
-                width: pageDim.height,
+                height: pageDim.height,
+                width: pageDim.width,
                 position: 'absolute',
-                top: '28px',
                 zIndex: 1,
             }}
             className="bg-transparent"
@@ -59,7 +65,8 @@ const BaseDocumentViewer = React.forwardRef<HTMLDivElement, Props>(({ children, 
                     <Skeleton height={1080} />
                 }
                 pageNumber={pageNumber}
-                height={1024}
+                height={pageDim.height}
+                width={pageDim.width}
             />
         </Document>
     </div>;
