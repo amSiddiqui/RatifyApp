@@ -150,3 +150,14 @@ input {
 .dashboard-title-cell {
     @apply cursor-pointer hover:text-blue-500 hover:scale-110 transition-all;
 }
+
+#contract-agreements-pdf-viewer-modal .mantine-Modal-inner {
+    padding: 0;
+    margin-top: 10px;
+}
+
+#contract-agreements-pdf-viewer-modal-body {
+    max-height: 100vh;
+    height: 86vh;
+
+}

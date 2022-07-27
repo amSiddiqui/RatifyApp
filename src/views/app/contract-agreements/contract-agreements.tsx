@@ -6,7 +6,7 @@ import Breadcrumb from '../../../containers/navs/Breadcrumb';
 import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import './contract-agreements.css';
 import CATopBar from './ca-topbar';
-import DocumentCarousel from './document_carousel';
+import DocumentCarousel from './document-carousel';
 import { Modal, Progress, Divider, Group, Center, Stack, TextInput, Select } from '@mantine/core';
 import { ContractHelper } from '../../../helpers/ContractHelper';
 import { AppDispatch, RootState } from '../../../redux';
@@ -174,39 +174,48 @@ const ContractAgreements: React.FC = () => {
             />
             
             <Stack>
-                <Group position='apart' className="mb-2 cursor-pointer">
-                    <h1 className="text-2xl mb-0">Select from saved templates</h1>
+                <Group position='apart' className="mb-2">
+                    <Stack spacing={2}>
+                        <h1 className="text-2xl mb-0 p-0">Select from saved templates</h1>
+                        <div>
+                            {templates.length === 0 && (
+                                <p>No templates found</p>
+                            )}
+                            {templates.length > 0 && (
+                                <p>
+                                    {templates.filter(d => d.name.toLowerCase().search(searchTerm.toLocaleLowerCase()) !== -1).length}{' '}
+                                    {templates.filter(d => d.name.toLowerCase().search(searchTerm.toLocaleLowerCase()) !== -1).length > 1
+                                        ? 'templates'
+                                        : 'template'}{' '}
+                                    found
+                                </p>
+                            )}
+                        </div>
+                    </Stack>
+                    <div className='text-lg w-fit py-1 px-3 border-2 border-gray-300 rounded-full'>
+                        {searchTerm.length === 0 && <Group position='apart'>
+                            <span className='capitalize text-primary'>{selectedCategory === '' ? 'All Templates' : selectedCategory}</span>
+                            {selectedCategory !== '' && <MdClose className='cursor-pointer' onClick={() => setSelectedCategory('')} />}
+                        </Group>}
+                        {searchTerm.length > 0 && <Group position='apart'>
+                            <span className='capitalize text-primary'>Search Result</span>
+                            <MdClose onClick={() => setSearchTerm('')} className='cursor-pointer'></MdClose>
+                        </Group>}
+                    </div>
                     <Group>
-                        {templates.length === 0 && (
-                            <p>No templates found</p>
-                        )}
-                        {templates.length > 0 && (
-                            <p>
-                                {templates.filter(d => d.name.toLowerCase().search(searchTerm.toLocaleLowerCase()) !== -1).length}{' '}
-                                {templates.filter(d => d.name.toLowerCase().search(searchTerm.toLocaleLowerCase()) !== -1).length > 1
-                                    ? 'templates'
-                                    : 'template'}{' '}
-                                found
-                            </p>
-                        )}
                         <TextInput value={searchTerm} onChange={(event) => {
                             setSearchTerm(event.target.value.trim());
                         }} placeholder='Search' style={{width: 200}} rightSection={searchTerm.length > 0 ? <span onClick={() => {
                             setSearchTerm('');
                         }} className='text-danger'><MdClose /></span> : ''} icon={<i className='simple-icon-magnifier' />}  />
-                        <Select style={{ maxWidth: 200, position: 'relative', top: -12 }} label='Select Category' placeholder='Category' data={[
-                            { value: '', label: 'All' },
-                            ...templateCategories.map(c => ({ value: c, label: c }))
-                            ]} value={selectedCategory} onChange={val => setSelectedCategory(val ? val : '')} />
+                        
                     </Group>
                 </Group>
                 <Stack spacing={'xs'}>
-                    <div className='text-lg w-fit py-1 px-3 border-2 border-gray-300 rounded-full'>
-                        <Group position='apart'>
-                            <span className='capitalize text-primary'>{selectedCategory === '' ? 'All Templates' : selectedCategory}</span>
-                            {selectedCategory !== '' && <MdClose className='cursor-pointer' onClick={() => setSelectedCategory('')} />}
-                        </Group>
-                    </div>
+                    <Select style={{ maxWidth: 200, position: 'relative', top: -12 }} label='Select Category' placeholder='Category' data={[
+                        { value: '', label: 'All' },
+                        ...templateCategories.map(c => ({ value: c, label: c }))
+                        ]} value={selectedCategory} onChange={val => setSelectedCategory(val ? val : '')} />
                     <DocumentCarousel 
                     onTemplateDelete={(id) => {
                         setTemplates(prev => {
@@ -362,8 +371,14 @@ const ContractAgreements: React.FC = () => {
                 onClose={() => {setShowPdfView(false)}}
                 size='xl'
                 overflow='inside'
-                style={{ height: '100vh' }}
-                title={<p className='font-bold text-lg'>PDF Title</p>}
+                id='contract-agreements-pdf-viewer-modal'
+                title={<Stack spacing={2}>
+                    <Group>
+                        <p><span>Document: </span><span className='font-bold'>{selectedTemplate && (selectedTemplate.name.length > 40 ? selectedTemplate.name.substring(0, 40) + '...' : selectedTemplate.name)}</span></p>
+                        <p><span>Category: </span><span className='font-bold'>{selectedTemplate?.category}</span></p>
+                    </Group>
+                    {selectedTemplate && selectedTemplate.description && <p><span>Description: </span><span>{selectedTemplate && (selectedTemplate.description.length > 100) ? selectedTemplate.description.substring(0, 100) + '...' : selectedTemplate?.description}</span></p>}
+                </Stack>}
             >
                 {selectedTemplate && <PdfViewer contractHelper={contractHelper} documentId={selectedTemplate.documents[0].toString()} />}
             </Modal>

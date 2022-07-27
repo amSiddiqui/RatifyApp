@@ -253,9 +253,9 @@ const AgreementDashboard: React.FC = () => {
                                                     className={classNames('text-5xl transition-all rounded-full border-2 border-gray-300', 
                                                     {'text-primary': !tile1Hovered, 'text-white bg-primary': tile1Hovered })}>{agreements.filter(a => a.status === 'draft').length}</p>
                                             </Group>
-                                            <Group>
-                                                <p style={{ marginLeft: 12 }}>Draft</p>
-                                            </Group>
+                                            <div style={{ height: 37 }}>
+                                                <p style={{ marginLeft: 8 }}>Draft</p>
+                                            </div>
                                         </Stack>
                                     </Center>
                                 </CardBody>
@@ -277,9 +277,10 @@ const AgreementDashboard: React.FC = () => {
                                                     className={classNames('text-5xl transition-all rounded-full border-2 border-gray-300', 
                                                     {'text-primary': !tile2Hovered, 'text-white bg-primary': tile2Hovered })}>{agreements.filter(a => a.status === 'complete').length}</p>
                                             </Group>
-                                            <Group>
-                                                <p style={{ marginLeft: 12 }}>Completed in the last 30 days</p>
-                                            </Group>
+                                            <div style={{ height: 37 }}>
+                                                <p style={{ marginLeft: 8 }}>Completed</p>
+                                                <p style={{ marginLeft: 8 }} className='text-muted text-xs'>(last 30 days)</p>
+                                            </div>
                                         </Stack>
                                     </Center>
                                 </CardBody>
@@ -301,9 +302,9 @@ const AgreementDashboard: React.FC = () => {
                                                     className={classNames('text-5xl transition-all rounded-full border-2 border-gray-300', 
                                                     {'text-primary': !tile3Hovered, 'text-white bg-primary': tile3Hovered })}>{agreements.filter(a => a.status === 'sent').length}</p>
                                             </Group>
-                                            <Group>
-                                                <p style={{ marginLeft: 12 }}>In Progress</p>
-                                            </Group>
+                                            <div style={{ height: 37 }}>
+                                                <p style={{ marginLeft: 8 }}>In Progress</p>
+                                            </div>
                                         </Stack>
                                     </Center>
                                 </CardBody>

@@ -1,6 +1,7 @@
 import {
     Autocomplete,
     Center,
+    Grid,
     Group,
     Image,
     Menu,
@@ -10,7 +11,6 @@ import {
     Stack,
     Textarea,
     TextInput,
-    Tooltip,
 } from '@mantine/core';
 import React from 'react';
 import { IntlShape } from 'react-intl';
@@ -162,74 +162,15 @@ const DocumentCarousel: React.FC<Props> = ({
                                 <Stack className="mr-5" key={image.id}>
                                     <div className="flex flex-col justify-centers items-center">
                                         <div className="flex justify-end w-full items-center">
-                                            <Menu size="lg">
-                                                <Menu.Item
-                                                    onClick={() => {
-                                                        onViewClick(image.id);
-                                                    }}
-                                                    icon={
-                                                        <BsBook />
-                                                    }>
-                                                    View
-                                                </Menu.Item>
-                                                <Menu.Item
-                                                    onClick={() => {
-                                                        onCreateClick(image.id);
-                                                    }}
-                                                    icon={
-                                                        <MdAdd />
-                                                    }>
-                                                    Create Document
-                                                </Menu.Item>
-                                                <Menu.Item
-                                                    onClick={() => {
-                                                        setShowError(false);
-                                                        setEditingTemplate(
-                                                            image.id,
-                                                        );
-                                                        setEditMode(true);
-                                                        setTemplateData({
-                                                            name: image.name,
-                                                            category:
-                                                                image.category,
-                                                            description:
-                                                                image.description,
-                                                        });
-                                                    }}
-                                                    icon={
-                                                        <MdEdit />
-                                                    }>
-                                                    Edit Properties
-                                                </Menu.Item>
-                                                <Menu.Item
-                                                    onClick={() => {
-                                                        setDeletingTemplate({
-                                                            id: image.id,
-                                                            name: image.name,
-                                                            description:
-                                                                image.description,
-                                                        });
-                                                        setShowDeleteConfirm(
-                                                            true,
-                                                        );
-                                                    }}
-                                                    color="red"
-                                                    icon={<BsTrash />}>
-                                                    Delete Template
-                                                </Menu.Item>
-                                            </Menu>
+                                            
                                         </div>
-                                        <Tooltip
-                                            label={image.description}
-                                            hidden={
-                                                image.description.length === 0
-                                            }>
+                                        <div>
                                             <div
                                                 style={{
                                                     height: 150,
                                                     width: 116,
                                                 }}>
-                                                {image.error && (
+                                                {(image.error || image.image.trim().length === 0) && (
                                                     <Center
                                                         style={{
                                                             height: 150,
@@ -244,7 +185,7 @@ const DocumentCarousel: React.FC<Props> = ({
                                                         </div>
                                                     </Center>
                                                 )}
-                                                {!image.error && (
+                                                {!(image.error || image.image.trim().length === 0) && (
                                                     <Image
                                                         className="shadow-md cursor-pointer"
                                                         onClick={() => {
@@ -260,16 +201,85 @@ const DocumentCarousel: React.FC<Props> = ({
                                                     />
                                                 )}
                                             </div>
-                                        </Tooltip>
+                                        </div>
                                     </div>
-                                    <p
-                                        style={{ maxWidth: '8rem' }}
-                                        className="text-center text-xs">
-                                        {image.name}
-                                    </p>
+                                    <Grid columns={12} gutter={0}>
+                                        <Grid.Col span={10} className='p-0'>
+                                            <Center className='h-full'>
+                                                <p
+                                                    style={{ maxWidth: '8rem' }}
+                                                    className="text-center text-xs">
+                                                    {image.name.length > 20 ? image.name.substring(0, 20) + '...' : image.name}
+                                                </p>
+                                            </Center>
+                                        </Grid.Col>
+                                        
+                                        <Grid.Col span={2} className='p-0'>
+                                            <Group position='left'>
+                                                <Menu size="lg" control={ <i className='simple-icon-options'></i> }>
+                                                    <Menu.Item
+                                                        onClick={() => {
+                                                            onViewClick(image.id);
+                                                        }}
+                                                        icon={
+                                                            <BsBook />
+                                                        }>
+                                                        Preview Document
+                                                    </Menu.Item>
+                                                    <Menu.Item
+                                                        onClick={() => {
+                                                            onCreateClick(image.id);
+                                                        }}
+                                                        icon={
+                                                            <MdAdd />
+                                                        }>
+                                                        Use Template
+                                                    </Menu.Item>
+                                                    <Menu.Item
+                                                        onClick={() => {
+                                                            setShowError(false);
+                                                            setEditingTemplate(
+                                                                image.id,
+                                                            );
+                                                            setEditMode(true);
+                                                            setTemplateData({
+                                                                name: image.name,
+                                                                category:
+                                                                    image.category,
+                                                                description:
+                                                                    image.description,
+                                                            });
+                                                        }}
+                                                        icon={
+                                                            <MdEdit />
+                                                        }>
+                                                        Edit Properties
+                                                    </Menu.Item>
+                                                    <Menu.Item
+                                                        onClick={() => {
+                                                            setDeletingTemplate({
+                                                                id: image.id,
+                                                                name: image.name,
+                                                                description:
+                                                                    image.description,
+                                                            });
+                                                            setShowDeleteConfirm(
+                                                                true,
+                                                            );
+                                                        }}
+                                                        color="red"
+                                                        icon={<BsTrash />}>
+                                                        Delete Template
+                                                    </Menu.Item>
+                                                </Menu>
+                                            </Group>
+                                        </Grid.Col>
+
+                                    </Grid>
                                 </Stack>
                             );
                         })}
+                        {!loading && templateImages.length === 0 && <div style={{ height: 210 }}></div>}
                 </div>
             </ScrollArea>
             <Modal

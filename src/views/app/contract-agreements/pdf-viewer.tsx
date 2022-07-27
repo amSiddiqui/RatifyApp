@@ -24,7 +24,7 @@ const PdfViewer:React.FC<Props> = ({documentId, contractHelper}) => {
     }, [documentId, contractHelper]);
 
 
-    return <div style={{ height: '550px', }}>
+    return <div style={{ height: '100%', }}>
         {loading && <Center className='h-full w-full'>
             <Loader size={'xl'} />
         </Center>}
