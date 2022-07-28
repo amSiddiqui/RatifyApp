@@ -137,8 +137,9 @@ const AgreementCreator: React.FC = () => {
     );
     const navigate = useNavigate();
 
-    const onAddSigner = React.useCallback((newSigners: SignerElement[]) => {
+    const onAddSigner = React.useCallback((ns: SignerElement[]) => {
         if (contractId) {
+            const newSigners = [...ns];
             contractHelper.syncSigners(contractId, newSigners).then((data) => {
                 const ids = data.ids;
                 for (const signer of newSigners) {

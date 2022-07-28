@@ -169,6 +169,7 @@ const AddSigner:React.FC<AddSignerProps> = ({ onConfirmAddSigner, onCancelAddSig
         color: s.color,
         type: s.type,
         uid: s.uid,
+        id: s.id,
     })));
     const [lastColorIndex, setLastColorIndex] = React.useState(signers.length);
     const [signerData, setSignerData] = React.useState<Array<SignerElementFormProps>>(() => signers.map(s => ({
@@ -211,7 +212,7 @@ const AddSigner:React.FC<AddSignerProps> = ({ onConfirmAddSigner, onCancelAddSig
         }
         const id = getRandomStringID();
         setLastColorIndex((prev) => prev + 1);
-        setItems((prev) => [...prev, { step: prev.length + 1, color, type, name: '', email: '', uid: id }]);
+        setItems((prev) => [...prev, { step: prev.length + 1, color, type, name: '', email: '', uid: id, id: -1 }]);
         setSignerData((prev) => [...prev, { name: '', email: '', uid: id, job_title: '', text_field: false, every: 1, every_unit: 'months'}]);
         setOrder((prev) => [...prev, prev.length]);
     }
@@ -226,7 +227,6 @@ const AddSigner:React.FC<AddSignerProps> = ({ onConfirmAddSigner, onCancelAddSig
                 email,
                 job_title,
                 text_field,
-                id: -1,
                 every,
                 every_unit
             }
@@ -291,6 +291,7 @@ const AddSigner:React.FC<AddSignerProps> = ({ onConfirmAddSigner, onCancelAddSig
                     }}
                 >
                     <SignerRow 
+                        id={items[i].id}
                         uid={items[i].uid} 
                         label={function() {
                             const label = labels.find(l => l.uid === items[i].uid);

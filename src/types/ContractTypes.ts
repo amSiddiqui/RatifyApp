@@ -79,6 +79,7 @@ export interface SingerElementStyleProps {
     color: string;
     type: 'signer' | 'approver' | 'viewer';
     uid: string;
+    id: number;
 }
 
 export interface SignerElementFormProps {
