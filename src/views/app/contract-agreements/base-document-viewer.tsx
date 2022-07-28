@@ -20,11 +20,21 @@ const BaseDocumentViewer = React.forwardRef<HTMLDivElement, Props>(({ children, 
         const width = viewBox[2];
         const height = viewBox[3];
         setPageOriginalDim({width, height});
-        const aspect = width / height;
+        let aspect = width / height;
         let newWidth = 791;
         let newHeight = 791 / aspect;
         // round off newHeight
         newHeight = Math.floor(newHeight);
+
+        // check if newHeight is greater than 1024
+        if (newHeight > 1024) {
+            aspect = width / height;
+            newHeight = 1024;
+            newWidth = 1024 * aspect;
+            // round off newWidth
+            newWidth = Math.floor(newWidth);
+        }
+
         setPageDim({width: newWidth, height: newHeight});
     }, [pageNumber, onDocLoadSuccess]);
     
