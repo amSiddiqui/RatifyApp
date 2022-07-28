@@ -28,7 +28,7 @@ const PdfViewer:React.FC<Props> = ({documentId, contractHelper}) => {
         {loading && <Center className='h-full w-full'>
             <Loader size={'xl'} />
         </Center>}
-        {!loading && !error && <object data={'data:application/pdf;base64,'+doc} type="application/pdf" style={{
+        {!loading && !error && <object data={'data:application/pdf;base64,'+doc} style={{
             width: '100%',
             height: '100%',
         }}>

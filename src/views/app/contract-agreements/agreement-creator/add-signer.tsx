@@ -73,7 +73,7 @@ const SignerRow:React.FC<SignerRowProps> = ({ index, color, step, onDragEnd, onD
                         <TextInput error={confirm && name.length === 0 ? 'Please enter full name' : ''} placeholder='Name (required)' value={name} onChange={(event) => setName(event.currentTarget.value)}  />
                         <TextInput error={confirm && email.length === 0 ? 'Please enter email' : ''} placeholder='Email (required)' value={email} onChange={(event) => setEmail(event.currentTarget.value)} />
                         <TextInput placeholder='Job Title' style={{width: 100}} value={job_title} onChange={(event) => setJobTitle(event.currentTarget.value)} />
-                        { type === 'signer' && <div><Checkbox size='xs' label='Add Text field' defaultChecked={text_field} onChange={(event) => {setTextField(event.currentTarget.checked);}} /></div>}
+                        { type === 'signer' && <div><Checkbox size='xs' label='Add extra field(s)' defaultChecked={text_field} onChange={(event) => {setTextField(event.currentTarget.checked);}} /></div>}
                     </Group>
                     { type !== 'viewer' && <Group>
                         <p>Remind Every</p>

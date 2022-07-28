@@ -188,6 +188,10 @@ const SignerProgress: React.FC<Props> = ({ signer, contractHelper, onDocumentSen
                                     </Group>
                                     <p>{signer.email}</p>
                                 </div>
+                                {signer.job_title.trim() && <div>
+                                    <p className='text-muted'>Job Title</p>
+                                    <p className='capitalize'>{ signer.job_title }</p>
+                                </div>}
                                 {signer.last_seen && <div>
                                     <p className='text-muted'>Last seen</p>
                                     <p>{getFormatDateFromIso(signer.last_seen)}</p>

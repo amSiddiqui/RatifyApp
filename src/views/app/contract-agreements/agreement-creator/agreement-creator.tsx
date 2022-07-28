@@ -598,7 +598,7 @@ const AgreementCreator: React.FC = () => {
                                                                 setDragInputProps({
                                                                     dragInputColor: signer.color,
                                                                     dragInputId: signer.id,
-                                                                    dragInputText: 'Text Field',
+                                                                    dragInputText: 'Extra Field',
                                                                     dragInputType: 'text'
                                                                 });
                                                                 setIsDragging(true);
@@ -606,7 +606,7 @@ const AgreementCreator: React.FC = () => {
                                                             position="apart"
                                                             className="border-2 cursor-pointer border-slate-300 rounded-sm bg-white p-2 text-slate-400"
                                                         >
-                                                            <span>Text Field</span>
+                                                            <span>Extra Field</span>
                                                             <i>
                                                                 <AiOutlineDrag />
                                                             </i>

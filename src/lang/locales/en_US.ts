@@ -92,7 +92,7 @@ export const enMessages = {
     'account.settings.profile': 'Profile Settings',
     'account.settings.ui': 'UI Settings',
 
-    'profile-settings.last-name': 'Last Name',
+    'profile-settings.last-name': 'Surname',
     'profile-settings.first-name': 'First Name',
     'profile-settings.email': 'Email',
     'profile-settings.save': 'Save',

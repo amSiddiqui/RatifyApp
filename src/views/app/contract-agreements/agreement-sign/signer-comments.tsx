@@ -84,7 +84,7 @@ const SignerComments:React.FC<Props> = ({ contractHelper, token, signerId, userI
                 setCommenting(false);
                 setComment('');
             }}><Button size='xs' color='light'>Cancel</Button></span>
-            <span onClick={createComment} className='ml-2'><Button size='xs' color='success'>Add</Button></span>
+            <span onClick={createComment} className='ml-2'><Button size='xs' color='success'>Insert</Button></span>
         </div>}
 
         {!loading && !error && (<>
