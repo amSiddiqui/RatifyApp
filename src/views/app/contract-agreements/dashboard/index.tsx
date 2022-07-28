@@ -198,8 +198,8 @@ const AgreementDashboard: React.FC = () => {
     }), []);
 
     const onCreateNewClick = React.useCallback(() => {
-        
-    }, []);
+        navigate('/agreements');
+    }, [navigate]);
 
     React.useEffect(() => {
         contractHelper.getAllAgreements().then(data => {
