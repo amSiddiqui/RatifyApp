@@ -94,7 +94,7 @@ const PrepareSend: React.FC<Props> = ({
                                     <div className='flex justify-end w-full'>
                                     {signer.id in signerStatus &&
                                         signerStatus[signer.id].length > 0 && (
-                                            <p>
+                                            <div>
                                                 {signerStatus[signer.id] ===
                                                 'sent' ? (
                                                     <Group spacing={8}>
@@ -109,15 +109,15 @@ const PrepareSend: React.FC<Props> = ({
                                                         </Group>
                                                     </Tooltip>
                                                 )}
-                                            </p>
+                                            </div>
                                     )}
                                     {!(signer.id in signerStatus) && (
-                                        <p>
+                                        <div>
                                             <Group spacing={8}>
                                                 <i className='simple-icon-close text-xl text-danger'></i>
                                                 <span>Error</span>
                                             </Group>
-                                        </p>
+                                        </div>
                                     )}
 
                                     </div>

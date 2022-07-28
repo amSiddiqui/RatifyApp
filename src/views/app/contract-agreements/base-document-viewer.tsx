@@ -10,7 +10,6 @@ type Props = {
 }; 
 
 const BaseDocumentViewer = React.forwardRef<HTMLDivElement, Props>(({ children, pdf, pageNumber, onDocLoadSuccess }, ref) => {
-    const [pageOriginalDim, setPageOriginalDim] = React.useState<{ width: number, height: number }>({ width: 0, height: 0 });
     const [pageDim, setPageDim] = React.useState<{ width: number, height: number }>({ width: 0, height: 0 });
 
     const onDocumentLoadSuccess = React.useCallback(async (pdfObject: any) => {
@@ -19,7 +18,6 @@ const BaseDocumentViewer = React.forwardRef<HTMLDivElement, Props>(({ children, 
         const viewBox = page.getViewport().viewBox;
         const width = viewBox[2];
         const height = viewBox[3];
-        setPageOriginalDim({width, height});
         let aspect = width / height;
         let newWidth = 791;
         let newHeight = 791 / aspect;
@@ -37,11 +35,6 @@ const BaseDocumentViewer = React.forwardRef<HTMLDivElement, Props>(({ children, 
 
         setPageDim({width: newWidth, height: newHeight});
     }, [pageNumber, onDocLoadSuccess]);
-    
-    React.useEffect(() => {
-        console.log(pageOriginalDim, pageDim);
-        // if page width greater than 791px then get the scale factor
-    }, [pageOriginalDim, pageDim]);
 
     return <div>
         <div

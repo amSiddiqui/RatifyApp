@@ -18,7 +18,7 @@ import classNames from 'classnames';
 import { useSprings, animated } from 'react-spring';
 import { useDrag } from '@use-gesture/react';
 import { clamp } from 'lodash-es';
-import { useMediaQuery } from '@mantine/hooks';
+import { useDebouncedValue, useMediaQuery } from '@mantine/hooks';
 import { GoPlus } from 'react-icons/go';
 import { colors, getBgColorLight as getColor } from '../types';
 import { generateSignerLabels, getRandomStringID } from '../../../../helpers/Utils';
@@ -39,8 +39,11 @@ interface SignerRowProps extends SingerElementStyleProps {
 const SignerRow:React.FC<SignerRowProps> = ({ index, color, step, onDragEnd, onDragStart, type, onDataChange, confirm, onDelete, uid, signerData, label }) => {
     const [i] = React.useState(index);
     const [name, setName] = React.useState(signerData.name);
+    const [dbName] = useDebouncedValue(name, 1000);
     const [email, setEmail] = React.useState(signerData.email);
+    const [dbEmail] = useDebouncedValue(email, 1000);
     const [job_title, setJobTitle] = React.useState(signerData.job_title);
+    const [dbJobTitle] = useDebouncedValue(job_title, 1000);
     const [text_field, setTextField] = React.useState(signerData.text_field ? signerData.text_field : false);
     const [every, setEvery] = React.useState(signerData.every ? signerData.every : 1);
     const [every_unit, setEveryUnit] = React.useState<'days' | 'weeks' | 'months' | 'years' | '0' | string>(signerData.every_unit ? signerData.every_unit : 'months');
@@ -49,14 +52,14 @@ const SignerRow:React.FC<SignerRowProps> = ({ index, color, step, onDragEnd, onD
     React.useEffect(() => {
         onDataChange(i, {
             uid,
-            name,
-            email,
-            job_title,
+            name: dbName,
+            email: dbEmail,
+            job_title: dbJobTitle,
             text_field,
             every,
             every_unit
         });
-    }, [name, uid, email, job_title, text_field, every, every_unit, onDataChange, i]);
+    }, [dbName, uid, dbEmail, dbJobTitle, text_field, every, every_unit, onDataChange, i]);
     
 
     return <>
