@@ -18,7 +18,7 @@ import 'ag-grid-community/styles/ag-grid.css';
 import 'ag-grid-community/styles/ag-theme-material.css';
 import { AgGridEvent, ColDef, ColGroupDef, GridOptions, ICellRendererParams, RowNode } from 'ag-grid-community';
 import { DateTime } from 'luxon';
-import { useHover, useLocalStorage } from '@mantine/hooks';
+import { useHover, useLocalStorage, useResizeObserver } from '@mantine/hooks';
 import classNames from 'classnames';
 import { MdClose } from 'react-icons/md';
 import AuditTrail from '../audit-trail';
@@ -38,7 +38,7 @@ const AllColumns = [
 const columnBuilder = (columns: boolean[], navigate: NavigateFunction, onMoreDetailsClicked: (id: number) => void):(ColDef | ColGroupDef)[] => {
     const columnDefs:(ColDef | ColGroupDef)[] = [];
     if (columns.length > 0 && columns[0]) {
-        columnDefs.push({ headerName: 'ID', field: 'id', width: 180, onCellClicked: (e) => {
+        columnDefs.push({ headerName: 'ID', field: 'id', width: 150, onCellClicked: (e) => {
             navigate( `/agreements/${e.data.id}`);
         }, cellClass: 'dashboard-title-cell', colId: 'agreement-id-col' });
     }
@@ -51,7 +51,7 @@ const columnBuilder = (columns: boolean[], navigate: NavigateFunction, onMoreDet
 
     if (columns.length > 2 && columns[2]) {
         columnDefs.push(
-            { headerName: 'Sent On', field: 'sent_on', cellRenderer: (params: ICellRendererParams) => {
+            { headerName: 'Sent On', field: 'sent_on', width: 180, cellRenderer: (params: ICellRendererParams) => {
                 return getFormatDateFromIso(params.value);
             }}
         );
@@ -74,7 +74,7 @@ const columnBuilder = (columns: boolean[], navigate: NavigateFunction, onMoreDet
     }
 
     if (columns.length > 6 && columns[6]) {
-        columnDefs.push({ headerName: 'Actions', width: 200, field: 'sent_on', cellRenderer: (params: ICellRendererParams) => {
+        columnDefs.push({ headerName: 'Actions', width: 200, field: 'sent_on', filter: false, cellRenderer: (params: ICellRendererParams) => {
             const dt = DateTime.fromISO(params.value);
             const today = DateTime.local();
             let diff = today.diff(dt, 'days');
@@ -160,6 +160,8 @@ const AgreementDashboard: React.FC = () => {
 
     const [signers, setSigners] = React.useState<Signer[]>([]);
 
+    const [cardRef, rect] = useResizeObserver();
+
     const gridOptions = React.useMemo<GridOptions>(() => {
         return {
             domLayout: 'autoHeight', 
@@ -217,6 +219,12 @@ const AgreementDashboard: React.FC = () => {
     React.useEffect(() => {
         setColumnDef(columnBuilder(showColumns, navigate, onShowDetailClick));
     }, [showColumns, navigate, onShowDetailClick]);
+
+    React.useLayoutEffect(() => {
+        if (gridRef && gridRef.current) {
+            gridRef.current.api.sizeColumnsToFit();
+        }
+    }, [rect]); 
 
     return (
         <>
@@ -317,87 +325,88 @@ const AgreementDashboard: React.FC = () => {
                     </div>
                 </Grid.Col>
             </Grid>            
-            
-            <Card className='mt-4'>
-                <CardBody>
-                    {loading && <Center className='w-full h-40'>
-                        <Loader size='lg' />
-                    </Center>}
-                
-                    {!loading && error && <p className='text-2xl text-muted text-center'>
-                        Cannot fetch data right now. Please try again later.    
-                    </p>}
-                    {!loading && !error && <div>
-                        <Group position='apart' className='mb-4'>
-                            <Center>
-                                <p className='text-2xl'>Contracts & Agreements</p>
-                            </Center>
-                            {renderTileFilter !== 0 && <div className='text-xl py-1 px-3 border-2 border-gray-300 rounded-full'>
-                                <Group position='apart'>
-                                    {renderTileFilter === 1 && <span className='text-primary'>Drafts</span>}
-                                    {renderTileFilter === 2 && <span className='text-primary'>Completed</span>}
-                                    {renderTileFilter === 3 && <span className='text-primary'>In Progress</span>}
-                                    <MdClose onClick={() => {
-                                        tileFilter = 0;
-                                        setRenderTileFilter(tileFilter);
-                                        gridRef.current!.api.onFilterChanged();
-                                    }} className='cursor-pointer' />
-                                </Group>
-                            </div>}
-                            <Group spacing={'lg'}>
-                                <Popover
-                                    position='bottom'
-                                    placement='center'
-                                    opened={showColumnSettings}
-                                    onClose={() => setShowColumnSettings(false)}
-                                    withArrow
-                                    withCloseButton
-                                    target={<Group onClick={() => setShowColumnSettings(true)} className='cursor-pointer hover:text-blue-500 hover:scale-110 transition-all' spacing={4}>
-                                    <i className='simple-icon-settings'></i>
-                                    <span>Select Columns</span>
-                                </Group>}
+            <div ref={cardRef}>
+                <Card className='mt-4'>
+                    <CardBody>
+                        {loading && <Center className='w-full h-40'>
+                            <Loader size='lg' />
+                        </Center>}
+                    
+                        {!loading && error && <p className='text-2xl text-muted text-center'>
+                            Cannot fetch data right now. Please try again later.    
+                        </p>}
+                        {!loading && !error && <div>
+                            <Group position='apart' className='mb-4'>
+                                <Center>
+                                    <p className='text-2xl'>Contracts & Agreements</p>
+                                </Center>
+                                {renderTileFilter !== 0 && <div className='text-xl py-1 px-3 border-2 border-gray-300 rounded-full'>
+                                    <Group position='apart'>
+                                        {renderTileFilter === 1 && <span className='text-primary'>Drafts</span>}
+                                        {renderTileFilter === 2 && <span className='text-primary'>Completed</span>}
+                                        {renderTileFilter === 3 && <span className='text-primary'>In Progress</span>}
+                                        <MdClose onClick={() => {
+                                            tileFilter = 0;
+                                            setRenderTileFilter(tileFilter);
+                                            gridRef.current!.api.onFilterChanged();
+                                        }} className='cursor-pointer' />
+                                    </Group>
+                                </div>}
+                                <Group spacing={'lg'}>
+                                    <Popover
+                                        position='bottom'
+                                        placement='center'
+                                        opened={showColumnSettings}
+                                        onClose={() => setShowColumnSettings(false)}
+                                        withArrow
+                                        withCloseButton
+                                        target={<Group onClick={() => setShowColumnSettings(true)} className='cursor-pointer hover:text-blue-500 hover:scale-110 transition-all' spacing={4}>
+                                        <i className='simple-icon-settings'></i>
+                                        <span>Select Columns</span>
+                                    </Group>}
 
-                                >
-                                    <p className='font-bold mb-4'>Select Columns</p>
-                                    <Stack>
-                                        {AllColumns.map((col, index) => (
-                                            <Checkbox key={index} size='sm' checked={showColumns[index]} disabled={index === 6} onChange={index  === 6 ? undefined : (event) => setShowColumns(prev => {
-                                                const newCols = [...prev];
-                                                newCols[index] = event.currentTarget.checked;
-                                                setColumnDef(columnBuilder(newCols, navigate, onShowDetailClick));                                                
-                                                gridRef.current!.api.redrawRows();
-                                                return newCols;
-                                            })} label={col} />
-                                        ))}
-                                    </Stack>
-                                </Popover>
-                                
-                                
-                                <Group className='cursor-pointer hover:text-blue-500 hover:scale-110 transition-all' spacing={4}>
-                                    <i className='simple-icon-share-alt'></i>
-                                    <span>Export</span>
-                                </Group>
+                                    >
+                                        <p className='font-bold mb-4'>Select Columns</p>
+                                        <Stack>
+                                            {AllColumns.map((col, index) => (
+                                                <Checkbox key={index} size='sm' checked={showColumns[index]} disabled={index === 6} onChange={index  === 6 ? undefined : (event) => setShowColumns(prev => {
+                                                    const newCols = [...prev];
+                                                    newCols[index] = event.currentTarget.checked;
+                                                    setColumnDef(columnBuilder(newCols, navigate, onShowDetailClick));                                                
+                                                    gridRef.current!.api.redrawRows();
+                                                    return newCols;
+                                                })} label={col} />
+                                            ))}
+                                        </Stack>
+                                    </Popover>
+                                    
+                                    
+                                    <Group className='cursor-pointer hover:text-blue-500 hover:scale-110 transition-all' spacing={4}>
+                                        <i className='simple-icon-share-alt'></i>
+                                        <span>Export</span>
+                                    </Group>
 
+                                </Group>
                             </Group>
-                        </Group>
-                        <div className='ag-theme-material w-full h-full'>
-                            <AgGridReact
-                                animateRows={true}
-                                columnDefs={columnDefs}
-                                rowHeight={70}
-                                onGridReady={onGridReady}
-                                ref={gridRef}
-                                rowData={agreements}
-                                isExternalFilterPresent={() => true}
-                                doesExternalFilterPass={doesExternalFilterPass}
-                                defaultColDef={defaultColDef}
-                                gridOptions={gridOptions}
-                                overlayNoRowsTemplate={'Currently you do not have any documents. Please click on \'Create New\' button to proceed.'}
-                            />
-                        </div>
-                    </div>}
-                </CardBody>
-            </Card>
+                            <div className='ag-theme-material w-full h-full'>
+                                <AgGridReact
+                                    animateRows={true}
+                                    columnDefs={columnDefs}
+                                    rowHeight={70}
+                                    onGridReady={onGridReady}
+                                    ref={gridRef}
+                                    rowData={agreements}
+                                    isExternalFilterPresent={() => true}
+                                    doesExternalFilterPass={doesExternalFilterPass}
+                                    defaultColDef={defaultColDef}
+                                    gridOptions={gridOptions}
+                                    overlayNoRowsTemplate={'Currently you do not have any documents. Please click on \'Create New\' button to proceed.'}
+                                />
+                            </div>
+                        </div>}
+                    </CardBody>
+                </Card>
+            </div>
             <Modal
                 opened={moreDetailModal}
                 onClose={() => setMoreDetailModal(false)}

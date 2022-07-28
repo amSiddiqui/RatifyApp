@@ -547,6 +547,7 @@ export class ContractHelper extends ApiHelper {
     async requestFinalDocument(token: string) {
         let response:AxiosResponse<{ status: string, type: string }> = await axios.post(
             `contracts/signer/request-document/?token=${token}`,
+            { token }
         );
         return response.data;
     }
