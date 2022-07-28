@@ -9,7 +9,8 @@ import { Center, Grid } from '@mantine/core';
 const CATopBar: React.FC<{
     intl: IntlShape;
     onDocSelect: (files: File[]) => void;
-}> = ({ intl, onDocSelect }) => {
+    onUploadButtonClick: (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void;
+}> = ({ intl, onDocSelect, onUploadButtonClick }) => {
 
     return (
         <Row>
@@ -30,6 +31,7 @@ const CATopBar: React.FC<{
                                 <Center className='h-36'>
                                     <div>
                                         <Button
+                                            onClick={onUploadButtonClick}
                                             className="contract-agreements-create-new flex h-14 items-center justify-between"
                                             size="lg"
                                             color="secondary">

@@ -348,7 +348,6 @@ const BusinessDetails: React.FC<{
                                                 : orgBasicInfo.companyAddress;
                                         newOrg.companyAddressSame =
                                             orgBasicInfo.companyAddressSame;
-                                        console.log({ orgBasicInfo });
                                         return newOrg;
                                     });
                                 }

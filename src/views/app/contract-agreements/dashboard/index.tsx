@@ -197,6 +197,10 @@ const AgreementDashboard: React.FC = () => {
         resizable: true,
     }), []);
 
+    const onCreateNewClick = React.useCallback(() => {
+        
+    }, []);
+
     React.useEffect(() => {
         contractHelper.getAllAgreements().then(data => {
             setAgreements(data);            
@@ -229,7 +233,7 @@ const AgreementDashboard: React.FC = () => {
             <Grid columns={12}>
                 <Grid.Col span={2}>
                     <Center className='h-full m-3'>
-                        <span onClick={() => navigate(`agreements`)}>
+                        <span onClick={onCreateNewClick}>
                             <Button className='w-32 agreement-button' color="primary">
                                 Create New
                             </Button>

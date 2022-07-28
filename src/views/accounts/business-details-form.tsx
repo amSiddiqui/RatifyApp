@@ -1,8 +1,8 @@
 import { yupResolver } from '@hookform/resolvers/yup';
 import {
+    Autocomplete,
     Checkbox,
     Group,
-    Select,
     SimpleGrid,
     Stack,
     Textarea,
@@ -85,6 +85,8 @@ const BusinessDetailsForm: React.FC<{
     });
 
     const sameAddress = watch('companyAddressSame');
+    const bACountry = watch('billingAddress.country');
+    const cACountry = watch('companyAddress.country');
 
     const onSubmit = (values: OrganizationBasicInfo) => {
         authHelper.updateOrganizationBasicInfo(values).then(() => {
@@ -213,21 +215,21 @@ const BusinessDetailsForm: React.FC<{
 
                             <SimpleGrid cols={2}>
 
-                                <Select
-                                    required={true}
+                                <Autocomplete
+                                    data={Country}
                                     size={size}
-                                    placeholder='Country'
                                     label='Country'
-                                    {...register('billingAddress.country')}
-                                    onChange={(e) => {
-                                        register('billingAddress.country').onChange({
-                                            target: e
-                                        });
+                                    required
+                                    error={errors.billingAddress?.country ? errors.billingAddress.country.message : ''}
+                                    placeholder="Country"
+                                    value={bACountry}
+
+                                    onChange={(value) => {
+                                        setValue('billingAddress.country', value);
                                     }}
-                                    data={Country.map(d => ({
-                                        label: d,
-                                        value: d,
-                                    }))}
+                                    onBlur={register('billingAddress.country').onBlur}
+                                    name={register('billingAddress.country').name}
+                                    ref={register('billingAddress.country').ref}
                                 />
 
                                 <TextInput
@@ -328,19 +330,20 @@ const BusinessDetailsForm: React.FC<{
                             </SimpleGrid>
 
                             <SimpleGrid cols={2}>
-                                <TextInput
-                                    required={true}
+                                <Autocomplete
+                                    data={Country}
                                     size={size}
+                                    label='Country'
                                     disabled={sameAddress}
-                                    {...register('companyAddress.country')}
-                                    error={
-                                        errors.companyAddress?.country
-                                            ? errors.companyAddress.country
-                                                  .message
-                                            : ''
-                                    }
+                                    error={errors.companyAddress?.country ? errors.companyAddress.country.message : ''}
                                     placeholder="Country"
-                                    label="Country"
+                                    value={cACountry}
+                                    onChange={(value) => {
+                                        setValue('companyAddress.country', value);
+                                    }}
+                                    onBlur={register('companyAddress.country').onBlur}
+                                    name={register('companyAddress.country').name}
+                                    ref={register('companyAddress.country').ref}
                                 />
 
                                 <TextInput

@@ -56,6 +56,18 @@ const ContractAgreements: React.FC = () => {
         setProgress(progressEvent.loaded / progressEvent.total);
     }, []);
 
+    const onUploadButtonClick = React.useCallback((event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+        if (!organization || !auth.user) {
+            event.stopPropagation();
+            toast.error('Something went wrong! Please try again later.');
+            return;
+        }
+        if (!auth.user.verified || organization.stepsCompleted < 3) {
+            setShowUnverifiedModal(true)
+            event.stopPropagation();
+        }
+    }, [auth, organization]);
+
     const onDocSelect = React.useCallback(
         (files: File[]) => {
             if (!organization || !auth.user) {
@@ -166,7 +178,7 @@ const ContractAgreements: React.FC = () => {
                     <Separator className="mb-14" />
                 </Colxx>
             </Row>
-            <CATopBar intl={intl} onDocSelect={onDocSelect} />
+            <CATopBar onUploadButtonClick={onUploadButtonClick} intl={intl} onDocSelect={onDocSelect} />
             <Divider
                 className="mb-10 mt-10"
                 label={<p className="text-2xl">OR</p>}
