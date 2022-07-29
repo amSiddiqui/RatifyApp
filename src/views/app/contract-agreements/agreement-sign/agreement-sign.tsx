@@ -471,7 +471,7 @@ const AgreementSign: React.FC = () => {
                                 {!thumbnailsLoading && (
                                     <ScrollArea
                                         style={{
-                                            height: 290,
+                                            height: 600,
                                             overflow: 'hidden',
                                             width: '70%',
                                         }}
@@ -483,25 +483,21 @@ const AgreementSign: React.FC = () => {
                                                     const pg = parseInt(key) + 1;
                                                     const pageCompleted = checkInputPageAllComplete(pg, inputElements);
                                                     return (
-                                                        <div key={key}>
-                                                            {pageCompleted && <i className='simple-icon-check text-success absolute text-xl' style={{top: 0, left: 8}} />}
+                                                        <div className='relative' key={key}>
+                                                            {pageCompleted && inputElements.filter(ip => ip.page === pg).length > 0 && <i className='simple-icon-check text-success absolute text-xl' style={{top: 0, left: 8}} />}
+                                                            {!pageCompleted && inputElements.filter(ip => ip.page === pg).length > 0 && 
+                                                            <Tooltip label='Required Fields'>
+                                                                <i className='simple-icon-note text-primary absolute text-xl' style={{top: 0, left: 8}} />
+                                                            </Tooltip>
+                                                            }
                                                             <div
                                                                 className="flex flex-col justify-center items-center"
                                                             >
-                                                                <Tooltip
-                                                                    label='Required'
-                                                                    position='left'
-                                                                    withArrow
-                                                                    zIndex={1}
-                                                                    placement='start'
-                                                                    opened={!pageCompleted}
-                                                                    color='blue'
-                                                                    className={classNames(
+                                                                <div className={classNames(
                                                                         'border-4',{ 'border-sky-500': pageNumber === pg,},
                                                                         { 'border-gray-300': pageNumber !== pg,},
                                                                         'cursor-pointer',
-                                                                        )}
-                                                                >
+                                                                        )}>
                                                                     <img
                                                                         src={ 'data:image/jpeg;base64,' + pdfThumbnails[ key ] }
                                                                         style={{
@@ -510,7 +506,7 @@ const AgreementSign: React.FC = () => {
                                                                         alt="Page"
                                                                         onClick={() =>  setPageNumber( pg ) }
                                                                     />
-                                                                </Tooltip>
+                                                                </div>
                                                                 <p className="text-center text-sm">
                                                                     {pg}
                                                                 </p>
