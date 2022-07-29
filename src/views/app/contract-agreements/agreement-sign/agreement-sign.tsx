@@ -534,7 +534,16 @@ const AgreementSign: React.FC = () => {
                                         <Skeleton height={1024} style={{zIndex: 0}} width={613} />
                                     )}
                                     {!pdfLoading && (
-                                        <BaseDocumentViewer ref={canvasRef} onDocLoadSuccess={onDocumentLoadSuccess} pdf={pdf} pageNumber={pageNumber}>
+                                        <BaseDocumentViewer 
+                                        ref={canvasRef} 
+                                        onDocLoadSuccess={onDocumentLoadSuccess} 
+                                        pdf={pdf} 
+                                        pageNumber={pageNumber}
+                                        showNextPage={!!numPages && pageNumber < numPages}
+                                        showPrevPage={!!numPages && pageNumber > 1}
+                                        onNextPage={onNextPage}
+                                        onPrevPage={onPreviousPage}
+                                        >
                                             <>
                                                 {inputElements.map(
                                                         (element, index) => {

@@ -448,7 +448,16 @@ const SenderAgreement: React.FC = () => {
                                         />
                                     )}
                                     {!pdfLoading && (
-                                        <BaseDocumentViewer ref={canvasRef} pdf={pdf} pageNumber={pageNumber} onDocLoadSuccess={onDocumentLoadSuccess}>
+                                        <BaseDocumentViewer 
+                                            ref={canvasRef} 
+                                            pdf={pdf} 
+                                            pageNumber={pageNumber} 
+                                            onDocLoadSuccess={onDocumentLoadSuccess}
+                                            showNextPage={!!numPages && pageNumber < numPages}
+                                            showPrevPage={!!numPages && pageNumber > 1}
+                                            onNextPage={onNextPage}
+                                            onPrevPage={onPreviousPage}
+                                        >
                                             <>
                                                 {inputElements.map(
                                                     (element, index) => {

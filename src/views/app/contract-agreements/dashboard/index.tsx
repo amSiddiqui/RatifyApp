@@ -381,7 +381,11 @@ const AgreementDashboard: React.FC = () => {
                                     </Popover>
                                     
                                     
-                                    <Group className='cursor-pointer hover:text-blue-500 hover:scale-110 transition-all' spacing={4}>
+                                    <Group onClick={() => {
+                                        if (gridRef && gridRef.current) {
+                                            gridRef.current.api.exportDataAsExcel();
+                                        }
+                                    }} className='cursor-pointer hover:text-blue-500 hover:scale-110 transition-all' spacing={4}>
                                         <i className='simple-icon-share-alt'></i>
                                         <span>Export</span>
                                     </Group>
