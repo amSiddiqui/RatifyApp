@@ -3,7 +3,7 @@ import { toast } from 'react-toastify';
 import { ContractHelper } from '../../../../helpers/ContractHelper';
 import { AuditTrailActionType, AuditTrailData } from '../../../../types/ContractTypes';
 import { Center, Loader, ScrollArea, Timeline } from '@mantine/core';
-import { MdClear, MdCreate, MdErrorOutline, MdSearch, MdSend } from 'react-icons/md';
+import { MdAlarm, MdClear, MdCreate, MdErrorOutline, MdSearch, MdSend } from 'react-icons/md';
 import { BiUndo } from 'react-icons/bi';
 import { TbWritingSign } from 'react-icons/tb';
 import { DateTime } from 'luxon';
@@ -42,6 +42,8 @@ function timelineIconFromType(type: AuditTrailActionType) {
             return <TbWritingSign />;
         case 'decline':
             return <MdClear />;
+        case 'reminder':
+            return <MdAlarm />;
         default:
             return <MdSearch />;
     }
@@ -68,6 +70,8 @@ function timelineTitleFromType(type: AuditTrailActionType, signer_type: string |
             return 'Document Submitted';
         case 'decline':
             return 'Document Declined';
+        case 'reminder':
+            return 'Reminder Sent';
         default:
             return 'Document Viewed';
     }
@@ -98,6 +102,14 @@ function timelineDescriptionFromType(data: AuditTrailData) {
         }
         return <p>Document '<span>{data.agreement}</span>' was sent to {data.signer}</p>;
     }
+    
+    if (data.action_type === 'reminder') {
+        if (data.user && data.user.trim()) {
+            return <p><span className='text-rose-400'>{data.user}</span> sent a reminder to {data.signer} {!!data.signer_email ? <span className='text-muted'>{`[${data.signer_email}]`}</span> : ``}</p>;
+        }
+        return <p>Reminder for '<span>{data.agreement}</span>' was sent to {data.signer}</p>;
+    }
+    
     if (data.action_type === 'submit') {
         if (data.signer_type === 'signer') {
             return <p><span className='text-rose-400'>{data.signer}</span> signed the document '<span>{data.agreement}</span>'</p>;

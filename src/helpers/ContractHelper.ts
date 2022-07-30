@@ -18,6 +18,7 @@ import {
     SignerInputElements,
     SignerPdfResponse,
     SignerPdfThumbnails,
+    SignerReminder,
     SyncSignerResponse,
 } from '../types/ContractTypes';
 import { BaseResponse } from '../types/AuthTypes';
@@ -548,6 +549,23 @@ export class ContractHelper extends ApiHelper {
         let response:AxiosResponse<{ status: string, type: string }> = await axios.post(
             `contracts/signer/request-document/?token=${token}`,
             { token }
+        );
+        return response.data;
+    }
+
+    async sendSignerReminder(agreement_id: string, signer_id: string) {
+        const response:AxiosResponse<{ status: string, type: string }> = await axios.post(
+            `contracts/signer/reminder/`,
+            {agreement_id, signer_id},
+            {headers: {Authorization: `Bearer ${await this.getToken()}`}}
+        );
+        return response.data;
+    }
+
+    async getSignerReminder(agreement_id: string, signer_id: string) {
+        const response:AxiosResponse<{ 'reminder': SignerReminder | null }> = await axios.get(
+            `contracts/signer/reminder/?agreement_id=${agreement_id}&signer_id=${signer_id}`,
+            {headers: {Authorization: `Bearer ${await this.getToken()}`}}
         );
         return response.data;
     }

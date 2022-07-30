@@ -415,6 +415,7 @@ const SenderAgreement: React.FC = () => {
                                             }
                                             return (
                                                 <SignerProgress
+                                                    agreementId={contractId}
                                                     label={function() {
                                                         const label = labels.find(label => label.uid === signer.id.toString());
                                                         if (label) {

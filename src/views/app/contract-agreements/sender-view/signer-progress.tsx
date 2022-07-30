@@ -14,14 +14,6 @@ import { toast } from 'react-toastify';
 import SignerPopover from '../signer-popover';
 import { MdCheck, MdClear, MdError, MdSearch } from 'react-icons/md';
 
-type Props = {
-    signer: Signer;
-    contractHelper: ContractHelper;
-    onDocumentSent: (id: number) => void;
-    signerProgress: {total: number, completed: number} | null;
-    label: string;
-};
-
 export const getSignerStatus = (signer:Signer, signerProgress: {total: number, completed: number} | null) => {
     if (signer.status === 'error') {
         return 'Error sending';
@@ -56,6 +48,7 @@ export const getSignerStatus = (signer:Signer, signerProgress: {total: number, c
         }
     }
 }
+
 
 
 export const getSignerStatusAndIcon = (signer: Signer, size?: string) => {
@@ -112,7 +105,16 @@ export const getSignerStatusAndIcon = (signer: Signer, size?: string) => {
     }
 }
 
-const SignerProgress: React.FC<Props> = ({ signer, contractHelper, onDocumentSent, signerProgress, label }) => {
+type Props = {
+    signer: Signer;
+    contractHelper: ContractHelper;
+    onDocumentSent: (id: number) => void;
+    signerProgress: {total: number, completed: number} | null;
+    label: string;
+    agreementId?: string;
+};
+
+const SignerProgress: React.FC<Props> = ({ signer, contractHelper, onDocumentSent, signerProgress, label, agreementId }) => {
     const [sendAgainModal, sendAgainHandlers] = useDisclosure(false);
     const [sending, setSending] = React.useState(false);
 
@@ -125,6 +127,10 @@ const SignerProgress: React.FC<Props> = ({ signer, contractHelper, onDocumentSen
 
     const [collapsed, setCollapsed] = React.useState(false);
     const [showDeclineMessage, setShowDeclineMessage] = React.useState(false);
+    const [showConfirmReminder, setShowConfirmReminder] = React.useState(false);
+    const [reminderSending, setReminderSending] = React.useState(false);
+    const [lastReminder, setLastReminder] = React.useState('');
+    const [lastReminderError, setLastReminderError] = React.useState(true);
 
     const { register, handleSubmit, formState: { errors } } = useForm({
         resolver: yupResolver(sendAgainSchema),
@@ -145,6 +151,53 @@ const SignerProgress: React.FC<Props> = ({ signer, contractHelper, onDocumentSen
             toast.error('Cannot send the document. Please contact support');
         });
     }
+
+    const sendReminder = () => {
+        if (reminderSending || !agreementId) {
+            return;
+        }
+        setReminderSending(true);
+        contractHelper.sendSignerReminder(agreementId, signer.id.toString()).then(() => {
+            setReminderSending(false);
+            setShowConfirmReminder(false);
+            toast.success('Reminder sent successfully!');
+            fetchReminder();
+        }).catch(err => {
+            setReminderSending(false);
+            setShowConfirmReminder(false);
+            if (err.response && err.response.data) {
+                if (err.response.data.type === 'many') {
+                    toast.warn('A reminder was sent recently. Please try again after 5 minutes.');
+                    return;
+                }
+                if (err.response.data.type === 'email') {
+                    toast.error('Reminder cannot be sent. Please check the email address and try again later.');
+                    return;
+                }
+            }
+            toast.error('Something went wrong, try again later!');
+        });
+
+    };
+
+    const fetchReminder = React.useCallback(() => {
+        if (agreementId) {
+            contractHelper.getSignerReminder(agreementId, signer.id.toString()).then(res => {
+                if (res.reminder) {
+                    setLastReminder(res.reminder.sent_on);
+                } else {
+                    setLastReminder('');
+                }
+                setLastReminderError(false);
+            }).catch(err => {
+                console.log(err);
+            });
+        }
+    }, [agreementId, contractHelper, signer]);
+
+    React.useEffect(() => {
+        fetchReminder();
+    }, [fetchReminder]);
 
     return (
         <>
@@ -239,9 +292,13 @@ const SignerProgress: React.FC<Props> = ({ signer, contractHelper, onDocumentSen
                                 )}
                                 <div>
                                     <p className='text-muted'>Last Reminder</p>
-                                    <p>Not sent</p>
+                                    {!lastReminderError && <p>
+                                        {lastReminder === '' ? 'Not sent' : getFormatDateFromIso(lastReminder)}    
+                                    </p>}
                                 </div>
-                                {!signer.declined && (signer.type === 'viewer' ? !signer.last_seen : signer.status === 'sent') &&<span><Button size='xs' color='primary'>
+                                {!signer.declined && (signer.type === 'viewer' ? !signer.last_seen : signer.status === 'sent') &&<span
+                                    onClick={() => setShowConfirmReminder(true)}
+                                ><Button size='xs' color='primary'>
                                     Send Reminder    
                                 </Button></span>}
                                 {signer.status === 'error' && <span onClick={() => {
@@ -272,6 +329,30 @@ const SignerProgress: React.FC<Props> = ({ signer, contractHelper, onDocumentSen
                         </Group>
                     </Stack>
                 </form>
+            </Modal>
+
+            <Modal
+                centered
+                opened={showConfirmReminder}
+                onClose={() => setShowConfirmReminder(false)}
+                title={<p className='font-bold'>Confirm Send Reminder</p>}
+                withCloseButton
+            >
+                <Stack className='p-4'>
+                    {!reminderSending && <div className='text-lg text-center'>Send a reminder email to { signer.name } [<span className='text-muted'>{signer.email}?</span>]</div>}
+                    {reminderSending && <Stack>
+                        <Center><Loader /></Center>
+                        <p className='text-lg text-center'>Sending</p>
+                    </Stack>}
+                    <Group position='right'>
+                        <span onClick={() => setShowConfirmReminder(false)} >
+                            <Button color='light'>Close</Button>
+                        </span>
+                        <span onClick={() => sendReminder()}>
+                            <Button color='success' disabled={reminderSending}>Send</Button>
+                        </span>
+                    </Group>
+                </Stack>
             </Modal>
         </>
     );

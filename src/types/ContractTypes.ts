@@ -69,6 +69,13 @@ export interface Signer {
     created_at: string;
 }
 
+export interface SignerReminder {
+    id: number;
+    signer_id: number;
+    signer: string;
+    sent_on: string;
+}
+
 export interface SyncSignerResponse {
     ids: {[uid: string]: number};
 }
@@ -168,7 +175,7 @@ export type SignerComment = {
     Action types: 'create' | 'sent' | 'error' | 'deleted' | 'viewed' | 'submit'
 */
 
-export type AuditTrailActionType = 'create' | 'sent' | 'error' | 'deleted' | 'viewed' | 'submit' | 'decline';
+export type AuditTrailActionType = 'create' | 'sent' | 'error' | 'deleted' | 'viewed' | 'submit' | 'decline' | 'reminder';
 
 export interface AuditTrailData {
     id: number;
