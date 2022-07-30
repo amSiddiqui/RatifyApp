@@ -182,7 +182,7 @@ const AuditTrail:React.FC<Props> = ({ contractHelper, contractId, token, height:
         {loading && <Center className='w-full h-36'>
             <Loader size='lg' />    
         </Center>}
-        {!loading && !error && <ScrollArea offsetScrollbars style={ auditTrail.length > 6 ? { height: height } : { maxHeight: height } }>    
+        {!loading && !error && <ScrollArea offsetScrollbars style={ auditTrail.length > 5 ? { height: height } : { maxHeight: height } }>    
             <Timeline active={auditTrail.length} bulletSize={24} lineWidth={2}>
                 {auditTrail.map((item, index) => {
                     return (
