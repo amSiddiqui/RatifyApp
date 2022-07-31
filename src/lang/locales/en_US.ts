@@ -54,7 +54,7 @@ export const enMessages = {
     'menu.ui-settings': 'UI Settings',
     'menu.analytics': 'Analytics',
     'menu.contracts-agreements': 'Contracts & Agreements',
-    'menu.agreements': 'Agreements',
+    'menu.agreements': 'Documents',
     'menu.reports': 'Reports',
     'menu.create': 'Create',
     'menu.documents': 'Documents',

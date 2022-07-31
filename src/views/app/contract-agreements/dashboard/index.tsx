@@ -217,7 +217,7 @@ const AgreementDashboard: React.FC = () => {
 
     const onSubmitProfileSettings = () => {
         setShowNameErrors(false);
-        if (firstName.trim().length === 0) {
+        if (firstName && typeof(firstName) === 'string' && firstName.trim().length === 0) {
             setShowNameErrors(true);
             return;
         }
@@ -225,7 +225,7 @@ const AgreementDashboard: React.FC = () => {
             setShowEnterDetails(false);
             setShowNameErrors(false);
             toast.success('Profile updated successfully.');
-            
+
         }).catch(err => {
             setShowNameErrors(false);
             setShowEnterDetails(false);
@@ -252,8 +252,9 @@ const AgreementDashboard: React.FC = () => {
 
     React.useEffect(() => {
         if (auth && auth.user) {
-            setUserName({firstName: auth.user.first_name, lastName: auth.user.last_name});
-            if (auth.user.first_name.trim().length === 0) {
+            let first_name = auth.user.first_name || '';
+            setUserName({firstName: first_name, lastName: auth.user.last_name || ''});
+            if (first_name.length === 0) {
                 setShowEnterDetails(true);
             }
         }
