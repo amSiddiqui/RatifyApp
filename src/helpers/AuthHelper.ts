@@ -79,6 +79,16 @@ export class AuthHelper extends ApiHelper {
         );
     }
 
+    async updateUserName(firstName: string, lastName: string) {
+        await axios.put(
+            `/auth/user/name/`,
+            {firstName, lastName},
+            { headers: { Authorization: `Bearer ${await this.getToken()}` } },
+        );
+
+        this.dispatchFn(authActions.setUserName({first_name: firstName, last_name: lastName}));
+    }
+
     async getOrganization() {
         let token = await this.getToken();
         if (token !== null) {

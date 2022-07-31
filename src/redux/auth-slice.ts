@@ -66,6 +66,13 @@ const authSlice = createSlice({
             state.user = action.payload;
         },
 
+        setUserName: (state, action:PayloadAction<{ first_name: string, last_name: string }>) => {
+            if (state.user) {
+                state.user.first_name = action.payload.first_name;
+                state.user.last_name = action.payload.last_name;
+            }
+        },
+
         setUserVerified: (state, action:PayloadAction<boolean>) => {
             if (state.user) {
                 state.user.verified = action.payload;

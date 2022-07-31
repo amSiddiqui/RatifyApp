@@ -1,6 +1,6 @@
-import { Center, Grid, Loader, Badge, Stack, Group, Popover, Checkbox, Tooltip, Modal, List } from '@mantine/core';
+import { Center, Grid, Loader, Badge, Stack, Group, Popover, Checkbox, Tooltip, Modal, List, TextInput, SimpleGrid } from '@mantine/core';
 import React from 'react';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate, useLocation, NavigateFunction } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { Button, Card, CardBody, Row } from 'reactstrap';
@@ -11,7 +11,7 @@ import {
 import Breadcrumb from '../../../../containers/navs/Breadcrumb';
 import { ContractHelper } from '../../../../helpers/ContractHelper';
 import { getAgreementBadgeColorFromStatus, getAgreementStatusText, getFormatDateFromIso } from '../../../../helpers/Utils';
-import { AppDispatch } from '../../../../redux';
+import { AppDispatch, RootState } from '../../../../redux';
 import { AgreementRowData, Signer } from '../../../../types/ContractTypes';
 import { AgGridReact } from 'ag-grid-react';
 import 'ag-grid-community/styles/ag-grid.css'; 
@@ -24,6 +24,7 @@ import { MdClose } from 'react-icons/md';
 import AuditTrail from '../audit-trail';
 import { getSignerStatusAndIcon } from '../sender-view/signer-progress';
 import AgreementProgressBar from '../sender-view/agreement-progress-bar';
+import { AuthHelper } from '../../../../helpers/AuthHelper';
 
 const AllColumns = [
     'ID',
@@ -129,6 +130,17 @@ const AgreementDashboard: React.FC = () => {
         [dispatchFn],
     );
 
+    const authHelper = React.useMemo(
+        () => new AuthHelper(dispatchFn),
+        [dispatchFn],
+    );
+
+    const [showEnterDetails, setShowEnterDetails] = React.useState(false);
+
+    const auth = useSelector((root: RootState) => root.auth);
+    const [{firstName, lastName}, setUserName] = React.useState<{firstName: string, lastName: string}>({firstName: '', lastName: ''});
+    const [showNameErrors, setShowNameErrors] = React.useState(false);
+
     const [showColumnSettings, setShowColumnSettings] = React.useState(false);
     const [moreDetailModal, setMoreDetailModal] = React.useState(false);
     const [moreDetailsAgreement, setMoreDetailsAgreement] = React.useState<AgreementRowData>();
@@ -203,6 +215,24 @@ const AgreementDashboard: React.FC = () => {
         navigate('/agreements');
     }, [navigate]);
 
+    const onSubmitProfileSettings = () => {
+        setShowNameErrors(false);
+        if (firstName.trim().length === 0) {
+            setShowNameErrors(true);
+            return;
+        }
+        authHelper.updateUserName(firstName, lastName).then(() => {
+            setShowEnterDetails(false);
+            setShowNameErrors(false);
+            toast.success('Profile updated successfully.');
+            
+        }).catch(err => {
+            setShowNameErrors(false);
+            setShowEnterDetails(false);
+            toast.error('Something went wrong. Please go to My Account page to complete profile.');
+        });
+    };
+
     React.useEffect(() => {
         contractHelper.getAllAgreements().then(data => {
             setAgreements(data);            
@@ -219,6 +249,15 @@ const AgreementDashboard: React.FC = () => {
     React.useEffect(() => {
         setColumnDef(columnBuilder(showColumns, navigate, onShowDetailClick));
     }, [showColumns, navigate, onShowDetailClick]);
+
+    React.useEffect(() => {
+        if (auth && auth.user) {
+            setUserName({firstName: auth.user.first_name, lastName: auth.user.last_name});
+            if (auth.user.first_name.trim().length === 0) {
+                setShowEnterDetails(true);
+            }
+        }
+    }, [auth]);
 
     React.useLayoutEffect(() => {
         if (gridRef && gridRef.current) {
@@ -507,6 +546,47 @@ const AgreementDashboard: React.FC = () => {
                         </div>
                     </Grid.Col>
                 </Grid>
+            </Modal>
+
+            <Modal 
+                centered
+                opened={showEnterDetails}
+                onClose={() => setShowEnterDetails(false)}
+                title={<p className='text-lg font-bold'>Welcome to Ratify!</p>}
+                size='md'
+            >
+                <Stack className='p-2' spacing={'xl'}>
+                    <p>Please complete your profile before getting started.</p>
+                    <SimpleGrid cols={2}>
+                        <TextInput
+                            required={true}
+                            value={firstName}
+                            onChange={(e) => {
+                                setUserName(prev => ({ ...prev, firstName: e.target.value }));
+                            }}
+                            label='First Name'
+                            placeholder='First Name'
+                            error={ showNameErrors && !firstName && 'Please enter your name' }
+                        />
+                        <TextInput
+                            value={lastName}
+                            onChange={(e) => {
+                                setUserName(prev => ({ ...prev, lastName: e.target.value }));
+                            }}
+                            label='Surname'
+                            placeholder='Surname'
+                            error={ showNameErrors && !firstName }
+                        />
+                    </SimpleGrid>
+                    <Group position='right'>
+                        <span onClick={() => setShowEnterDetails(false)}>
+                            <Button color='light'>Later</Button>
+                        </span>
+                        <span onClick={onSubmitProfileSettings}>
+                            <Button color='success'>Submit</Button>
+                        </span>
+                    </Group>
+                </Stack>
             </Modal>
         </>
     );
