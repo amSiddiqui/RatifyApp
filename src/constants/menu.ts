@@ -23,7 +23,7 @@ const data = [
         id: 'account',
         icon: 'iconsminds-profile',
         label: 'menu.account',
-        to: `/account/profile-settings`,
+        to: `/profile-settings`,
     },
     {
         id: 'billing',
@@ -35,7 +35,7 @@ const data = [
         id: 'business',
         icon: 'iconsminds-shop-2',
         label: 'menu.business-profile',
-        to: `/account/business-profile`,
+        to: `/business-profile`,
     },
     {
         id: 'administration',

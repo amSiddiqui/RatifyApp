@@ -287,7 +287,7 @@ const ProfileSettings: React.FC = () => {
                                     <Stack>
                                         <p>Business profile incomplete. Please click the button below to complete your business profile.</p>
                                         <span onClick={() => {
-                                            navigate('/account/business-profile');
+                                            navigate('/business-profile');
                                         }}><Button size='xs' color='primary'>Business Profile</Button></span>
                                     </Stack>
                                 </Alert>

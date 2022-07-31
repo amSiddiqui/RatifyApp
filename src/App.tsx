@@ -169,12 +169,9 @@ function App() {
                                         <Route path=':contractId' element={ <SenderAgreement /> } />
                                     </Route>
                                     <Route path='reports' element={<Reports></Reports>}></Route>
-                                    <Route path='account' element={<><Outlet /></>}>
-                                        <Route index element={<Navigate to='/account/profile-settings' />} />
-                                        <Route path='profile-settings' element={<ProfileSettings />} />
-                                        <Route path='ui-settings' element={<UiSettings />} />
-                                        <Route path='business-profile' element={<BusinessProfile />} />
-                                    </Route>
+                                    <Route path='profile-settings' element={<ProfileSettings />} />
+                                    <Route path='ui-settings' element={<UiSettings />} />
+                                    <Route path='business-profile' element={<BusinessProfile />} />
                                     <Route path='blank' element={<BlankPage />} />
                                     <Route path='billing' element={<Billing />}></Route>
                                     <Route path='administration' element={<Administration />}></Route>

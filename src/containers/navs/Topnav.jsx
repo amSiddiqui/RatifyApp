@@ -306,7 +306,7 @@ const TopNav = ({ intl }) => {
                             </span>
                         </DropdownToggle>
                         <DropdownMenu className="mt-3" right>
-                            <DropdownItem className='active:text-white' onClick={() => {navigate('/account/profile-settings')}}>
+                            <DropdownItem className='active:text-white' onClick={() => {navigate('/profile-settings')}}>
                                 <p className='active:text-white w-full'>Account</p>
                             </DropdownItem>
                             <DropdownItem divider />
