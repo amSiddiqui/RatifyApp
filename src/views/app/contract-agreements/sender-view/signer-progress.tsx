@@ -161,7 +161,7 @@ const SignerProgress: React.FC<Props> = ({ signer, contractHelper, onDocumentSen
             setReminderSending(false);
             setShowConfirmReminder(false);
             toast.success('Reminder sent successfully!');
-            fetchReminder();
+            fetchReminder({ shouldUpdate: true });
         }).catch(err => {
             setReminderSending(false);
             setShowConfirmReminder(false);
@@ -180,15 +180,17 @@ const SignerProgress: React.FC<Props> = ({ signer, contractHelper, onDocumentSen
 
     };
 
-    const fetchReminder = React.useCallback(() => {
+    const fetchReminder = React.useCallback((meta: { shouldUpdate: boolean}) => {
         if (agreementId) {
             contractHelper.getSignerReminder(agreementId, signer.id.toString()).then(res => {
-                if (res.reminder) {
-                    setLastReminder(res.reminder.sent_on);
-                } else {
-                    setLastReminder('');
+                if (meta.shouldUpdate) {
+                    if (res.reminder) {
+                        setLastReminder(res.reminder.sent_on);
+                    } else {
+                        setLastReminder('');
+                    }
+                    setLastReminderError(false);
                 }
-                setLastReminderError(false);
             }).catch(err => {
                 console.log(err);
             });
@@ -196,7 +198,9 @@ const SignerProgress: React.FC<Props> = ({ signer, contractHelper, onDocumentSen
     }, [agreementId, contractHelper, signer]);
 
     React.useEffect(() => {
-        fetchReminder();
+        let meta = { shouldUpdate: true };
+        fetchReminder(meta);
+        return () => { meta.shouldUpdate = false; }
     }, [fetchReminder]);
 
     return (

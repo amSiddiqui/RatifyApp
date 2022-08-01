@@ -28,15 +28,20 @@ const AgreementDecline:React.FC = () => {
     }, [searchParams]);
 
     React.useEffect(() => {
+        let shouldUpdate = true;
         if (token) {
             contractHelper.getSignerDeclineInfo(token).then(data => {
-                setDeclineMessage(data.data.declineMessage);
-                setSenderName(data.data.senderName);
-                setSignerType(data.data.signerType);
+                if (shouldUpdate) {
+                    setDeclineMessage(data.data.declineMessage);
+                    setSenderName(data.data.senderName);
+                    setSignerType(data.data.signerType);
+                }
             }).catch(err => {
                 console.log(err);
             });
         }
+
+        return () => { shouldUpdate = false; } 
     }, [contractHelper, token]);
 
 

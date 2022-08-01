@@ -71,15 +71,20 @@ const AgreementSuccess: React.FC = () => {
     }, [searchParams]);
 
     React.useEffect(() => {
+        let shouldUpdate = true;
         if (token) {
             contractHelper.getSignerSuccessInfo(token).then(data => {
-                setSenderName(data.data.senderName);
-                setSignerType(data.data.signerType);
-                setOrganizationName(data.data.organizationName);
+                if (shouldUpdate) {
+                    setSenderName(data.data.senderName);
+                    setSignerType(data.data.signerType);
+                    setOrganizationName(data.data.organizationName);
+                }
             }).catch(err => {
                 console.log(err);
             });
         }
+
+        return () => { shouldUpdate = false; }
     }, [token, contractHelper]);
 
     const requestDocumentCopy = React.useCallback(() => {

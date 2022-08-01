@@ -183,86 +183,105 @@ const SenderAgreement: React.FC = () => {
     }, []);
 
     React.useEffect(() => {
+        let shouldUpdate = true;
         if (contractId) {
             contractHelper
                 .getAgreement(contractId)
                 .then((data) => {
-                    const agreement = data.agreement;
-                    if (!agreement.sent) {
-                        navigate('/agreements/add-signers/' + contractId);
-                        return;
-                    }
-
-                    const doc_id = data.agreement.documents[0];
-                    contractHelper
-                        .getPdfDocument(doc_id.toString())
-                        .then((pdf) => {
-                            setPdf(pdf);
-                        })
-                        .catch((error) => {
-                            throw error;
-                        })
-                        .finally(() => {
-                            setPdfLoading(false);
-                        });
-
-                    contractHelper
-                        .getPdfThumbnails(doc_id.toString())
-                        .then((thumbnails) => {
-                            setPdfThumbnails(thumbnails);
-                        })
-                        .catch((error) => {
-                            console.log(error);
-                            toast.error('Error loading pdf thumbnails');
-                        })
-                        .finally(() => {
-                            setThumbnailsLoading(false);
-                        });
-
-                    setAgreement(data.agreement);
-                    setSigners(
-                        data.signers.map((signer) => {
-                            if (signer.type !== 'viewer') {
-                                return signer;
-                            } else {
-                                if (signer.status === 'error') {
+                    if (shouldUpdate) {
+                        const agreement = data.agreement;
+                        if (!agreement.sent) {
+                            navigate('/agreements/add-signers/' + contractId);
+                            return;
+                        }
+    
+                        const doc_id = data.agreement.documents[0];
+                        contractHelper
+                            .getPdfDocument(doc_id.toString())
+                            .then((pdf) => {
+                                if (shouldUpdate) {
+                                    setPdf(pdf);
+                                }
+                            })
+                            .catch((error) => {
+                                throw error;
+                            })
+                            .finally(() => {
+                                if (shouldUpdate) {
+                                    setPdfLoading(false);
+                                }
+                            });
+    
+                        contractHelper
+                            .getPdfThumbnails(doc_id.toString())
+                            .then((thumbnails) => {
+                                if (shouldUpdate) {
+                                    setPdfThumbnails(thumbnails);
+                                }
+                            })
+                            .catch((error) => {
+                                if (shouldUpdate) {
+                                    console.log(error);
+                                    toast.error('Error loading pdf thumbnails');
+                                }
+                            })
+                            .finally(() => {
+                                if (shouldUpdate) {
+                                    setThumbnailsLoading(false);
+                                }
+                            });
+    
+                        setAgreement(data.agreement);
+                        setSigners(
+                            data.signers.map((signer) => {
+                                if (signer.type !== 'viewer') {
                                     return signer;
                                 } else {
-                                    if (signer.last_seen !== null) {
-                                        signer.status = 'completed';
+                                    if (signer.status === 'error') {
+                                        return signer;
                                     } else {
-                                        signer.status = 'sent';
+                                        if (signer.last_seen !== null) {
+                                            signer.status = 'completed';
+                                        } else {
+                                            signer.status = 'sent';
+                                        }
+                                        return signer;
                                     }
-                                    return signer;
                                 }
-                            }
-                        }).sort((a, b) => {
-                            return a.step - b.step;
-                        }),
-                    );
-                    setLabels(generateSignerLabels([], data.signers.map((s) => ({ uid: s.id.toString(), type: s.type, step: s.step })), true));
-                    setInputElements(data.input_fields);
+                            }).sort((a, b) => {
+                                return a.step - b.step;
+                            }),
+                        );
+                        setLabels(generateSignerLabels([], data.signers.map((s) => ({ uid: s.id.toString(), type: s.type, step: s.step })), true));
+                        setInputElements(data.input_fields);
+                    }
                 })
                 .catch((err) => {
-                    // check if error is 404
-                    if (err.response && err.response.status === 404) {
-                        toast.error('Agreement not found');
-                    } else {
-                        toast.error(
-                            'Error loading the agreement try again later',
-                        );
+                    if (shouldUpdate) {
+                        if (err.response && err.response.status === 404) {
+                            toast.error('Agreement not found');
+                        } else {
+                            toast.error(
+                                'Error loading the agreement try again later',
+                            );
+                        }
+                        navigate('/agreements');
                     }
-                    navigate('/agreements');
+                    // check if error is 404
                 });
         }
+        return () => { shouldUpdate = false; }
     }, [contractHelper, contractId, navigate]);
 
 
     React.useEffect(() => {
+        let shouldUpdate = true;
         authHelper
             .getOrganizationName()
             .then((data) => {
-                setOrganizationName(data.name);
+                if (shouldUpdate) {
+                    setOrganizationName(data.name);
+                }
             })
             .catch((err) => {
                 console.log(err);
@@ -271,7 +290,9 @@ const SenderAgreement: React.FC = () => {
         authHelper
             .getOrganizationLogo()
             .then((data) => {
-                setClientLogo(data);
+                if (shouldUpdate) {
+                    setClientLogo(data);
+                }
             })
             .catch((err) => {
                 if (err.response && err.response.status === 404) {
@@ -279,6 +300,8 @@ const SenderAgreement: React.FC = () => {
                 }
                 console.log(err.response, err.response.status);
             });
+
+        return () => { shouldUpdate = false; }
     }, [authHelper]);
 
     return (

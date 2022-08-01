@@ -149,32 +149,43 @@ const AuditTrail:React.FC<Props> = ({ contractHelper, contractId, token, height:
     const [height] = React.useState(h ? h: 500); 
 
     React.useEffect(() => {
+        let shouldUpdate = true;
         setError(false);
         if (contractId) {
             if (!token) {
                 contractHelper.getAuditTrail(contractId).then(data => {
-                    setAuditTrail(data.data);
-                    setLoading(false);
-                }).catch(err => {
-                    if (err) {
-                        console.log(err);
-                        toast.error('Error fetching audit trail. Try again later!');
+                    if (shouldUpdate) {
+                        setAuditTrail(data.data);
+                        setLoading(false);
                     }
-                    setError(true);
+                }).catch(err => {
+                    if (shouldUpdate) {
+                        if (err) {
+                            console.log(err);
+                            toast.error('Error fetching audit trail. Try again later!');
+                        }
+                        setError(true);
+                    }
                 });
             } else {
                 contractHelper.getSignerAuditTrail(token).then(data => {
-                    setAuditTrail(data.data);
-                    setLoading(false);
-                }).catch(err => {
-                    if (err) {
-                        console.log(err);
-                        toast.error('Error fetching audit trail. Try again later!');
+                    if (shouldUpdate) {
+                        setAuditTrail(data.data);
+                        setLoading(false);
                     }
-                    setError(true);
+                }).catch(err => {
+                    if (shouldUpdate) {
+                        if (err) {
+                            console.log(err);
+                            toast.error('Error fetching audit trail. Try again later!');
+                        }
+                        setError(true);
+                    }
                 })
             }
         }
+
+        return () => { shouldUpdate = false; }
     }, [contractHelper, contractId, token]);
 
 

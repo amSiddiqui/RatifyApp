@@ -74,15 +74,19 @@ const BusinessDetails: React.FC<{
     const [showLeError, setShowLeError] = React.useState(false);
 
     React.useEffect(() => {
+        let shouldUpdate = true;
         authHelper
             .getOrganizationLegalEntities()
             .then((data) => {
-                setLegalEntities(data.legalEntity);
-                setBusinessFunctions(data.businessFunction);
+                if (shouldUpdate) {
+                    setLegalEntities(data.legalEntity);
+                    setBusinessFunctions(data.businessFunction);
+                }
             })
             .catch((err) => {
                 console.log(err);
             });
+        return () => {shouldUpdate = false};
     }, [authHelper]);
 
     const onSubmit = () => {

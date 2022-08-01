@@ -191,25 +191,34 @@ const ProfileSettings: React.FC = () => {
     };
 
     React.useEffect(() => {
+        let shouldUpdate = true;
         authHelper
             .getUserVerified()
             .then((data) => {
-                setUserVerified(data.verified);
-                setLastVerificationSent(
-                    DateTime.fromISO(data.last_verification_sent).toLocal(),
-                );
+                if (shouldUpdate) {
+                    setUserVerified(data.verified);
+                    setLastVerificationSent(
+                        DateTime.fromISO(data.last_verification_sent).toLocal(),
+                    );
+                }
             })
             .catch((err) => {
-                toast.error('Cannot user at the moment. Try again later!');
-                console.log(err);
+                if (shouldUpdate) {
+                    toast.error('Cannot user at the moment. Try again later!');
+                    console.log(err);
+                }
             });
 
         authHelper
             .getOrganizationName().then(resp => {
-                setOrganization(resp);
+                if (shouldUpdate) {
+                    setOrganization(resp);
+                }
             }).catch(err => {
                 console.log(err);
             });
+        
+            return () => { shouldUpdate = false; }
     }, [authHelper]);
 
     return (

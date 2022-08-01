@@ -36,14 +36,18 @@ const BusinessLegalEntities:React.FC<{ prevStep: () => void, defaultLegalEntity?
     }
 
     React.useEffect(() => {
+        let shouldUpdate = true;
         authHelper.getOrganizationLegalEntities().then((data) => {
-            if (data.legalEntity.length > 0) {
-                setLegalEntities(data.legalEntity);
+            if (shouldUpdate) {
+                if (data.legalEntity.length > 0) {
+                    setLegalEntities(data.legalEntity);
+                }
+                setBusinessFunctions(data.businessFunction);
             }
-            setBusinessFunctions(data.businessFunction);
         }).catch(err => {
             console.log(err);
         });
+        return () => {shouldUpdate = false;}
     }, [authHelper]);
 
     return <>

@@ -16,29 +16,35 @@ const AgreementProgressBar:React.FC<Props> = ({contractHelper, contractId, token
     
 
     React.useEffect(() => {
+        let shouldUpdate = true;
         if (token) {
             contractHelper.getSignerProgress(token).then(dt => {
-                setProgressSections(dt.sections);
-                if (getSections) {
-                    getSections(dt.sections);
+                if (shouldUpdate) {
+                    setProgressSections(dt.sections);
+                    if (getSections) {
+                        getSections(dt.sections);
+                    }
+                    setOverallProgress([dt.progress, dt.total]);
                 }
-                setOverallProgress([dt.progress, dt.total]);
             }).catch(err => {
                 console.log(err);
             })
         } else {
             if (contractId) {
                 contractHelper.getSignerSenderProgress(contractId).then((dt) => {
-                    setOverallProgress([dt.progress, dt.total]);
-                    setProgressSections(dt.sections);
-                    if (getSections) {
-                        getSections(dt.sections);
+                    if (shouldUpdate) {
+                        setOverallProgress([dt.progress, dt.total]);
+                        setProgressSections(dt.sections);
+                        if (getSections) {
+                            getSections(dt.sections);
+                        }
                     }
                 }).catch(err => {
                     console.log(err);
                 });
             }
         }
+        return () => {shouldUpdate = false;}
     }, [contractHelper, token, contractId, getSections]);
 
 

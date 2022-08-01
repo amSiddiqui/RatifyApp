@@ -236,6 +236,7 @@ const AgreementCreator: React.FC = () => {
     }
 
     React.useEffect(() => {
+        let shouldUpdate = true;
         if (contractId) {
             contractHelper.getAgreement(contractId).then((data) => {
                 const agreement = data.agreement;
@@ -243,97 +244,112 @@ const AgreementCreator: React.FC = () => {
                     navigate('/agreements/'+contractId);
                     return;
                 }
-                const agreement_signers = data.signers;
-                const agreement_input_fields = data.input_fields;
-                setAgreementName(agreement.title);
-                if (agreement.end_date !== null) {
-                    setShowEndDate(true);
-                    setEndDate(DateTime.fromISO(agreement.end_date));
-                    setTemplateDate('');
-                }
-                if (agreement.start_date !== null) {
-                    setShowStartDate(true);
-                    setStartDate(DateTime.fromISO(agreement.start_date));
-                }
-                if (agreement.signed_before !== null) {
-                    setSignedBefore(new Date(agreement.signed_before));
-                }
-                setSignSequence(agreement.sequence);
-
-                setSigners(agreement_signers.map((s) => ({
-                    id: s.id,
-                    uid: s.id.toString(),
-                    step: s.step,
-                    color: s.color,
-                    type: s.type,
-                    name: s.name,
-                    email: s.email,
-                    job_title: s.job_title,
-                    text_field: s.text_field,
-                    every: s.every,
-                    every_unit: s.every_unit,
-                } as SignerElement )));
-
-                setLabels(generateSignerLabels([], agreement_signers.map((s) => ({uid: s.id.toString(), type: s.type, step: s.step}) ), true));
-
-                setInputElements(agreement_input_fields.map((i) => ({
-                    id: i.id,
-                    required: i.required,
-                    signerId: i.signer,
-                    placeholder: i.placeholder,
-                    color: i.color,
-                    x: i.x,
-                    y: i.y,
-                    width: i.width,
-                    height: i.height,
-                    uid: i.id.toString(),
-                    type: i.type,
-                    page: i.page
-                } as PdfFormInputType)));
-
-                const doc_id = data.agreement.documents[0];
-                contractHelper
-                    .getPdfDocument(doc_id.toString())
-                    .then((pdf) => {
-                        setPdf(pdf);
-                    })
-                    .catch((error) => {
-                        throw error;
-                    })
-                    .finally(() => {
-                        setPdfLoading(false);
-                    });
+                if (shouldUpdate)  {
+                    const agreement_signers = data.signers;
+                    const agreement_input_fields = data.input_fields;
+                    setAgreementName(agreement.title);
+                    if (agreement.end_date !== null) {
+                        setShowEndDate(true);
+                        setEndDate(DateTime.fromISO(agreement.end_date));
+                        setTemplateDate('');
+                    }
+                    if (agreement.start_date !== null) {
+                        setShowStartDate(true);
+                        setStartDate(DateTime.fromISO(agreement.start_date));
+                    }
+                    if (agreement.signed_before !== null) {
+                        setSignedBefore(new Date(agreement.signed_before));
+                    }
+                    setSignSequence(agreement.sequence);
     
-                contractHelper
-                    .getPdfThumbnails(doc_id.toString())
-                    .then((thumbnails) => {
-                        setPdfThumbnails(thumbnails);
-                    })
-                    .catch((error) => {
-                        console.log(error);
-                        toast.error('Error loading pdf thumbnails');
-                    })
-                    .finally(() => {
-                        setThumbnailsLoading(false);
-                    });
+                    setSigners(agreement_signers.map((s) => ({
+                        id: s.id,
+                        uid: s.id.toString(),
+                        step: s.step,
+                        color: s.color,
+                        type: s.type,
+                        name: s.name,
+                        email: s.email,
+                        job_title: s.job_title,
+                        text_field: s.text_field,
+                        every: s.every,
+                        every_unit: s.every_unit,
+                    } as SignerElement )));
+    
+                    setLabels(generateSignerLabels([], agreement_signers.map((s) => ({uid: s.id.toString(), type: s.type, step: s.step}) ), true));
+    
+                    setInputElements(agreement_input_fields.map((i) => ({
+                        id: i.id,
+                        required: i.required,
+                        signerId: i.signer,
+                        placeholder: i.placeholder,
+                        color: i.color,
+                        x: i.x,
+                        y: i.y,
+                        width: i.width,
+                        height: i.height,
+                        uid: i.id.toString(),
+                        type: i.type,
+                        page: i.page
+                    } as PdfFormInputType)));
+    
+                    const doc_id = data.agreement.documents[0];
+                    contractHelper
+                        .getPdfDocument(doc_id.toString())
+                        .then((pdf) => {
+                            if (shouldUpdate) {
+                                setPdf(pdf);
+                            }
+                        })
+                        .catch((error) => {
+                            throw error;
+                        })
+                        .finally(() => {
+                            if (shouldUpdate) {
+                                setPdfLoading(false);
+                            }
+                        });
+                    contractHelper
+                        .getPdfThumbnails(doc_id.toString())
+                        .then((thumbnails) => {
+                            if (shouldUpdate) {
+                                setPdfThumbnails(thumbnails);
+                            }
+                        })
+                        .catch((error) => {
+                            console.log(error);
+                            if (shouldUpdate) {
+                                toast.error('Error loading pdf thumbnails');
+                            }
+                        })
+                        .finally(() => {
+                            if (shouldUpdate) {
+                                setThumbnailsLoading(false);
+                            }
+                        });
+                }
             }).catch(err => {
                 console.log(err);
-                if (err.response && err.response.status === 404) {
-                    navigate(`/agreements/?error=404`);
-                } else {
-                    navigate(`/agreements/?error=500`);
+                if (shouldUpdate) {
+                    if (err.response && err.response.status === 404) {
+                        navigate(`/agreements/?error=404`);
+                    } else {
+                        navigate(`/agreements/?error=500`);
+                    }
                 }
             });
-
         } else {
             toast.error('Cannot Find Document. Redirecting to Contract List');
             setTimeout(() => {
                 navigate('/agreements');
             }, 4000);
         }
+
+        return () => { shouldUpdate = false; }
     }, [contractHelper, contractId, navigate]);
 
     React.useEffect(() => {
+
         const canvas = canvasRef.current;
         if (!canvas || isDragging === null || isDragging === true) {
             return;
@@ -365,16 +381,22 @@ const AgreementCreator: React.FC = () => {
     }, [isDragging, mousePosition, dragInputColor, dragInputId, dragInputText, pageNumber, dragInputType]);
     
     React.useEffect(() => {
+        let shouldUpdate = true;
+
         if (!contractId || pdfLoading) {
             return;
         }
         if (!titleFirstCall.current) {
             contractHelper.updateAgreementTitle(contractId, dbAgreementName, '').catch(err => {
-                toast.error('Error updating agreement title');
+                if (shouldUpdate) {
+                    toast.error('Error updating agreement title');
+                }
             });
         } else {
             titleFirstCall.current = false;
         }
+
+        return () => { shouldUpdate = false; }
     }, [dbAgreementName, contractHelper, contractId, pdfLoading]);
 
     React.useEffect(() => {
@@ -399,6 +421,7 @@ const AgreementCreator: React.FC = () => {
     }, [contractId, contractHelper, endDate, signedBefore, showEndDate, signSequence, pdfLoading, showStartDate, startDate]);
 
     React.useEffect(() => {
+        let shouldUpdate = true;
         if (pdfLoading || !contractId) {
             return;
         }
@@ -408,27 +431,35 @@ const AgreementCreator: React.FC = () => {
         }
         if (!inputElementsSynchronized.current) {
             contractHelper.syncInputField(contractId, inputElements).then(data => {
-                const ids = data.ids;
-                setInputElements(prev => {
-                    const newInputElements = [...prev];
-                    for (const inputElement of newInputElements) {
-                        inputElement.id = ids[inputElement.uid];
-                    }
-                    return newInputElements;
-                });
+                if (shouldUpdate) {
+                    const ids = data.ids;
+                    setInputElements(prev => {
+                        const newInputElements = [...prev];
+                        for (const inputElement of newInputElements) {
+                            inputElement.id = ids[inputElement.uid];
+                        }
+                        return newInputElements;
+                    });
+                }
             });
             inputElementsSynchronized.current = true;
         } else {
             inputElementsSynchronized.current = false;
         }
+
+        return () => { shouldUpdate = false; }
     }, [inputElements, pdfLoading, contractId, contractHelper]);
 
     React.useEffect(() => {
+        let shouldUpdate = true;
         contractHelper.getAgreementTemplateCategories().then(data => {
-            setTemplateCategories(data);
+            if (shouldUpdate) {
+                setTemplateCategories(data);
+            }
         }).catch(err => {
             console.log(err);  
         });
+        return () => { shouldUpdate = false; }
     }, [contractHelper]);
 
     React.useLayoutEffect(() => {

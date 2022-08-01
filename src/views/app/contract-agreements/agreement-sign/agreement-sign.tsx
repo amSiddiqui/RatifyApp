@@ -217,6 +217,7 @@ const AgreementSign: React.FC = () => {
     }, []);
 
     React.useEffect(() => {
+        let shouldUpdate = true;
         const token = searchParams.get('token');
         if (!token) {
             navigate('/');
@@ -226,91 +227,112 @@ const AgreementSign: React.FC = () => {
         contractHelper
             .validateSignToken(token)
             .then((resp) => {
-                if (resp.status === 'completed') {
-                    navigate(`/agreements/success?token=${token}`);
-                    return;
+                if (shouldUpdate) {
+                    if (resp.status === 'completed') {
+                        navigate(`/agreements/success?token=${token}`);
+                        return;
+                    }
+                    if (resp.data.declined) {
+                        navigate('/agreements/decline?token=' + token);
+                        return;
+                    }
+                    if (resp.valid) {
+                        setTokenValid(true);
+                        setBasicInfo(resp.data);
+                        contractHelper.getSignerClientLogo(token).then(data => {
+                            setClientLogo(data.data);
+                            setLoadingLogo(false);
+                        }).catch(err => {
+                            setLoadingLogo(false);
+                            console.log(err);
+                        });
+                    } else {
+                        setTokenValid(false);
+                        setTokenErrorType(resp.errorType);
+                    }
+                    setLoading(false);
                 }
-                if (resp.data.declined) {
-                    navigate('/agreements/decline?token=' + token);
-                    return;
-                }
-                if (resp.valid) {
-                    setTokenValid(true);
-                    setBasicInfo(resp.data);
-                    contractHelper.getSignerClientLogo(token).then(data => {
-                        setClientLogo(data.data);
-                        setLoadingLogo(false);
-                    }).catch(err => {
-                        setLoadingLogo(false);
-                        console.log(err);
-                    });
-                } else {
-                    setTokenValid(false);
-                    setTokenErrorType(resp.errorType);
-                }
-                setLoading(false);
             })
             .catch((err) => {
-                setLoading(false);
-                setTokenValid(false);
-                if (err.response && err.response.data) {
-                    setTokenErrorType(err.response.data.errorType ? err.response.data.errorType : 'SERVER');
+                if (shouldUpdate) {
+                    setLoading(false);
+                    setTokenValid(false);
+                    if (err.response && err.response.data) {
+                        setTokenErrorType(err.response.data.errorType ? err.response.data.errorType : 'SERVER');
+                    }
                 }
             });
+        
+        return () => { shouldUpdate = false; } 
     }, [searchParams, navigate, contractHelper]);
 
 
     React.useEffect(() => {
+        let shouldUpdate = true;
         if (token.length === 0 || !tokenValid ) {
             return;
         }
 
         contractHelper.getSignerData(token).then(resp => {
-            if (resp.valid) {
-                setAgreement(resp.data.agreement);
-                setClientName(resp.data.clientName);
+            if (shouldUpdate) {
+                if (resp.valid) {
+                    setAgreement(resp.data.agreement);
+                    setClientName(resp.data.clientName);
+                }
             }
         }).catch(err => {
             console.log(err);
         });
 
         contractHelper.getSignerPdf(token).then(resp => {
-            if (resp.valid) {
-                setPdf(resp.data);
-            } else {
+            if (shouldUpdate) {
+                if (resp.valid) {
+                    setPdf(resp.data);
+                } else {
+                    toast.error('Error Loading Document. Please contact support');
+                }
+                setPdfLoading(false);
+            }
+        }).catch(err => {
+            if (shouldUpdate) {
+                console.log(err);
+                setPdfLoading(false);
                 toast.error('Error Loading Document. Please contact support');
             }
-            setPdfLoading(false);
-        }).catch(err => {
-            console.log(err);
-            setPdfLoading(false);
-            toast.error('Error Loading Document. Please contact support');
         });
 
         contractHelper.getSignerPdfThumbnails(token).then(resp => {
-            if (resp.valid) {
-                setThumbnails(resp.data);
+            if (shouldUpdate) {
+                if (resp.valid) {
+                    setThumbnails(resp.data);
+                }
+                setThumbnailsLoading(false);
             }
-            setThumbnailsLoading(false);
         }).catch(err => {
-            setThumbnailsLoading(false);
+            if (shouldUpdate) {
+                setThumbnailsLoading(false);
+            }
         });
 
         contractHelper.getSignerInputElements(token).then(resp => {
-            if (resp.valid) {
-                let input_fields = resp.data;
-                setTotalFields(input_fields.length);
-                setCompletedFields(input_fields.filter(field => field.completed).length);
-                setInputElements(input_fields);
+            if (shouldUpdate) {
+                if (resp.valid) {
+                    let input_fields = resp.data;
+                    setTotalFields(input_fields.length);
+                    setCompletedFields(input_fields.filter(field => field.completed).length);
+                    setInputElements(input_fields);
+                }
             }
         }).catch(err => {
             console.log(err);
         });
 
         contractHelper.getSignerOtherInputElements(token).then(resp => {
-            if (resp.valid) {
-                let input_fields = resp.data;
-                setOtherInputElements(input_fields);
+            if (shouldUpdate) {
+                if (resp.valid) {
+                    let input_fields = resp.data;
+                    setOtherInputElements(input_fields);
+                }
             }
         }).catch(err => {
             console.log(err);
@@ -324,22 +346,28 @@ const AgreementSign: React.FC = () => {
     }, [inputElements]);
 
     React.useEffect(() => {
-        if (shouldUpdate) {
-            const data = inputElements.map(field => ({
-                id: field.id,
-                completed: field.completed,
-                value: field.value,
-            }));
-            console.log({data});
-            contractHelper.updateSignerResponse(token, data).then(resp => {
+        let shouldUpdate = true;
+        
+        const data = inputElements.map(field => ({
+            id: field.id,
+            completed: field.completed,
+            value: field.value,
+        }));
+        contractHelper.updateSignerResponse(token, data).then(resp => {
+            if (shouldUpdate) {
                 if (!resp.valid) {
                     toast.error('Error saving data. Please contact support');
                 }
-            }).catch(err => {
+            }
+        }).catch(err => {
+            if (shouldUpdate) {
                 toast.error('Error saving responses. Please contact support');
                 console.log(err);
-            });
-        }
+            }
+        });
+
+        return () => { shouldUpdate = false; }
+    
     }, [shouldUpdate, token, inputElements, contractHelper]);
 
     return (

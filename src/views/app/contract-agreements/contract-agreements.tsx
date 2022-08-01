@@ -136,25 +136,35 @@ const ContractAgreements: React.FC = () => {
     }, []);
 
     React.useEffect(() => {
+        let shouldUpdate = true;
         contractHelper
             .getAgreementTemplates().then(data => {
-                setTemplates(data);
-                const categories = new Set(data.map(t => t.category));
-                setTemplateCategories(Array.from(categories));
+                if (shouldUpdate) {
+                    setTemplates(data);
+                    const categories = new Set(data.map(t => t.category));
+                    setTemplateCategories(Array.from(categories));
+                }
             })
             .catch(err => {
-                console.log(err);
-                toast.error('Cannot fetch templates. Try Again Later!');
+                if (shouldUpdate) {
+                    console.log(err);
+                    toast.error('Cannot fetch templates. Try Again Later!');
+                }
             });
+        return () => { shouldUpdate = false; }
     }, [contractHelper]);
 
     React.useEffect(() => {
+        let shouldUpdate = true;
         authHelper
             .getOrganizationName().then(resp => {
-                setOrganization(resp);
+                if (shouldUpdate) {
+                    setOrganization(resp);
+                }
             }).catch(err => {
                 console.log(err);
             });
+        return () => { shouldUpdate = false; } 
     }, [authHelper]);
 
     React.useEffect(() => {

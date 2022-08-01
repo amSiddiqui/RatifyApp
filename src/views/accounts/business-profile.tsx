@@ -24,15 +24,19 @@ const BusinessProfile: React.FC = () => {
     const [error, setError] = React.useState(false);
     const [showLoading, setShowLoading] = React.useState(false);
 
-    const fetchData = React.useCallback(() => {
+    const fetchData = React.useCallback((meta: { shouldUpdate: boolean }) => {
         authHelper.getOrganization().then(org => {
-            setBusinessProfile(org);
-            setLoading(false);
-            setStepperForm(org.stepsCompleted < 3);
+            if (meta.shouldUpdate) {
+                setBusinessProfile(org);
+                setLoading(false);
+                setStepperForm(org.stepsCompleted < 3);
+            }
         }).catch(err => {
-            setLoading(false);
-            setError(true);
-            console.error(err);    
+            if (meta.shouldUpdate) {
+                setLoading(false);
+                setError(true);
+                console.error(err);    
+            }
         });
     }, [authHelper]);
 
@@ -41,7 +45,9 @@ const BusinessProfile: React.FC = () => {
     }, []);
 
     React.useEffect(() => {
-        fetchData();
+        let meta = { shouldUpdate: true}; 
+        fetchData(meta);
+        return () => { meta.shouldUpdate = false; }
     }, [fetchData]);
 
     if (showLoading) {

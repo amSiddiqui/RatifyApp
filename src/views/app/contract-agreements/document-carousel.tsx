@@ -121,25 +121,30 @@ const DocumentCarousel: React.FC<Props> = ({
     };
 
     React.useEffect(() => {
+        let shouldUpdate = true;
         Promise.allSettled(
             templates.map((d) => {
                 return contractHelper.getPdfCover(d.documents[0].toString());
             }),
         ).then((results) => {
-            const images = results.map((result, index) => {
-                return {
-                    id: templates[index].id,
-                    doc_id: templates[index].documents[0],
-                    name: templates[index].name,
-                    image: result.status === 'fulfilled' ? result.value : '',
-                    error: result.status === 'rejected',
-                    category: templates[index].category,
-                    description: templates[index].description,
-                };
-            });
-            setTemplateImages(images);
-            setLoading(false);
-        });
+            if (shouldUpdate) {
+                const images = results.map((result, index) => {
+                    return {
+                        id: templates[index].id,
+                        doc_id: templates[index].documents[0],
+                        name: templates[index].name,
+                        image: result.status === 'fulfilled' ? result.value : '',
+                        error: result.status === 'rejected',
+                        category: templates[index].category,
+                        description: templates[index].description,
+                    };
+                });
+                setTemplateImages(images);
+                setLoading(false);
+            }
+        }).catch((err) => { console.log(err); });
+        
+        return () => { shouldUpdate = false; }
     }, [templates, contractHelper]);
 
     return (

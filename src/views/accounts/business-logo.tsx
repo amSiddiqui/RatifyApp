@@ -28,13 +28,17 @@ const BusinessLogo: React.FC<{authHelper: AuthHelper}> = ( {authHelper} ) => {
     };
 
     React.useEffect(() => {
+        let shouldUpdate = true;
         authHelper
             .getOrganizationLogo()
             .then((data) => {
-                setImage(data);
+                if (shouldUpdate) {
+                    setImage(data);
+                }
             })
             .catch((err) => {
             });
+        return () => {shouldUpdate = false;}
     }, [authHelper]);
 
 

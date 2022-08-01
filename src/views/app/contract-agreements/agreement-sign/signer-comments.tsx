@@ -58,15 +58,21 @@ const SignerComments:React.FC<Props> = ({ contractHelper, token, signerId, userI
     }
 
     React.useEffect(() => {
+        let shouldUpdate = true;
         if (token && contractHelper) {
             contractHelper.getSignerComments(token, type).then(resp => {
-                setComments(resp.data);
-                setLoading(false);
+                if (shouldUpdate) {
+                    setComments(resp.data);
+                    setLoading(false);
+                }
             }).catch(err => {
-                setError(true);
-                setLoading(false);
+                if (shouldUpdate) {
+                    setError(true);
+                    setLoading(false);
+                }
             });
         }
+        return () => { shouldUpdate = false; }
     }, [contractHelper, token, type]);
 
     return (<>

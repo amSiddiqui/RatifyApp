@@ -234,15 +234,21 @@ const AgreementDashboard: React.FC = () => {
     };
 
     React.useEffect(() => {
+        let shouldUpdate = true;
         contractHelper.getAllAgreements().then(data => {
-            setAgreements(data);            
-            setLoading(false);
+            if (shouldUpdate) {
+                setAgreements(data);            
+                setLoading(false);
+            }
         }).catch(err => {
-            console.log(err);
-            toast.error('Error fetching agreements. Try again later');
-            setLoading(false);
-            setError(true);
+            if (shouldUpdate) {
+                console.log(err);
+                toast.error('Error fetching agreements. Try again later');
+                setLoading(false);
+                setError(true);
+            }
         });
+        return () => { shouldUpdate = false; }
     }, [contractHelper]);
 
 

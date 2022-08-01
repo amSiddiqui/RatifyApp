@@ -13,14 +13,21 @@ const PdfViewer:React.FC<Props> = ({documentId, contractHelper}) => {
     const [loading, setLoading] = React.useState(true);
 
     React.useEffect(() => {
+        let shouldUpdate = true;
         contractHelper.getPdfDocument(documentId).then(data => {
-            setDoc(data);
-            setLoading(false);
+            if (shouldUpdate) {
+                setDoc(data);
+                setLoading(false);
+            }
         }).catch(err => {
-            console.log(err);
-            setLoading(false);
-            setError(true);
+            if (shouldUpdate) {
+                console.log(err);
+                setLoading(false);
+                setError(true);
+            }
         });
+
+        return () => { shouldUpdate = false; }
     }, [documentId, contractHelper]);
 
 

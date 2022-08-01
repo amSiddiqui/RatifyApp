@@ -6,7 +6,6 @@ import React from 'react';
 import { getBgColorLight, getBorderColorBold, INPUT_TOP_OFFSET } from '../types';
 import SignatureInput from './SignatureInput';
 import { MdClear } from 'react-icons/md';
-import { useDebouncedValue } from '@mantine/hooks';
 
 interface Props  {
     placeholder: string;
@@ -33,7 +32,6 @@ const SignerInput:React.FC<Props> = ({id, x, y, type, placeholder, onFilled, ini
         }
     });
     const [signValue, setSignValue] = React.useState(initialValue);
-    const [debounced] = useDebouncedValue(signValue, 1000);
 
     React.useEffect(() => {
         const timeout = setTimeout(() => {
@@ -41,12 +39,6 @@ const SignerInput:React.FC<Props> = ({id, x, y, type, placeholder, onFilled, ini
         }, 700);
         return () => clearTimeout(timeout);
     }, []);
-
-    React.useEffect(() => {
-        if (type === 'name' || type === 'text') {
-            
-        }
-    }, [debounced, type]);
 
     return (
     <div className='flex-col pdf-form-input' style={{

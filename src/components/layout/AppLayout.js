@@ -40,19 +40,25 @@ const AppLayout = ({ children }) => {
     const menu = useSelector((root) => root.menu);
 
     React.useEffect(() => {
+        let shouldUpdate = true;
         authHelper
             .getUser()
             .then((user) => {
                 setUser(user);
             })
             .catch(err => {
-                if (err.response && err.response.status === 401) {
-                    toast.error('Session expired, please login again');
+                if (shouldUpdate) {
+                    if (err.response && err.response.status === 401) {
+                        toast.error('Session expired, please login again');
+                    }
                 }
             })
             .finally(() => {
-                setLoading(false);
+                if (shouldUpdate) {
+                    setLoading(false);
+                }
             });
+        return () => {shouldUpdate = false};
     }, [authHelper]);
 
     if (loading) {
