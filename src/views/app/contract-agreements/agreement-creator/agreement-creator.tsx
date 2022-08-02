@@ -28,14 +28,7 @@ import { useDispatch } from 'react-redux';
 import { AppDispatch } from '../../../../redux';
 import { ContractHelper } from '../../../../helpers/ContractHelper';
 import { toast } from 'react-toastify';
-import classNames from 'classnames';
 import { MdCalendarToday } from 'react-icons/md';
-import {
-    HiChevronLeft,
-    HiChevronRight,
-    HiChevronDoubleLeft,
-    HiChevronDoubleRight,
-} from 'react-icons/hi';
 import { DateTime } from 'luxon';
 import { Button } from 'reactstrap';
 import { GoPlus } from 'react-icons/go';
@@ -50,6 +43,7 @@ import { useDebouncedValue, useDisclosure } from '@mantine/hooks';
 import PrepareSend from './prepare-send';
 import SignerPopover from '../signer-popover';
 import BaseDocumentViewer from '../base-document-viewer';
+import PageNavigation from '../page-navigation';
 
 // luxon today date
 const today = DateTime.local();
@@ -77,13 +71,11 @@ const AgreementCreator: React.FC = () => {
     const [agreementName, setAgreementName] = React.useState('');
     const [dbAgreementName] = useDebouncedValue(agreementName, 1000);
     
-    const [numPages, setNumPages] = React.useState<number>();
+    const [numPages, setNumPages] = React.useState<number>(0);
     const [pageNumber, setPageNumber] = React.useState(1);
     const { contractId } = useParams();
     const [pdf, setPdf] = React.useState('');
     const [pdfLoading, setPdfLoading] = React.useState(true);
-    const [pdfThumbnails, setPdfThumbnails] = React.useState<{[id: string]: string;}>({});
-    const [thumbnailsLoading, setThumbnailsLoading] = React.useState(true);
     
     const [showEndDate, setShowEndDate] = React.useState(false);
     const [showStartDate, setShowStartDate] = React.useState(false);
@@ -129,7 +121,7 @@ const AgreementCreator: React.FC = () => {
 
     const [confirmDeleteModal, deleteModalHandlers] = useDisclosure(false);
     const [showNameHelper, setShowNameHelper] = React.useState(true);
-    
+    const [docId, setDocId] = React.useState('');
 
     const dispatchFn = useDispatch<AppDispatch>();
     const contractHelper = React.useMemo(
@@ -295,6 +287,7 @@ const AgreementCreator: React.FC = () => {
                     } as PdfFormInputType)));
     
                     const doc_id = data.agreement.documents[0];
+                    setDocId(doc_id.toString());
                     contractHelper
                         .getPdfDocument(doc_id.toString())
                         .then((pdf) => {
@@ -308,24 +301,6 @@ const AgreementCreator: React.FC = () => {
                         .finally(() => {
                             if (shouldUpdate) {
                                 setPdfLoading(false);
-                            }
-                        });
-                    contractHelper
-                        .getPdfThumbnails(doc_id.toString())
-                        .then((thumbnails) => {
-                            if (shouldUpdate) {
-                                setPdfThumbnails(thumbnails);
-                            }
-                        })
-                        .catch((error) => {
-                            console.log(error);
-                            if (shouldUpdate) {
-                                toast.error('Error loading pdf thumbnails');
-                            }
-                        })
-                        .finally(() => {
-                            if (shouldUpdate) {
-                                setThumbnailsLoading(false);
                             }
                         });
                 }
@@ -751,87 +726,18 @@ const AgreementCreator: React.FC = () => {
                                 Page Navigation
                             </h5>
                             <Divider className="mb-4" />
-                            <Center className="mb-4">
-                                <div className="text-2xl">
-                                    <HiChevronDoubleLeft
-                                        onClick={onFirstPage}
-                                        className="cursor-pointer"
-                                    />
-                                </div>
-                                <div className="text-2xl">
-                                    <HiChevronLeft
-                                        onClick={onPreviousPage}
-                                        className="cursor-pointer"
-                                    />
-                                </div>
-                                <div className="px-1">
-                                    Page: {pageNumber} / {numPages}
-                                </div>
-                                <div className="text-2xl">
-                                    <HiChevronRight
-                                        onClick={onNextPage}
-                                        className="cursor-pointer"
-                                    />
-                                </div>
-                                <div className="text-2xl">
-                                    <HiChevronDoubleRight
-                                        onClick={onLastPage}
-                                        className="cursor-pointer"
-                                    />
-                                </div>
-                            </Center>
-                            <Center>
-                                {thumbnailsLoading && (
-                                    <Stack>
-                                        <Skeleton style={{zIndex: 1}} height={150} width={120} />
-                                        <Skeleton style={{zIndex: 1}} height={10} width={120} />
-                                    </Stack>
-                                )}
-                                {!thumbnailsLoading && (
-                                    <ScrollArea
-                                        style={{
-                                            height: 290,
-                                            overflowY: 'hidden',
-                                            width: '70%',
-                                        }}
-                                        className="rounded-md"
-                                    >
-                                        <Stack spacing={2}>
-                                            {Object.keys(pdfThumbnails).map(
-                                                (key) => {
-                                                    return (
-                                                        <div
-                                                            key={key}
-                                                            className="flex flex-col justify-center items-center"
-                                                        >
-                                                            <span
-                                                                className={classNames(
-                                                                    'border-4',{ 'border-sky-500': pageNumber === parseInt( key, ) + 1,},
-                                                                    { 'border-gray-300': pageNumber !== parseInt( key, ) +1,},
-                                                                    'cursor-pointer',
-                                                                )}
-                                                            >
-                                                                <img
-                                                                    src={ 'data:image/jpeg;base64,' + pdfThumbnails[ key ] }
-                                                                    style={{
-                                                                        height: 100,
-                                                                    }}
-                                                                    alt="Page"
-                                                                    onClick={() => { setPageNumber( parseInt( key, ) + 1, );
-                                                                    }}
-                                                                />
-                                                            </span>
-                                                            <p className="text-center text-sm">
-                                                                {parseInt(key) + 1}
-                                                            </p>
-                                                        </div>
-                                                    );
-                                                },
-                                            )}
-                                        </Stack>
-                                    </ScrollArea>
-                                )}
-                            </Center>
+                            <PageNavigation
+                                height={290}
+                                pageNumber={pageNumber}
+                                numPages={numPages}
+                                onNextPage={onNextPage}
+                                onPrevPage={onPreviousPage}
+                                onFirstPage={onFirstPage}
+                                onLastPage={onLastPage}
+                                onGotoPage={(pg) => setPageNumber(pg)}
+                                contractHelper={contractHelper}
+                                doc_id={docId}
+                            />
                             <Divider className="mt-4" />
                             <div className='py-4 bg-gray-50'>
                                 <h5 className="text-center ">Settings</h5>

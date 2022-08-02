@@ -1,4 +1,4 @@
-import { Center, Modal, Loader, Stack, Group, Divider, Grid, Progress, Tooltip, Skeleton, ScrollArea, Textarea } from '@mantine/core';
+import { Center, Modal, Loader, Stack, Group, Divider, Grid, Progress, Tooltip, Skeleton, Textarea } from '@mantine/core';
 import React from 'react';
 import { useDispatch } from 'react-redux';
 import { NavLink, useNavigate, useSearchParams } from 'react-router-dom';
@@ -9,13 +9,6 @@ import { Button, Card, CardBody } from 'reactstrap';
 import { Agreement, InputField, SignerErrorTypes } from '../../../../types/ContractTypes';
 import { toast } from 'react-toastify';
 import { DateTime } from 'luxon';
-import {
-    HiChevronLeft,
-    HiChevronRight,
-    HiChevronDoubleLeft,
-    HiChevronDoubleRight,
-} from 'react-icons/hi';
-import classNames from 'classnames';
 import SignerInput from '../form-elements/SignerInput';
 import SignerComments from './signer-comments';
 import { getFormatDateFromIso } from '../../../../helpers/Utils';
@@ -26,6 +19,7 @@ import AuditTrail from '../audit-trail';
 import AuditTrailButton from '../audit-trail/audit-trail-button';
 import AgreementProgressBar from '../sender-view/agreement-progress-bar';
 import BaseDocumentViewer from '../base-document-viewer';
+import PageNavigation from '../page-navigation';
 
 
 const GRID_TOTAL = 16;
@@ -103,11 +97,10 @@ const AgreementSign: React.FC = () => {
 
     const [pdf, setPdf] = React.useState('');
     const [pdfLoading, setPdfLoading] = React.useState(true);
-    const [pdfThumbnails, setThumbnails] = React.useState<{[id: string]: string}>({});
-    const [thumbnailsLoading, setThumbnailsLoading] = React.useState(true);
-    const [numPages, setNumPages] = React.useState<number>();
+    const [numPages, setNumPages] = React.useState<number>(0);
     const [pageNumber, setPageNumber] = React.useState(1);
     const canvasRef = React.useRef<HTMLDivElement>(null);
+    const [pageCompleted, setPageCompleted] = React.useState<{hasFields: boolean, completed: boolean}[]>([]);
 
     const [inputElements, setInputElements] = React.useState<InputField[]>([]);
     const [otherInputElements, setOtherInputElements] = React.useState<InputField[]>([]);
@@ -301,19 +294,6 @@ const AgreementSign: React.FC = () => {
             }
         });
 
-        contractHelper.getSignerPdfThumbnails(token).then(resp => {
-            if (shouldUpdate) {
-                if (resp.valid) {
-                    setThumbnails(resp.data);
-                }
-                setThumbnailsLoading(false);
-            }
-        }).catch(err => {
-            if (shouldUpdate) {
-                setThumbnailsLoading(false);
-            }
-        });
-
         contractHelper.getSignerInputElements(token).then(resp => {
             if (shouldUpdate) {
                 if (resp.valid) {
@@ -348,27 +328,38 @@ const AgreementSign: React.FC = () => {
     React.useEffect(() => {
         let shouldUpdate = true;
         
-        const data = inputElements.map(field => ({
-            id: field.id,
-            completed: field.completed,
-            value: field.value,
-        }));
-        contractHelper.updateSignerResponse(token, data).then(resp => {
-            if (shouldUpdate) {
-                if (!resp.valid) {
-                    toast.error('Error saving data. Please contact support');
+        if (token) {
+            const data = inputElements.map(field => ({
+                id: field.id,
+                completed: field.completed,
+                value: field.value,
+            }));
+            contractHelper.updateSignerResponse(token, data).then(resp => {
+                if (shouldUpdate) {
+                    if (!resp.valid) {
+                        toast.error('Error saving data. Please contact support');
+                    }
                 }
-            }
-        }).catch(err => {
-            if (shouldUpdate) {
-                toast.error('Error saving responses. Please contact support');
-                console.log(err);
-            }
-        });
+            }).catch(err => {
+                if (shouldUpdate) {
+                    toast.error('Error saving responses. Please contact support');
+                    console.log(err);
+                }
+            });
+        }
 
         return () => { shouldUpdate = false; }
     
     }, [shouldUpdate, token, inputElements, contractHelper]);
+
+    React.useEffect(() => {
+        let pageCompleted = [];
+        for (let i = 1; i <= numPages; i++) {
+            let pc = { hasFields: inputElements.filter(ip => ip.page === i).length > 0, completed: checkInputPageAllComplete(i, inputElements) }
+            pageCompleted.push(pc);
+        }
+        setPageCompleted(pageCompleted);
+    }, [inputElements, numPages]);
 
     return (
         <>
@@ -460,93 +451,19 @@ const AgreementSign: React.FC = () => {
                                     Page Navigation
                                 </h5>
                                 <Divider className='mb-4' />
-                                <Center className="mb-4">
-                                    <div className="text-2xl">
-                                        <HiChevronDoubleLeft
-                                            onClick={onFirstPage}
-                                            className="cursor-pointer"
-                                        />
-                                    </div>
-                                    <div className="text-2xl">
-                                        <HiChevronLeft
-                                            onClick={onPreviousPage}
-                                            className="cursor-pointer"
-                                        />
-                                    </div>
-                                    <div className="px-1">
-                                        Page: {pageNumber} / {numPages}
-                                    </div>
-                                    <div className="text-2xl">
-                                        <HiChevronRight
-                                            onClick={onNextPage}
-                                            className="cursor-pointer"
-                                        />
-                                    </div>
-                                    <div className="text-2xl">
-                                        <HiChevronDoubleRight
-                                            onClick={onLastPage}
-                                            className="cursor-pointer"
-                                        />
-                                    </div>
-                                </Center>
-                                <Center>
-                                {thumbnailsLoading && (
-                                    <Stack>
-                                        <Skeleton style={{zIndex: 1}} height={150} width={120} />
-                                        <Skeleton style={{zIndex: 1}} height={10} width={120} />
-                                    </Stack>
-                                )}
-                                {!thumbnailsLoading && (
-                                    <ScrollArea
-                                        style={{
-                                            height: 600,
-                                            overflow: 'hidden',
-                                            width: '70%',
-                                        }}
-                                        className="rounded-md"
-                                    >
-                                        <Stack spacing={2}>
-                                            {Object.keys(pdfThumbnails).map(
-                                                (key) => {
-                                                    const pg = parseInt(key) + 1;
-                                                    const pageCompleted = checkInputPageAllComplete(pg, inputElements);
-                                                    return (
-                                                        <div className='relative' key={key}>
-                                                            {pageCompleted && inputElements.filter(ip => ip.page === pg).length > 0 && <i className='simple-icon-check text-success absolute text-xl' style={{top: 0, left: 8}} />}
-                                                            {!pageCompleted && inputElements.filter(ip => ip.page === pg).length > 0 && 
-                                                            <Tooltip label='Required Fields'>
-                                                                <i className='simple-icon-note text-primary absolute text-xl' style={{top: 0, left: 8}} />
-                                                            </Tooltip>
-                                                            }
-                                                            <div
-                                                                className="flex flex-col justify-center items-center"
-                                                            >
-                                                                <div className={classNames(
-                                                                        'border-4',{ 'border-sky-500': pageNumber === pg,},
-                                                                        { 'border-gray-300': pageNumber !== pg,},
-                                                                        'cursor-pointer',
-                                                                        )}>
-                                                                    <img
-                                                                        src={ 'data:image/jpeg;base64,' + pdfThumbnails[ key ] }
-                                                                        style={{
-                                                                            height: 100,
-                                                                        }}
-                                                                        alt="Page"
-                                                                        onClick={() =>  setPageNumber( pg ) }
-                                                                    />
-                                                                </div>
-                                                                <p className="text-center text-sm">
-                                                                    {pg}
-                                                                </p>
-                                                            </div>
-                                                        </div>
-                                                    );
-                                                },
-                                            )}
-                                        </Stack>
-                                    </ScrollArea>
-                                )}
-                                </Center>
+                                <PageNavigation
+                                    pageNumber={pageNumber}
+                                    numPages={numPages}
+                                    onNextPage={onNextPage}
+                                    onPrevPage={onPreviousPage}
+                                    onFirstPage={onFirstPage}
+                                    onLastPage={onLastPage}
+                                    onGotoPage={(pg) => setPageNumber(pg)}
+                                    token={token}
+                                    contractHelper={contractHelper}
+                                    pageCompleted={pageCompleted}
+                                    height={600}
+                                />
                             </CardBody>
                         </Card>
                     </Grid.Col>
@@ -559,6 +476,7 @@ const AgreementSign: React.FC = () => {
                                     )}
                                     {!pdfLoading && (
                                         <BaseDocumentViewer 
+                                        viewOnly={true}
                                         ref={canvasRef} 
                                         onDocLoadSuccess={onDocumentLoadSuccess} 
                                         pdf={pdf} 

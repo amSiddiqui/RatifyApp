@@ -14,10 +14,11 @@ type Props = {
     showPrevPage: boolean;
     onNextPage: () => void;
     onPrevPage: () => void;
+    viewOnly?: boolean;
 };
 
 const BaseDocumentViewer = React.forwardRef<HTMLDivElement, Props>(
-    ({ children, pdf, pageNumber, onDocLoadSuccess, showNextPage, showPrevPage, onNextPage, onPrevPage }, ref) => {
+    ({ children, pdf, pageNumber, onDocLoadSuccess, showNextPage, showPrevPage, onNextPage, onPrevPage, viewOnly }, ref) => {
         const [pageDim, setPageDim] = React.useState<{
             width: number;
             height: number;
