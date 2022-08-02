@@ -161,3 +161,7 @@ input {
     height: 86vh;
 
 }
+
+#dashboard-main-table .ag-paging-panel {
+    display: none !important;
+}

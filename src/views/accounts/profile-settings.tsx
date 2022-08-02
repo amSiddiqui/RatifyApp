@@ -71,6 +71,7 @@ const ProfileSettings: React.FC = () => {
     const navigate = useNavigate();
 
     const [organization, setOrganization] = React.useState<OrganizationNameResponse>();
+    const [editMode, setEditMode] = React.useState(false);
 
     const schema = Yup.object().shape({
         changePassword: Yup.boolean(),
@@ -175,6 +176,7 @@ const ProfileSettings: React.FC = () => {
                 console.log('Setting user: ', { newUser });
                 dispatchFn(authActions.setUser(newUser));
                 toast.success('User updated successfully');
+                setEditMode(false);
             })
             .catch((err) => {
                 if (
@@ -359,7 +361,7 @@ const ProfileSettings: React.FC = () => {
                                     </div>
                                     <Grid columns={12}>
                                         <Grid.Col span={6}>
-                                            <TextInput
+                                            {editMode && <TextInput
                                                 required={true}
                                                 {...register('firstName')}
                                                 error={errors.firstName ? errors.firstName.message : ''}
@@ -372,10 +374,14 @@ const ProfileSettings: React.FC = () => {
                                                 label={intl.formatMessage({
                                                     id: 'profile-settings.first-name',
                                                 })}
-                                            />
+                                            />}
+                                            {!editMode && <Stack style={{ minWidth: 200 }} spacing={'sm'}>
+                                                <p className='font-bold'>First Name</p>    
+                                                <Group className='border-b-2 border-gray-200 pb-1 mr-3'><i className='simple-icon-user relative' style={{ top: -2 }} /><p>{auth.user?.first_name}</p></Group>
+                                            </Stack>}
                                         </Grid.Col>
                                         <Grid.Col span={6}>
-                                            <TextInput
+                                            {editMode && <TextInput
                                                 {...register('lastName')}
                                                 error={
                                                     errors.lastName
@@ -392,10 +398,14 @@ const ProfileSettings: React.FC = () => {
                                                 label={intl.formatMessage({
                                                     id: 'profile-settings.last-name',
                                                 })}
-                                            />
+                                            />}
+                                            {!editMode && <Stack style={{ minWidth: 200 }} spacing={'sm'}>
+                                                <p className='font-bold'>Surname</p>    
+                                                <Group className='border-b-2 border-gray-200 pb-1 mr-3'><i className='simple-icon-user relative' style={{ top: -2 }} /><p>{auth.user?.last_name}</p></Group>
+                                            </Stack>}
                                         </Grid.Col>
                                     </Grid>
-                                    <TextInput
+                                    {editMode &&  <TextInput
                                         required={true}
                                         {...register('email')}
                                         error={
@@ -410,9 +420,13 @@ const ProfileSettings: React.FC = () => {
                                         label={intl.formatMessage({
                                             id: 'profile-settings.email',
                                         })}
-                                    />
+                                    />}
+                                    {!editMode && <Stack style={{ minWidth: 220, width: '100%' }} spacing={'sm'}>
+                                        <p className='font-bold'>Email</p>    
+                                        <Group className='border-b-2 border-gray-200 pb-1 mr-3'><i className='simple-icon-envelope relative' style={{ top: -2 }} /><p>{auth.user?.email}</p></Group>
+                                    </Stack>}
 
-                                    <p
+                                    {editMode && <p
                                         className="cursor-pointer"
                                         onClick={() => {
                                             let prev =
@@ -429,8 +443,8 @@ const ProfileSettings: React.FC = () => {
                                         <span className="ml-3">
                                             Change Password
                                         </span>
-                                    </p>
-                                    <Collapse in={showPassword}>
+                                    </p>}
+                                    {editMode && <Collapse in={showPassword}>
                                         <Stack>
                                             <PasswordInput
                                                 {...register('oldPassword')}
@@ -462,25 +476,39 @@ const ProfileSettings: React.FC = () => {
                                                 placeholder='*********'
                                             />
                                         </Stack>
-                                    </Collapse>
+                                    </Collapse>}
 
-                                    <Group position="right">
-                                        {showPassword && <span onClick={() => {
-                                            let prev = getValues().changePassword;
-                                            setValue('changePassword', !prev);
+                                    {editMode && <Group position="right">
+                                        <span onClick={() => {
+                                            setEditMode(false);
+                                            setValue('changePassword', false);
                                         }}>
                                             <Button color='light'>
                                                 Cancel
                                             </Button>
-                                        </span>}
+                                        </span>
                                         <span>
-                                            <Button color="primary">
+                                            <Button color="success">
                                                 {intl.formatMessage({
                                                     id: 'profile-settings.save',
                                                 })}
                                             </Button>
                                         </span>
-                                    </Group>
+                                    </Group>}
+
+                                    {!editMode && <Group className='mt-2' position='right'>
+                                        <span onClick={() => {
+                                            setEditMode(true);
+                                            setValue('changePassword', true);
+                                        }}>
+                                            <Button type='button' color='light'>Change Password</Button>
+                                        </span>
+                                        <span onClick={() => {
+                                            setEditMode(true);
+                                        }}>
+                                            <Button type='button' color='primary'>Edit</Button>
+                                        </span>
+                                    </Group>}
                                 </Stack>
                             </form>
                         </CardBody>

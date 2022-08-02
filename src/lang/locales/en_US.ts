@@ -50,7 +50,7 @@ export const enMessages = {
     'menu.docs': 'Docs',
     'menu.blank-page': 'Blank Page',
     'menu.account': 'My Account',
-    'menu.profile-settings': 'Profile Settings',
+    'menu.profile-settings': 'My Account',
     'menu.ui-settings': 'UI Settings',
     'menu.analytics': 'Analytics',
     'menu.contracts-agreements': 'Contracts & Agreements',
@@ -89,7 +89,7 @@ export const enMessages = {
     // 06. Account
     'account.account': 'My Account',
     'account.business-profile': 'Business Profile',
-    'account.settings.profile': 'Profile Settings',
+    'account.settings.profile': 'My Account',
     'account.settings.ui': 'UI Settings',
 
     'profile-settings.last-name': 'Surname',

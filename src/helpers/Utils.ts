@@ -271,7 +271,55 @@ export const getAgreementStatusText = (status: string) => {
             return 'Deleted';
         case 'decline':
             return 'Declined';
+        case 'expire':
+            return 'Expired';
+        case 'end':
+            return 'Ended';
         default:
             return 'draft';
     }
+}
+
+export const getPaginationArray = (total: number, page: number, limit: number): number[] => {
+    const pages:number[] = [];
+    if (total <= limit) {
+        // make an array from 1 to total
+        for (let i = 1; i <= total; i++) {
+            pages.push(i);
+        }
+        return pages;
+    }
+
+    pages.push(1);
+    if (page < limit - 2) {
+        for (let i = 2; i <= limit - 2; i++) {
+            pages.push(i);
+        }
+        pages.push(-1);
+        pages.push(total);
+        return pages;
+    }
+
+    if (page >= (total - limit + 3)) {
+        pages.push(-1);
+        for (let i = total - limit + 3; i <= total; i++) {
+            pages.push(i);
+        }
+
+        return pages;
+    }
+
+    let remaining = limit - 5;
+    pages.push(-1);
+
+    let lower = Math.floor(remaining / 2);
+    let upper = Math.ceil(remaining / 2);
+
+    for (let i = page - lower; i <= page + upper; i++) {
+        pages.push(i);
+    }
+
+    pages.push(-1);
+    pages.push(total);
+    return pages;
 }

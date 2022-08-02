@@ -1,16 +1,16 @@
-import { Center, Grid, Loader, Badge, Stack, Group, Popover, Checkbox, Tooltip, Modal, List, TextInput, SimpleGrid } from '@mantine/core';
+import { Center, Grid, Loader, Badge, Stack, Group, Popover, Checkbox, Tooltip, Modal, List, TextInput, SimpleGrid, Select } from '@mantine/core';
 import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate, useLocation, NavigateFunction } from 'react-router-dom';
 import { toast } from 'react-toastify';
-import { Button, Card, CardBody, Row } from 'reactstrap';
+import { Button, Card, CardBody, Pagination, PaginationItem, PaginationLink, Row } from 'reactstrap';
 import {
     Colxx,
     Separator,
 } from '../../../../components/common/CustomBootstrap';
 import Breadcrumb from '../../../../containers/navs/Breadcrumb';
 import { ContractHelper } from '../../../../helpers/ContractHelper';
-import { getAgreementBadgeColorFromStatus, getAgreementStatusText, getFormatDateFromIso } from '../../../../helpers/Utils';
+import { getAgreementBadgeColorFromStatus, getAgreementStatusText, getFormatDateFromIso, getPaginationArray } from '../../../../helpers/Utils';
 import { AppDispatch, RootState } from '../../../../redux';
 import { AgreementRowData, Signer } from '../../../../types/ContractTypes';
 import { AgGridReact } from 'ag-grid-react';
@@ -144,6 +144,9 @@ const AgreementDashboard: React.FC = () => {
     const [showColumnSettings, setShowColumnSettings] = React.useState(false);
     const [moreDetailModal, setMoreDetailModal] = React.useState(false);
     const [moreDetailsAgreement, setMoreDetailsAgreement] = React.useState<AgreementRowData>();
+    const [pageSize, setPageSize] = useLocalStorage<number>({key: 'agreement-dashboard-page-size', defaultValue: 10});
+    const [page, setPage] = React.useState(1);
+    const [totalPages, setTotalPages] = React.useState(1);
 
     const { hovered: tile1Hovered, ref: tile1Ref } = useHover();
     const { hovered: tile2Hovered, ref: tile2Ref } = useHover();
@@ -183,6 +186,7 @@ const AgreementDashboard: React.FC = () => {
 
     const onGridReady = (e:AgGridEvent<AgreementRowData>) => {
         e.api.sizeColumnsToFit();
+        e.api.paginationSetPageSize(pageSize);
     }
 
     const [renderTileFilter, setRenderTileFilter] = React.useState(tileFilter);
@@ -233,6 +237,20 @@ const AgreementDashboard: React.FC = () => {
         });
     };
 
+    const onFilterChange = () => {
+        if (gridRef.current && gridRef.current.api) {
+            let newTotal = 0;
+            gridRef.current.api.forEachNodeAfterFilterAndSort(() => {
+                newTotal++;
+            });
+            let newTotalPages = Math.ceil(newTotal / pageSize);
+            setTotalPages(newTotalPages);
+            if (page > newTotalPages) {
+                setPage(newTotalPages);
+            }
+        }
+    }
+
     React.useEffect(() => {
         let shouldUpdate = true;
         contractHelper.getAllAgreements().then(data => {
@@ -251,6 +269,12 @@ const AgreementDashboard: React.FC = () => {
         return () => { shouldUpdate = false; }
     }, [contractHelper]);
 
+    React.useEffect(() => {
+        const totalAgreements = agreements.length;
+        const totalPages = Math.ceil(totalAgreements / pageSize);
+        setTotalPages(totalPages);
+    }, [agreements, pageSize]);
+
 
     React.useEffect(() => {
         setColumnDef(columnBuilder(showColumns, navigate, onShowDetailClick));
@@ -267,7 +291,7 @@ const AgreementDashboard: React.FC = () => {
     }, [auth]);
 
     React.useLayoutEffect(() => {
-        if (gridRef && gridRef.current) {
+        if (gridRef && gridRef.current && gridRef.current.api) {
             gridRef.current.api.sizeColumnsToFit();
         }
     }, [rect]); 
@@ -384,7 +408,7 @@ const AgreementDashboard: React.FC = () => {
                         {!loading && !error && <div>
                             <Group position='apart' className='mb-4'>
                                 <Center>
-                                    <p className='text-2xl'>Contracts & Agreements</p>
+                                    <p className='text-2xl'>Contracts &#38; Agreements</p>
                                 </Center>
                                 {renderTileFilter !== 0 && <div className='text-xl py-1 px-3 border-2 border-gray-300 rounded-full'>
                                     <Group position='apart'>
@@ -399,6 +423,23 @@ const AgreementDashboard: React.FC = () => {
                                     </Group>
                                 </div>}
                                 <Group spacing={'lg'}>
+                                    <Group>
+                                        <p>Page Size</p>
+                                        <Select style={{ width: 70 }} size='xs' data={[
+                                            { value: '5', label: '5' },
+                                            { value: '10', label: '10' },
+                                            { value: '20', label: '20' },
+                                            { value: '50', label: '50' },
+                                            { value: '100', label: '100' },
+                                        ]} value={pageSize.toString()} onChange={(e) => {
+                                            if (e) {
+                                                setPageSize(parseInt(e));
+                                                if (gridRef && gridRef.current && gridRef.current.api) {
+                                                    gridRef.current.api.paginationSetPageSize(parseInt(e));
+                                                }
+                                            }
+                                        }} />
+                                    </Group>
                                     <Popover
                                         position='bottom'
                                         placement='center'
@@ -438,21 +479,79 @@ const AgreementDashboard: React.FC = () => {
 
                                 </Group>
                             </Group>
-                            <div className='ag-theme-material w-full h-full'>
+                            <div id='dashboard-main-table' className='ag-theme-material w-full h-full'>
                                 <AgGridReact
                                     animateRows={true}
                                     columnDefs={columnDefs}
                                     rowHeight={70}
                                     onGridReady={onGridReady}
                                     ref={gridRef}
+                                    pagination={true}
                                     rowData={agreements}
                                     isExternalFilterPresent={() => true}
                                     doesExternalFilterPass={doesExternalFilterPass}
                                     defaultColDef={defaultColDef}
+                                    onFilterChanged={onFilterChange}
                                     gridOptions={gridOptions}
                                     overlayNoRowsTemplate={'Currently you do not have any documents. Please click on \'Create New\' button to proceed.'}
                                 />
                             </div>
+                            <Group position='right' className='mt-2'>
+                                <Pagination
+                                    className="d-inline-block"
+                                    size="sm"
+                                    listClassName="justify-content-center"
+                                    aria-label="Page navigation example"                        
+                                >
+                                    <PaginationItem
+                                        className={page === 1 ? 'disabled' : ''}
+                                    >
+                                        <PaginationLink className="prev" onClick={() => {
+                                            if (gridRef.current && gridRef.current.api) {
+                                                if (page > 1) {
+                                                    setPage(page - 1);
+                                                    gridRef.current.api.paginationGoToPage(page - 1);
+                                                }
+                                            }
+                                        }}>
+                                            <i className="simple-icon-arrow-left" />
+                                        </PaginationLink>
+
+                                    </PaginationItem>
+                                    {getPaginationArray(totalPages, page, 8).map((p, index) => {
+                                        if (p === -1) {
+                                            return <PaginationItem>
+                                                <Center className='h-full'>
+                                                    <i className='simple-icon-options' />
+                                                </Center>
+                                            </PaginationItem>
+                                        } else {
+                                            return <PaginationItem active={p === page} key={index}>
+                                                <PaginationLink onClick={() => {
+                                                    if (gridRef.current && gridRef.current.api) {
+                                                        setPage(p);
+                                                        gridRef.current.api.paginationGoToPage(p);
+                                                    }
+                                                }}>
+                                                    {p}
+                                                </PaginationLink>
+                                            </PaginationItem>
+                                        }
+                                    })}
+                                    <PaginationItem className={page === totalPages ? 'disabled' : ''}>
+                                        <PaginationLink className='next' onClick={() => {
+                                            if (gridRef.current && gridRef.current.api) {
+                                                if (page < totalPages) {
+                                                    setPage(page + 1);
+                                                    gridRef.current.api.paginationGoToPage(page + 1);
+                                                }
+                                            }
+                                        }}>
+                                            <i className="simple-icon-arrow-right" />
+                                        </PaginationLink>
+                                    </PaginationItem>
+                                </Pagination>
+                            </Group>
                         </div>}
                     </CardBody>
                 </Card>
@@ -546,6 +645,11 @@ const AgreementDashboard: React.FC = () => {
                                 </Stack>}
                             </div>
                             <Group position='right'>
+                                <span onClick={() => {
+                                    setMoreDetailModal(false);
+                                }}>
+                                    <Button color='light'>Close</Button>
+                                </span>
                                 {moreDetailsAgreement && <span onClick={() => {
                                     navigate(`/agreements/${moreDetailsAgreement.id}`);
                                 }}><Button color='primary'>Open</Button></span>}
