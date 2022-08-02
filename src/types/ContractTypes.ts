@@ -30,6 +30,7 @@ export interface Agreement {
 
 export interface AgreementRowData extends Agreement {
     user_name: string;
+    index: number;
     signers: string[];
 }
 

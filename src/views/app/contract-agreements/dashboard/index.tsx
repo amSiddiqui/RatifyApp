@@ -39,7 +39,7 @@ const AllColumns = [
 const columnBuilder = (columns: boolean[], navigate: NavigateFunction, onMoreDetailsClicked: (id: number) => void):(ColDef | ColGroupDef)[] => {
     const columnDefs:(ColDef | ColGroupDef)[] = [];
     if (columns.length > 0 && columns[0]) {
-        columnDefs.push({ headerName: 'ID', field: 'id', width: 150, onCellClicked: (e) => {
+        columnDefs.push({ headerName: 'ID', field: 'index', width: 150, onCellClicked: (e) => {
             navigate( `/agreements/${e.data.id}`);
         }, cellClass: 'dashboard-title-cell', colId: 'agreement-id-col' });
     }
