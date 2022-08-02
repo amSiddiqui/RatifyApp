@@ -1,4 +1,4 @@
-import { Group } from '@mantine/core';
+import { Group, Indicator } from '@mantine/core';
 import { DatePicker } from '@mantine/dates';
 import classNames from 'classnames';
 import { DateTime } from 'luxon';
@@ -6,6 +6,8 @@ import React from 'react';
 import { getBgColorLight, getBorderColorBold, INPUT_TOP_OFFSET } from '../types';
 import SignatureInput from './SignatureInput';
 import { MdClear } from 'react-icons/md';
+
+const today = DateTime.local();
 
 interface Props  {
     placeholder: string;
@@ -95,6 +97,11 @@ const SignerInput:React.FC<Props> = ({id, x, y, type, placeholder, onFilled, ini
                 {'border-2 pdf-form-input-date-filled': dateValue !== null},
                 dateValue === null ? getBgColorLight(color) : getBorderColorBold(color),
             )}
+            renderDay={(date) => {
+                return <Indicator size={6} color="blue" offset={8} disabled={date.toDateString() !== today.toJSDate().toDateString()}>
+                    {date.getDate()}
+                </Indicator>;
+            }}
         />}
 
 

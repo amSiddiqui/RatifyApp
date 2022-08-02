@@ -3,14 +3,17 @@ import React from 'react';
 import { getBgColorLight, getBorderColorBold } from '../types';
 import { DraggableCore } from 'react-draggable';
 import { useId } from '@mantine/hooks';
-import { Center, Checkbox, Grid, Group, Popover, Stack, TextInput } from '@mantine/core';
+import { Center, Checkbox, Grid, Group, Indicator, Popover, Stack, TextInput } from '@mantine/core';
 import { BoundType, INPUT_TOP_OFFSET } from '../types';
 import { DatePicker } from '@mantine/dates';
 import { Button } from 'reactstrap';
 import { ContractHelper } from '../../../../helpers/ContractHelper';
 import { toast } from 'react-toastify';
 import { BsTrash } from 'react-icons/bs';
+import { DateTime } from 'luxon';
  
+
+const today = DateTime.local();
 
 interface Props {
     inputElementId: number;
@@ -209,6 +212,11 @@ const PdfFormInput: React.FC<Props> = ({ x: initX, y: initY, color, onDelete, pl
                             'pdf-form-input-date',
                             getBgColorLight(color),
                         )}
+                        renderDay={(date) => {
+                            return <Indicator size={6} color="blue" offset={8} disabled={date.toDateString() !== today.toJSDate().toDateString()}>
+                                {date.getDate()}
+                            </Indicator>;
+                        }}
                     />}
                 </div>
             </DraggableCore>

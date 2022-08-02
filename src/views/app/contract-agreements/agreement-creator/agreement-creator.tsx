@@ -20,6 +20,7 @@ import {
     Textarea,
     Autocomplete,
     Space,
+    Indicator,
 } from '@mantine/core';
 import { DatePicker } from '@mantine/dates';
 import { Card, CardBody } from 'reactstrap';
@@ -866,6 +867,11 @@ const AgreementCreator: React.FC = () => {
                                             icon={<MdCalendarToday />}
                                             style={{ width: 150 }}
                                             placeholder="Select Date"
+                                            renderDay={(date) => {
+                                                return <Indicator size={6} color="blue" offset={8} disabled={date.toDateString() !== today.toJSDate().toDateString()}>
+                                                    {date.getDate()}
+                                                </Indicator>;
+                                            }}
                                         />
                                     )}
                                 </Stack>
@@ -944,6 +950,11 @@ const AgreementCreator: React.FC = () => {
                                                 icon={<MdCalendarToday />}
                                                 style={{ width: 150 }}
                                                 placeholder="Select Date"
+                                                renderDay={(date) => {
+                                                    return <Indicator size={6} color="blue" offset={8} disabled={date.toDateString() !== today.toJSDate().toDateString()}>
+                                                        {date.getDate()}
+                                                    </Indicator>;
+                                                }}
                                             />
                                         </Stack>
                                     )}
@@ -960,6 +971,11 @@ const AgreementCreator: React.FC = () => {
                                         icon={<MdCalendarToday />}
                                         style={{ width: 150 }}
                                         placeholder="Select Date"
+                                        renderDay={(date) => {
+                                            return <Indicator size={6} color="blue" offset={8} disabled={date.toDateString() !== today.toJSDate().toDateString()}>
+                                                {date.getDate()}
+                                            </Indicator>;
+                                        }}
                                     />
                                 </Stack>
                             </ScrollArea>

@@ -57,7 +57,7 @@ const BaseDocumentViewer = React.forwardRef<HTMLDivElement, Props>(
                 {showPrevPage && <Center
                     onClick={onPrevPage}
                     className={classNames("cursor-pointer transition-all", {'opacity-0': !hovered, 'opacity-90': hovered})}
-                    style={{ width: 50, height: pageDim.height, backgroundImage: 'linear-gradient(270deg, rgba(255,255,255,1) 0%, rgba(226 243 255, 1) 100%)'}}>
+                    style={{ width: 50, height: pageDim.height, backgroundImage: 'linear-gradient(270deg, rgba(255,255,255,1) 0%, rgba(226, 243, 255, 1) 100%)'}}>
                         <HiChevronLeft style={{ fontSize: '4rem' }} />    
                     </Center>}
                 {!showPrevPage && <div style={{ width: 50, height: pageDim.height }}>
@@ -95,7 +95,7 @@ const BaseDocumentViewer = React.forwardRef<HTMLDivElement, Props>(
                 {showNextPage && <Center
                     onClick={onNextPage}
                     className={classNames("bg-black cursor-pointer transition-all", {'opacity-0': !hovered, 'opacity-90': hovered})}
-                    style={{ width: 50, height: pageDim.height, backgroundImage: 'linear-gradient(90deg, rgba(255,255,255,1) 0%, rgba(226 243 255,1) 100%' }}>
+                    style={{ width: 50, height: pageDim.height, backgroundImage: 'linear-gradient(90deg, rgba(255,255,255,1) 0%, rgba(226, 243, 255,1) 100%' }}>
                         <HiChevronRight style={{ fontSize: '4rem' }} /> 
                     </Center>}
             </div>
