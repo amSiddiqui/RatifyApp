@@ -50,7 +50,6 @@ const BaseDocumentViewer = React.forwardRef<HTMLDivElement, Props>(
                     // round off newWidth
                     newWidth = Math.floor(newWidth);
                 }
-
                 setPageDim({ width: newWidth, height: newHeight });
             },
             [pageNumber, onDocLoadSuccess],
