@@ -4,7 +4,7 @@ import React from 'react';
 import { Button } from 'reactstrap';
 import  { FcSignature } from 'react-icons/fc';
 import { MdClear, MdDraw, MdTextFormat } from 'react-icons/md';
-import SignatureDrawing from './SignatureDrawing';
+import SignatureDrawing from './signature-drawing';
 import SignatureCanvas from 'react-signature-canvas'
 import { toast } from 'react-toastify';
 import html2canvas from 'html2canvas';

@@ -27,7 +27,7 @@ import Breadcrumb from '../../../../containers/navs/Breadcrumb';
 import { Button, Card, CardBody } from 'reactstrap';
 import { generateSignerLabels, getAgreementBadgeColorFromStatus, getAgreementStatusText, getFormatDateFromIso } from '../../../../helpers/Utils';
 import { toast } from 'react-toastify';
-import SenderInputView from '../form-elements/SenderInputView';
+import SenderInputView from '../form-elements/sender-input-view';
 import { AuthHelper } from '../../../../helpers/AuthHelper';
 import SignerComments from '../agreement-sign/signer-comments';
 import SignerProgress from './signer-progress';

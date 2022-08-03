@@ -4,7 +4,7 @@ import classNames from 'classnames';
 import { DateTime } from 'luxon';
 import React from 'react';
 import { getBgColorLight, getBorderColorBold, INPUT_TOP_OFFSET } from '../types';
-import SignatureInput from './SignatureInput';
+import SignatureInput from './signature-input';
 import { MdClear } from 'react-icons/md';
 
 const today = DateTime.local();

@@ -1,6 +1,6 @@
 import { Card, Center, SimpleGrid } from '@mantine/core';
 import React from 'react';
-import AuthMessage from './auth_message';
+import AuthMessage from './auth-message';
 
 const AuthLayout:React.FC = ({children}) => {
     return (<>
