@@ -1,7 +1,7 @@
-import { Center, Modal, Loader, Stack, Group, Divider, Grid, Progress, Tooltip, Skeleton, Textarea } from '@mantine/core';
+import { Center, Modal, Loader, Stack, Group, Divider, Grid, Progress, Tooltip, Skeleton, Textarea, Image } from '@mantine/core';
 import React from 'react';
 import { useDispatch } from 'react-redux';
-import { NavLink, useNavigate, useSearchParams } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { ContractHelper } from '../../../../helpers/ContractHelper';
 import { AppDispatch } from '../../../../redux';
 import { useDisclosure, useMediaQuery, useResizeObserver } from '@mantine/hooks';
@@ -58,14 +58,15 @@ const errorTypeToText = (errorType: SignerErrorTypes) => {
 }
 
 export const AgreementSignNav: React.FC = () => {
+    const navigate = useNavigate();
+
     return (
         <nav className="navbar">
-            <div className="d-flex align-items-center navbar-left"></div>
-            <NavLink className="navbar-logo" to="/">
-                <span className="logo d-none d-xs-block" />
-                <span className="logo-mobile d-block d-xs-none" />
-            </NavLink>
-            <div className="navbar-right"></div>
+            <Center className='w-full'>
+                <Image onClick={() => {
+                    navigate('/');
+                }} className='w-[70px] cursor-pointer sm:w-[90px]' src='/static/logos/black.png' alt='Ratify' />
+            </Center>
         </nav>
     );
 };
@@ -466,10 +467,10 @@ const AgreementSign: React.FC = () => {
                     </Grid.Col>
                     {!secondBreakPoint && <Grid.Col span={GRID_SIDE}></Grid.Col>}
                 </Grid>}
-                {thirdBreakPoint && <Center>
+                {thirdBreakPoint && <Center className={classNames({ 'px-4': mdBP})}>
                             <h1>{!!agreement && agreement.title}</h1>
                         </Center>}
-                {thirdBreakPoint && <div className='mt-4'>
+                {thirdBreakPoint && <div className={classNames('mt-4', { 'px-4': mdBP})}>
                     {clientLogoElement}    
                 </div>}
 
@@ -495,7 +496,7 @@ const AgreementSign: React.FC = () => {
                     </Grid.Col>
                 </Grid>}
                 
-                {thirdBreakPoint && <Stack>
+                {thirdBreakPoint && <Stack className={classNames({ 'px-4': mdBP })}>
                     {signerInfo}
                     {notSignerInfo}
                     {signBefore}
@@ -594,7 +595,7 @@ const AgreementSign: React.FC = () => {
                     {!firstBreakPoint && <Grid.Col span={GRID_SIDE}></Grid.Col>}
                     
                     <Grid.Col span={GRID_CENTER + (firstBreakPoint ? GRID_SIDE : 0) + (secondBreakPoint ? GRID_SIDE : 0)}>
-                        <Group position='apart'>
+                        <Group position='apart' className={classNames({ 'px-4': mdBP})}>
                             <span onClick={() => setShowDecline(true)}><Button color='danger' className='agreement-button' >Decline</Button></span>
                             <span onClick={onDocumentComplete}><Button className='items-center justify-center capitalize agreement-button' color='success'>{basicInfo ? getCompleteButtonLabel(basicInfo.signerType) : ''}</Button></span>
                         </Group>
@@ -604,7 +605,7 @@ const AgreementSign: React.FC = () => {
                     </Grid.Col>}
 
                 </Grid>}
-                {secondBreakPoint && <div className='w-full mt-8'>
+                {secondBreakPoint && <div className={classNames('w-full mt-8', { 'px-4': mdBP})}>
                     <Divider className='my-4' />
                     <h3 className='bg-gray-50 py-4'>
                         Comments

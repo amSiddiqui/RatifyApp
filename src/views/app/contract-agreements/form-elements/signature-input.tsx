@@ -1,4 +1,4 @@
-import { Center, Divider, Grid, Group, Modal, Stack, TextInput } from '@mantine/core';
+import { Center, Divider, Grid, Group, Modal, SimpleGrid, Stack, TextInput } from '@mantine/core';
 import { useDisclosure, useInputState } from '@mantine/hooks';
 import React from 'react';
 import { Button } from 'reactstrap';
@@ -116,8 +116,13 @@ const SignatureInput:React.FC<Props> = ({placeholder, onSignComplete, initialVal
 
         <Modal size={'lg'} title='Add your signature' centered opened={showSignModal} onClose={signModalHandlers.close}>
             <Stack>
-                {(!drawing && !imageUploaded) && <><Group className='w-full'>
-                    <Center onClick={() => setDrawing(true)} className='bg-gray-100 px-3 cursor-pointer py-4' style={{width: '48%'}}>
+                {(!drawing && !imageUploaded) && <>
+                <SimpleGrid breakpoints={[
+                    { minWidth: 640, cols: 2 },
+                    { maxWidth: 640, cols: 1 },
+
+                ]} className='w-full'>
+                    <Center onClick={() => setDrawing(true)} className='bg-gray-100 px-3 cursor-pointer py-4'>
                         <div className='flex items-center justify-between'>
                             <MdDraw className='text-5xl' />
                             <div className='ml-3'>
@@ -130,7 +135,7 @@ const SignatureInput:React.FC<Props> = ({placeholder, onSignComplete, initialVal
                         if (fileInputRef.current) {
                             fileInputRef.current.click();
                         }
-                    }} className='bg-gray-100 cursor-pointer px-3 py-4' style={{width: '48%'}}>
+                    }} className='bg-gray-100 cursor-pointer px-3 py-4'>
                         <div className='flex items-center justify-between'>
                             <FcSignature className='text-6xl' />
                             <div className='ml-3'>
@@ -139,9 +144,8 @@ const SignatureInput:React.FC<Props> = ({placeholder, onSignComplete, initialVal
                             </div>
                         </div>
                     </Center>
-                    <input onChange={onFileSelect} ref={fileInputRef} type="file" className='hidden' accept='image/*' />            
-                </Group>
-                
+                </SimpleGrid>
+                <input onChange={onFileSelect} ref={fileInputRef} type="file" className='hidden' accept='image/*' />            
                 <Divider label='OR' labelPosition='center'/>
                 <Stack>
                     <Group>
@@ -152,10 +156,10 @@ const SignatureInput:React.FC<Props> = ({placeholder, onSignComplete, initialVal
                         </div>
                     </Group>
                     <Grid columns={12}>
-                        <Grid.Col span={6}>
+                        <Grid.Col md={6}>
                             <TextInput placeholder='First Name' value={lastName} onChange={setLastName} />
                         </Grid.Col>
-                        <Grid.Col span={6}>
+                        <Grid.Col md={6}>
                             <TextInput placeholder='Surname' value={firstName} onChange={setFirstName} />
                         </Grid.Col>
                     </Grid>
