@@ -11,7 +11,7 @@ import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { ContractHelper } from '../../../../helpers/ContractHelper';
 import { toast } from 'react-toastify';
-import SignerPopover from '../signer-popover';
+import SignerPopover from '../form-elements/signer-popover';
 import { MdCheck, MdClear, MdError, MdSearch } from 'react-icons/md';
 
 export const getSignerStatus = (signer:Signer, signerProgress: {total: number, completed: number} | null) => {

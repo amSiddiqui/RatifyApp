@@ -7,7 +7,7 @@ import {
     HiChevronDoubleLeft,
     HiChevronDoubleRight,
 } from 'react-icons/hi';
-import { ContractHelper } from '../../../helpers/ContractHelper';
+import { ContractHelper } from '../../../../helpers/ContractHelper';
 import { toast } from 'react-toastify';
 
 type Props = {

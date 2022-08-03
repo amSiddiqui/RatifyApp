@@ -1,23 +1,23 @@
 import React from 'react';
 import { Row } from 'reactstrap';
 import { useIntl } from 'react-intl';
-import { Colxx, Separator } from '../../../components/common/CustomBootstrap';
-import Breadcrumb from '../../../containers/navs/Breadcrumb';
+import { Colxx, Separator } from '../../../../components/common/CustomBootstrap';
+import Breadcrumb from '../../../../containers/navs/Breadcrumb';
 import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import './contract-agreements.css';
 import CATopBar from './ca-topbar';
 import DocumentCarousel from './document-carousel';
 import { Modal, Progress, Divider, Group, Center, Stack, TextInput, Select } from '@mantine/core';
-import { ContractHelper } from '../../../helpers/ContractHelper';
-import { AppDispatch, RootState } from '../../../redux';
+import { ContractHelper } from '../../../../helpers/ContractHelper';
+import { AppDispatch, RootState } from '../../../../redux';
 import { useDispatch, useSelector } from 'react-redux';
 import { toast } from 'react-toastify';
 import { Button } from 'reactstrap';
-import { AgreementTemplate } from '../../../types/ContractTypes';
+import { AgreementTemplate } from '../../../../types/ContractTypes';
 import { useDisclosure } from '@mantine/hooks';
 import { MdClose } from 'react-icons/md';
-import { OrganizationNameResponse } from '../../../types/AuthTypes';
-import { AuthHelper } from '../../../helpers/AuthHelper';
+import { OrganizationNameResponse } from '../../../../types/AuthTypes';
+import { AuthHelper } from '../../../../helpers/AuthHelper';
 import PdfViewer from './pdf-viewer';
 
 const ContractAgreements: React.FC = () => {

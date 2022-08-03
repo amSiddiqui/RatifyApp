@@ -1,6 +1,6 @@
 import { Popover } from '@mantine/core';
 import React, { ReactElement } from 'react';
-import { getBgColorLight } from './types';
+import { getBgColorLight } from '../types';
 
 
 const SignerPopover: React.FC<{target: ReactElement, color: string}> = ({children, target, color}) => {

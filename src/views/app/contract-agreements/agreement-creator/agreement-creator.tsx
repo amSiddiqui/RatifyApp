@@ -41,9 +41,9 @@ import PdfFormInput from '../form-elements/PdfFormInput';
 import { generateSignerLabels, getRandomStringID } from '../../../../helpers/Utils';
 import { useDebouncedValue, useDisclosure } from '@mantine/hooks';
 import PrepareSend from './prepare-send';
-import SignerPopover from '../signer-popover';
-import BaseDocumentViewer from '../base-document-viewer';
-import PageNavigation from '../page-navigation';
+import SignerPopover from '../form-elements/signer-popover';
+import BaseDocumentViewer from '../document-viewer/base-document-viewer';
+import PageNavigation from '../document-viewer/page-navigation';
 
 // luxon today date
 const today = DateTime.local();

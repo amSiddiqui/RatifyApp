@@ -3,7 +3,7 @@ import { Row } from 'reactstrap';
 import { Colxx, Separator } from '../../components/common/CustomBootstrap';
 import Breadcrumb from '../../containers/navs/Breadcrumb';
 import { useLocation } from 'react-router-dom';
-import UnderConstruction from './construction';
+import UnderConstruction from '../app/construction';
 
 const BlankPage = () => {
   const match = useLocation();

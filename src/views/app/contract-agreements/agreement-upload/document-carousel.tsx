@@ -14,10 +14,10 @@ import {
 } from '@mantine/core';
 import React from 'react';
 import { IntlShape } from 'react-intl';
-import { AgreementTemplate } from '../../../types/ContractTypes';
+import { AgreementTemplate } from '../../../../types/ContractTypes';
 import { Button } from 'reactstrap';
 import { toast } from 'react-toastify';
-import { ContractHelper } from '../../../helpers/ContractHelper';
+import { ContractHelper } from '../../../../helpers/ContractHelper';
 import { BsBook, BsTrash } from 'react-icons/bs';
 import { MdAdd, MdEdit } from 'react-icons/md';
 

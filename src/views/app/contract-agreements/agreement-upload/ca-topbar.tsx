@@ -1,6 +1,6 @@
 import React from 'react';
 import { Row, Button } from 'reactstrap';
-import { Colxx } from '../../../components/common/CustomBootstrap';
+import { Colxx } from '../../../../components/common/CustomBootstrap';
 import { IntlShape } from 'react-intl';
 import { Dropzone, PDF_MIME_TYPE } from '@mantine/dropzone';
 import { MdFileUpload } from 'react-icons/md';

@@ -10,11 +10,11 @@ import { AppDispatch, RootState } from './redux/';
 import { AuthHelper } from './helpers/AuthHelper';
 
 const ViewError = React.lazy(() =>
-  import(/* webpackChunkName: "views-error" */ './views/error')
+  import(/* webpackChunkName: "views-error" */ './views/errors/error')
 );
 
 const ViewUnauthorized = React.lazy(() =>
-  import(/* webpackChunkName: "views-error" */ './views/unauthorized')
+  import(/* webpackChunkName: "views-error" */ './views/errors/unauthorized')
 );
 
 const ViewUser = React.lazy(() =>
@@ -50,7 +50,7 @@ const ViewApp = React.lazy(() =>
 );
 
 const ContractsAgreements = React.lazy(() =>
-  import(/* webpackChunkName: "views-contracts-agreements" */ './views/app/contract-agreements')
+  import(/* webpackChunkName: "views-contracts-agreements" */ './views/app/contract-agreements/agreement-upload')
 );
 
 const AgreementCreator = React.lazy(() => 
@@ -58,7 +58,7 @@ const AgreementCreator = React.lazy(() =>
 );
 
 const Reports = React.lazy(() =>
-  import(/* webpackChunkName: "views-reports" */ './views/app/reports')
+  import(/* webpackChunkName: "views-reports" */ './views/reports/reports')
 );
 
 const ProfileSettings = React.lazy(() =>
@@ -192,7 +192,7 @@ function App() {
                                     <Route path='success' element={<AgreementSuccess />} />
                                     <Route path='decline' element={<AgreementDecline />} />
                                 </Route>
-                                <Route path="*" element={<Navigate to='/error' />} />
+                                <Route path="*" element={<ViewError />} />
                             </Routes>
                         </BrowserRouter>
                     </React.Suspense>

@@ -18,8 +18,8 @@ import { IoWarningOutline } from 'react-icons/io5';
 import AuditTrail from '../audit-trail';
 import AuditTrailButton from '../audit-trail/audit-trail-button';
 import AgreementProgressBar from '../sender-view/agreement-progress-bar';
-import BaseDocumentViewer from '../base-document-viewer';
-import PageNavigation from '../page-navigation';
+import BaseDocumentViewer from '../document-viewer/base-document-viewer';
+import PageNavigation from '../document-viewer/page-navigation';
 
 
 const GRID_TOTAL = 16;

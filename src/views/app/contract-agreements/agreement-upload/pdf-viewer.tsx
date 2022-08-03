@@ -1,6 +1,6 @@
 import { Center, Loader } from '@mantine/core';
 import React from 'react';
-import { ContractHelper } from '../../../helpers/ContractHelper';
+import { ContractHelper } from '../../../../helpers/ContractHelper';
 
 type Props = {
     documentId: string;
