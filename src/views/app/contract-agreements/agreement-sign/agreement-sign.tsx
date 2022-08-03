@@ -4,14 +4,14 @@ import { useDispatch } from 'react-redux';
 import { NavLink, useNavigate, useSearchParams } from 'react-router-dom';
 import { ContractHelper } from '../../../../helpers/ContractHelper';
 import { AppDispatch } from '../../../../redux';
-import { useDisclosure } from '@mantine/hooks';
+import { useDisclosure, useMediaQuery, useResizeObserver } from '@mantine/hooks';
 import { Button, Card, CardBody } from 'reactstrap';
 import { Agreement, InputField, SignerErrorTypes } from '../../../../types/ContractTypes';
 import { toast } from 'react-toastify';
 import { DateTime } from 'luxon';
 import SignerInput from '../form-elements/signer-input';
 import SignerComments from './signer-comments';
-import { getFormatDateFromIso } from '../../../../helpers/Utils';
+import { getFormatDateFromIso, documentViewerBreakpoint } from '../../../../helpers/Utils';
 import SenderInputView from '../form-elements/sender-input-view';
 import { MdPendingActions } from 'react-icons/md';
 import { IoWarningOutline } from 'react-icons/io5';
@@ -20,7 +20,7 @@ import AuditTrailButton from '../audit-trail/audit-trail-button';
 import AgreementProgressBar from '../sender-view/agreement-progress-bar';
 import BaseDocumentViewer from '../document-viewer/base-document-viewer';
 import PageNavigation from '../document-viewer/page-navigation';
-
+import classNames from 'classnames';
 
 const GRID_TOTAL = 16;
 const GRID_SIDE = 3;
@@ -33,12 +33,10 @@ const getCompleteButtonLabel = (type: string) => {
     return 'approve';
 }
 
-
 const checkInputPageAllComplete = (pageNumber: number, inputFields: InputField[]) => {
     const reduced = inputFields.filter(inputField => inputField.page === pageNumber && inputField.completed === false && inputField.required);
     return reduced.length === 0;
 }
-
 
 const errorTypeToText = (errorType: SignerErrorTypes) => {
     switch (errorType) {
@@ -111,6 +109,14 @@ const AgreementSign: React.FC = () => {
     const [showDecline, setShowDecline] = React.useState(false);
     const [declineMessage, setDeclineMessage] = React.useState('');
 
+    const firstBreakPoint = useMediaQuery('(max-width: 1370px)');
+    const secondBreakPoint = useMediaQuery('(max-width: 1095px)');
+    const thirdBreakPoint = useMediaQuery('(max-width: 1000px)');
+    const mdBP = useMediaQuery('(max-width: 768px)');
+    const [{ scale, topOffset }, setScaleTopOffset] = React.useState<{ scale: number | undefined, topOffset: number | undefined }>({ scale: undefined, topOffset: undefined });
+
+    const [containerRef, rect] = useResizeObserver();
+    
     const [basicInfo, setBasicInfo] = React.useState<{
         signerEmail: string;
         signerName: string;
@@ -361,130 +367,173 @@ const AgreementSign: React.FC = () => {
         setPageCompleted(pageCompleted);
     }, [inputElements, numPages]);
 
+    React.useEffect(() => {
+        const width = rect.width;
+        if (width > 700) {
+            setScaleTopOffset({ scale: undefined, topOffset: undefined });
+            return;
+        }
+
+        for (const docBP of documentViewerBreakpoint) {
+            if (width > docBP.bp) {
+                setScaleTopOffset({ scale: docBP.scale, topOffset: docBP.topOffset });
+                return;
+            }
+        }
+        
+    }, [rect]);
+
+    const pgNavigation = <PageNavigation
+        pageNumber={pageNumber}
+        numPages={numPages}
+        onNextPage={onNextPage}
+        onPrevPage={onPreviousPage}
+        onFirstPage={onFirstPage}
+        onLastPage={onLastPage}
+        onGotoPage={(pg) => setPageNumber(pg)}
+        token={token}
+        contractHelper={contractHelper}
+        pageCompleted={pageCompleted}
+        height={600}
+        showBottomNavigation={firstBreakPoint}
+    />;
+    const comments = basicInfo ? <SignerComments type='signer' token={token} signerId={basicInfo.signerId} contractHelper={contractHelper} /> : null ;
+
+    const clientLogoElement = <Stack style={{height: '108px'}} spacing={'xs'}>
+                {loadingLogo && <Center style={{height: 75, width: 75}}>
+                    <Loader />
+                </Center>}
+                {!loadingLogo && clientLogo && <div style={{height: 75, width: 75}}>
+                    <img src={clientLogo} alt={clientName} />
+                </div>}
+                {((loadingLogo) || (!loadingLogo && clientLogo)) && clientName && <p>{clientName}</p>}
+                {(!loadingLogo && !clientLogo && clientName) && <p className='client-logo-text'>{clientName}</p>}
+            </Stack>;
+
+    const messageElement = <div className='flex text-primary'><span><MdPendingActions className='text-xl' /></span><p className='ml-2 text-lg'>Please <span>{!basicInfo ? 'sign':  (basicInfo.signerType === 'approver' ? 'approve' : basicInfo.signerType.substring(0, basicInfo.signerType.length - 2))}</span> the following document!</p></div>;
+    const downloadElement = 
+    <Group className='relative' spacing={'xl'}>
+        {pdfLoading && <Loader size='xs' />}
+        {!pdfLoading && <Group spacing='xs'>    
+        <Tooltip label='Download Document' className='cursor-pointer'>
+            <a href={"data:application/pdf;base64,"+pdf} download={agreement ? agreement.title + '.pdf' : 'document.pdf'}>
+                <i className='iconsminds-download-1 text-lg'/>
+            </a>
+        </Tooltip>
+        <p>Download Document</p>
+        </Group>}
+    </Group>;
+    
+    const signerInfo = basicInfo && basicInfo.signerType === 'signer' ?  
+    <Group position={thirdBreakPoint ? 'left' : 'right'}>
+        <div>
+            <Progress style={{ width: thirdBreakPoint ? 180 : 300 }} className=' h-3' value={totalFields === 0 ? 0: completedFields * 100 / totalFields} color='green'/>
+            <Group style={{ width: thirdBreakPoint ? 180 : 300 }} position='apart'>
+                <p className='text-muted text-xs'>Actions completed:</p>
+                <p className='text-muted text-xs'>{completedFields} of {totalFields}</p>
+            </Group>
+        </div>
+    </Group> : null;
+    
+    const notSignerInfo = basicInfo && basicInfo.signerType !== 'signer' ? 
+    <Group position={thirdBreakPoint ? 'left' : 'right'}>
+        <AgreementProgressBar contractHelper={contractHelper} token={token} />
+    </Group> : null;
+
+    const signBefore = agreement && agreement.signed_before ?
+    <div className={classNames('flex items-center relative', {'justify-center ' : !thirdBreakPoint, 'justify-start': thirdBreakPoint})}>     
+        <IoWarningOutline className='text-warning text-xl relative' style={{ top: -1}} />
+        <p className='ml-2'>Document is required to be signed before <span className='text-rose-400'>{agreement && agreement.signed_before ? getFormatDateFromIso(agreement.signed_before) : ''}</span></p>
+    </div> : null;
+
+    const auditTrailButtonElement = basicInfo && basicInfo.signerType !== 'signer' ?
+    <AuditTrailButton agreement={agreement} onAuditClick={() => setShowAuditTrail(true)} /> : null;
+
     return (
         <>
             <AgreementSignNav />
-            <div className='mt-5 px-16'>
-                <Grid columns={GRID_TOTAL}>
+            <div className={classNames('mt-5', { 'px-0': mdBP, 'px-16': !mdBP })}>
+                {!thirdBreakPoint && <Grid columns={GRID_TOTAL}>
                     <Grid.Col span={GRID_SIDE}>
                         <Center>
-                            <Stack style={{height: '108px'}} spacing={'xs'}>
-                                {loadingLogo && <Center style={{height: 75, width: 75}}>
-                                    <Loader />
-                                </Center>}
-                                {!loadingLogo && clientLogo && <div style={{height: 75, width: 75}}>
-                                    <img src={clientLogo} alt={clientName} />
-                                </div>}
-                                {((loadingLogo) || (!loadingLogo && clientLogo)) && clientName && <p>{clientName}</p>}
-                                {(!loadingLogo && !clientLogo && clientName) && <p className='client-logo-text'>{clientName}</p>}
-                            </Stack>
+                            {clientLogoElement}
                         </Center>
                     </Grid.Col>
-                    <Grid.Col span={GRID_CENTER}>
+                    <Grid.Col span={GRID_CENTER + (secondBreakPoint ? GRID_SIDE : 0)}>
                         <Center>
                             <h1>{!!agreement && agreement.title}</h1>
                         </Center>                        
                     </Grid.Col>
-                    <Grid.Col span={GRID_SIDE}></Grid.Col>
-                </Grid>
+                    {!secondBreakPoint && <Grid.Col span={GRID_SIDE}></Grid.Col>}
+                </Grid>}
+                {thirdBreakPoint && <Center>
+                            <h1>{!!agreement && agreement.title}</h1>
+                        </Center>}
+                {thirdBreakPoint && <div className='mt-4'>
+                    {clientLogoElement}    
+                </div>}
 
-
-                <Grid className='mb-4' columns={GRID_TOTAL}>
-                    <Grid.Col span={GRID_SIDE}></Grid.Col>
-                    <Grid.Col span={GRID_CENTER}>
+                {!thirdBreakPoint && <Grid className='mb-4' columns={GRID_TOTAL}>
+                    {!firstBreakPoint && <Grid.Col span={GRID_SIDE}></Grid.Col>}
+                    <Grid.Col span={GRID_CENTER + (firstBreakPoint ? GRID_SIDE : 0)}>
                         <Group position='apart'>
-                            <div>
-                                <Group spacing={'xs'} className='text-primary'><span><MdPendingActions className='text-xl' /></span><p className=' text-lg'>Please <span>{!basicInfo ? 'sign':  (basicInfo.signerType === 'approver' ? 'approve' : basicInfo.signerType.substring(0, basicInfo.signerType.length - 2))}</span> the following document!</p></Group>
-                                <Group className='relative' style={{top: '15px'}} spacing={'xl'}>
-                                    {pdfLoading && <Loader size='xs' />}
-                                    {!pdfLoading && <Group spacing='xs'>    
-                                    <Tooltip label='Download Document' className='cursor-pointer'>
-                                        <a href={"data:application/pdf;base64,"+pdf} download={agreement ? agreement.title + '.pdf' : 'document.pdf'}>
-                                            <i className='iconsminds-download-1 text-lg'/>
-                                        </a>
-                                    </Tooltip>
-                                    <p>Download Document</p>
-                                    </Group>}
-                                </Group>
-                            </div>
-                            
-                            <div>
-                            {basicInfo && basicInfo.signerType === 'signer' && 
-                            <Group position='right'>
-                                <div>
-                                    <Progress style={{ width: 300 }} className=' h-3' value={totalFields === 0 ? 0: completedFields * 100 / totalFields} color='green'/>
-                                    <Group style={{ width: 300 }} position='apart'>
-                                        <p className='text-muted text-xs'>Actions completed:</p>
-                                        <p className='text-muted text-xs'>{completedFields} of {totalFields}</p>
-                                    </Group>
-                                </div>
-                            </Group>
-                            }
-                            {basicInfo && basicInfo.signerType !== 'signer' && 
-                            <Group position='right'>
-                                <AgreementProgressBar contractHelper={contractHelper} token={token} />
-                            </Group>
-                            }
-                            {agreement && agreement.signed_before && 
-                                <div style={{top: '15px'}} className='flex justify-center items-center relative'>     
-                                    <IoWarningOutline className='text-warning text-xl relative' style={{ top: -1}} />
-                                    <p className='ml-2'>Document is required to be signed before <span className='text-rose-400'>{agreement && agreement.signed_before ? getFormatDateFromIso(agreement.signed_before) : ''}</span></p>
-                                </div>
-                            }
-                            </div>
+                            <Stack>
+                                {messageElement}
+                                {downloadElement}
+                            </Stack>
+                            <Stack>
+                                {signerInfo}
+                                {notSignerInfo}
+                                {signBefore}
+                            </Stack>
                         </Group>
                     </Grid.Col>
                     <Grid.Col span={GRID_SIDE}>
                         <Center>
-                            {basicInfo && basicInfo.signerType !== 'signer' && 
-                                <AuditTrailButton agreement={agreement} onAuditClick={() => setShowAuditTrail(true)} />
-                            }
+                            {auditTrailButtonElement}
                         </Center>
                     </Grid.Col>
-                </Grid>
+                </Grid>}
+                
+                {thirdBreakPoint && <Stack>
+                    {signerInfo}
+                    {notSignerInfo}
+                    {signBefore}
+                    {messageElement}
+                    {downloadElement}
+                </Stack>}
 
                 <Grid className='mt-2' columns={GRID_TOTAL}>
-                    <Grid.Col span={GRID_SIDE}>
+                    {!firstBreakPoint &&<Grid.Col span={GRID_SIDE}>
                         <Card style={{height: '1080px'}}>
                             <CardBody className='p-0'>
                                 <h5 className='text-center bg-gray-50 py-4'>
                                     Page Navigation
                                 </h5>
                                 <Divider className='mb-4' />
-                                <PageNavigation
-                                    pageNumber={pageNumber}
-                                    numPages={numPages}
-                                    onNextPage={onNextPage}
-                                    onPrevPage={onPreviousPage}
-                                    onFirstPage={onFirstPage}
-                                    onLastPage={onLastPage}
-                                    onGotoPage={(pg) => setPageNumber(pg)}
-                                    token={token}
-                                    contractHelper={contractHelper}
-                                    pageCompleted={pageCompleted}
-                                    height={600}
-                                />
+                                {pgNavigation}
                             </CardBody>
                         </Card>
-                    </Grid.Col>
-                    <Grid.Col span={GRID_CENTER}>
-                        <Card style={{height: '1080px'}}>
+                    </Grid.Col>}
+                    {firstBreakPoint && pgNavigation}
+                    <Grid.Col span={GRID_CENTER + (firstBreakPoint ? GRID_SIDE : 0) + (secondBreakPoint ? GRID_SIDE : 0)}>
+                        <Card style={{height: 1080 * (scale ? scale : 1) }}>
                             <CardBody>
-                                <Center>
+                                <Center ref={containerRef}>
                                     {pdfLoading && (
-                                        <Skeleton height={1024} style={{zIndex: 0}} width={613} />
+                                        <Skeleton height={ scale ? 1024 * scale : 1024 } style={{zIndex: 0}} width={ scale ? 613 * scale : 613} />
                                     )}
                                     {!pdfLoading && (
                                         <BaseDocumentViewer 
-                                        viewOnly={true}
-                                        ref={canvasRef} 
-                                        onDocLoadSuccess={onDocumentLoadSuccess} 
-                                        pdf={pdf} 
-                                        pageNumber={pageNumber}
-                                        showNextPage={!!numPages && pageNumber < numPages}
-                                        showPrevPage={!!numPages && pageNumber > 1}
-                                        onNextPage={onNextPage}
-                                        onPrevPage={onPreviousPage}
+                                            ref={canvasRef} 
+                                            onDocLoadSuccess={onDocumentLoadSuccess} 
+                                            pdf={pdf} 
+                                            pageNumber={pageNumber}
+                                            showNextPage={!!numPages && pageNumber < numPages}
+                                            showPrevPage={!!numPages && pageNumber > 1}
+                                            onNextPage={onNextPage}
+                                            onPrevPage={onPreviousPage}
+                                            scale={scale} topOffset={topOffset}
                                         >
                                             <>
                                                 {inputElements.map(
@@ -526,7 +575,7 @@ const AgreementSign: React.FC = () => {
                             </CardBody>
                         </Card>
                     </Grid.Col>
-                    <Grid.Col span={GRID_SIDE}>
+                    {!secondBreakPoint && <Grid.Col span={GRID_SIDE}>
                         <Card style={{height: '1080px'}}>
                             <CardBody className='p-0'>
                                 <h5 className='text-center bg-gray-50 py-4'>
@@ -534,30 +583,37 @@ const AgreementSign: React.FC = () => {
                                 </h5>
                                 <Divider className='mb-4' />
                                 <div style={{ height: '475px' }}>
-                                    {!!basicInfo && <SignerComments type='signer' token={token} signerId={basicInfo.signerId} contractHelper={contractHelper} />}
+                                    {comments}
                                 </div>
                             </CardBody>
                         </Card>
-                    </Grid.Col>
+                    </Grid.Col>}
                 </Grid>
 
                 {basicInfo?.signerType !== 'viewer' && <Grid className='mt-8' columns={GRID_TOTAL}>
-                    <Grid.Col span={GRID_SIDE}>
-
-                    </Grid.Col>
+                    {!firstBreakPoint && <Grid.Col span={GRID_SIDE}></Grid.Col>}
                     
-                    <Grid.Col span={GRID_CENTER}>
+                    <Grid.Col span={GRID_CENTER + (firstBreakPoint ? GRID_SIDE : 0) + (secondBreakPoint ? GRID_SIDE : 0)}>
                         <Group position='apart'>
                             <span onClick={() => setShowDecline(true)}><Button color='danger' className='agreement-button' >Decline</Button></span>
                             <span onClick={onDocumentComplete}><Button className='items-center justify-center capitalize agreement-button' color='success'>{basicInfo ? getCompleteButtonLabel(basicInfo.signerType) : ''}</Button></span>
                         </Group>
                     </Grid.Col>
-                    <Grid.Col span={GRID_SIDE}>
+                    {!secondBreakPoint && <Grid.Col span={GRID_SIDE}>
 
-                    </Grid.Col>
+                    </Grid.Col>}
 
                 </Grid>}
-
+                {secondBreakPoint && <div className='w-full mt-8'>
+                    <Divider className='my-4' />
+                    <h3 className='bg-gray-50 py-4'>
+                        Comments
+                    </h3>
+                    <div style={{ height: '600px' }}>
+                        {comments}
+                    </div>
+                    
+                </div>}
             </div>
 
             <Modal

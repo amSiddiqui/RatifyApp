@@ -147,6 +147,19 @@ input {
     font-weight: bold;
 }
 
+@media (max-width: 1000px) {
+    .client-logo-text {
+        font-size: 18px;
+    }
+}
+
+@media (max-width: 600px) {
+    .client-logo-text {
+        font-size: 16px;
+    }
+}
+
+
 .dashboard-title-cell {
     @apply cursor-pointer hover:text-blue-500 hover:scale-110 transition-all;
 }

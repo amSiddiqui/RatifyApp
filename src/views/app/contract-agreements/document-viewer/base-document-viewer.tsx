@@ -1,9 +1,9 @@
 import React from 'react';
 import { Center, Skeleton } from '@mantine/core';
 import { Document, Page } from 'react-pdf/dist/esm/entry.webpack5';
-import { useHover } from '@mantine/hooks';
 import classNames from 'classnames';
 import { HiChevronLeft, HiChevronRight } from 'react-icons/hi';
+import { isTouchDevice } from '../../../../helpers/Utils';
 
 type Props = {
     pdf: string;
@@ -14,17 +14,20 @@ type Props = {
     showPrevPage: boolean;
     onNextPage: () => void;
     onPrevPage: () => void;
-    viewOnly?: boolean;
+    scale?: number;
+    topOffset?: number;
 };
 
+const touchDevice = isTouchDevice();
+
 const BaseDocumentViewer = React.forwardRef<HTMLDivElement, Props>(
-    ({ children, pdf, pageNumber, onDocLoadSuccess, showNextPage, showPrevPage, onNextPage, onPrevPage, viewOnly }, ref) => {
+    ({ children, pdf, pageNumber, onDocLoadSuccess, showNextPage, showPrevPage, onNextPage, onPrevPage, topOffset, scale }, ref) => {
         const [pageDim, setPageDim] = React.useState<{
             width: number;
             height: number;
         }>({ width: 0, height: 0 });
 
-        const { hovered, ref: containerRef } = useHover();
+        const [hovered, setHovered] = React.useState(false);
 
         const onDocumentLoadSuccess = React.useCallback(
             async (pdfObject: any) => {
@@ -54,15 +57,14 @@ const BaseDocumentViewer = React.forwardRef<HTMLDivElement, Props>(
         );
 
         return (
-            <div className="flex" ref={containerRef}>
+            <div style={ (scale !== undefined && topOffset !== undefined) ? { transform: `scale(${scale}) translate(0%, -${topOffset}%)` } : {}} className="flex" onMouseEnter={() => setHovered(true)} onMouseLeave={() => setHovered(false)}>
                 {showPrevPage && <Center
                     onClick={onPrevPage}
-                    className={classNames("cursor-pointer transition-all", {'opacity-0': !hovered, 'opacity-90': hovered})}
+                    className={classNames("cursor-pointer transition-all", {'opacity-0': !hovered , 'opacity-90': hovered})}
                     style={{ width: 50, height: pageDim.height, backgroundImage: 'linear-gradient(270deg, rgba(255,255,255,1) 0%, rgba(226, 243, 255, 1) 100%)'}}>
-                        <HiChevronLeft style={{ fontSize: '4rem' }} />    
+                        <HiChevronLeft style={{ fontSize: '4rem' }} />
                     </Center>}
                 {!showPrevPage && <div style={{ width: 50, height: pageDim.height }}>
-                        
                     </div>}
                     <div className='relative'>
                         <div
@@ -95,7 +97,7 @@ const BaseDocumentViewer = React.forwardRef<HTMLDivElement, Props>(
                 {!showNextPage && <div style={{ width: 50, height: pageDim.height }}></div>}
                 {showNextPage && <Center
                     onClick={onNextPage}
-                    className={classNames("bg-black cursor-pointer transition-all", {'opacity-0': !hovered, 'opacity-90': hovered})}
+                    className={classNames("bg-black cursor-pointer transition-all", {'opacity-0': !hovered || !touchDevice, 'opacity-90': hovered || touchDevice})}
                     style={{ width: 50, height: pageDim.height, backgroundImage: 'linear-gradient(90deg, rgba(255,255,255,1) 0%, rgba(226, 243, 255,1) 100%' }}>
                         <HiChevronRight style={{ fontSize: '4rem' }} /> 
                     </Center>}

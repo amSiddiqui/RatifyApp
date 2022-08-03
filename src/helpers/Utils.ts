@@ -323,3 +323,24 @@ export const getPaginationArray = (total: number, page: number, limit: number): 
     pages.push(total);
     return pages;
 }
+
+export const isTouchDevice = () => {  
+    // @ts-ignore
+    const msMaxTouchPoints = navigator.msMaxTouchPoints;
+
+    return (('ontouchstart' in window) ||  
+      (navigator.maxTouchPoints > 0) ||  
+      (msMaxTouchPoints && msMaxTouchPoints > 0));  
+} 
+
+
+export const documentViewerBreakpoint = [
+    { bp: 645, scale: 0.9, topOffset: 5 },
+    { bp: 625, scale: 0.85, topOffset: 10 },
+    { bp: 500, scale: 0.7, topOffset: 20 },
+    { bp: 428, scale: 0.6, topOffset: 30 },
+    { bp: 375, scale: 0.55, topOffset: 40 },
+    { bp: 328, scale: 0.5, topOffset: 50 },
+    { bp: 291, scale: 0.45, topOffset: 60 },
+    { bp: 0, scale: 0.4, topOffset: 70 },
+];

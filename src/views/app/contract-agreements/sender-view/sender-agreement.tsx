@@ -447,7 +447,6 @@ const SenderAgreement: React.FC = () => {
                                     )}
                                     {!pdfLoading && (
                                         <BaseDocumentViewer 
-                                            viewOnly={true}
                                             ref={canvasRef} 
                                             pdf={pdf} 
                                             pageNumber={pageNumber} 
