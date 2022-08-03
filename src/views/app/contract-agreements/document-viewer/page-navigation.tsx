@@ -9,6 +9,7 @@ import {
 } from 'react-icons/hi';
 import { ContractHelper } from '../../../../helpers/ContractHelper';
 import { toast } from 'react-toastify';
+import { createPortal } from 'react-dom';
 
 type Props = {
     pageNumber: number;
@@ -28,6 +29,7 @@ type Props = {
 const PageNavigation: React.FC<Props> = ({ token, doc_id, contractHelper, pageNumber, numPages, onNextPage, onPrevPage, onFirstPage, onLastPage, onGotoPage, pageCompleted, height }) => {
     const [thumbnailsLoading, setThumbnailsLoading] = React.useState(true);
     const [pdfThumbnails, setThumbnails] = React.useState<{[id: string]: string}>({});
+    const [showBottomNavigation] = React.useState(false);
 
     React.useEffect(() => {
         let shouldUpdate = true;
@@ -156,6 +158,37 @@ const PageNavigation: React.FC<Props> = ({ token, doc_id, contractHelper, pageNu
             </ScrollArea>
         )}
         </Center>
+        {showBottomNavigation && createPortal(<div style={{ position: 'fixed', bottom: 20, left: '50%', margin: '0 auto', transform: 'translate(-50%, 0)', backgroundColor: 'white'}}>
+                <Center className='absolute bg-white shadow-lg' style={{ width: 30, height: 30, right: 10, top: -30, borderTopLeftRadius: 200, borderTopRightRadius: 200 }}>
+                    <i className='simple-icon-arrow-down relative' style={{ top: 2 }} />
+                </Center>
+                <div className='shadow-lg rounded-md py-4 px-4'>
+                    <ScrollArea offsetScrollbars style={{ width: '80vw', height: 100, maxWidth: 400 }} >
+                        <div className='flex'>
+                            <div className='mx-2'>
+                                <Skeleton width={70} height={100} />
+                            </div>
+                            
+                            <div className='mx-2'>
+                                <Skeleton width={70} height={100} />
+                            </div>
+                            
+                            <div className='mx-2'>
+                                <Skeleton width={70} height={100} />
+                            </div>
+                            
+                            <div className='mx-2'>
+                                <Skeleton width={70} height={100} />
+                            </div>
+                            
+                            <div className='mx-2'>
+                                <Skeleton width={70} height={100} />
+                            </div>
+                            
+                        </div>
+                    </ScrollArea>
+                </div>
+        </div>, document.getElementById('page-navigation-portal')!)}
     </>;
 }
 
