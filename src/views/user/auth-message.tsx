@@ -3,7 +3,7 @@ import React from 'react';
 
 const AuthMessage: React.FC = () => {
     return (
-        <Stack spacing={24} style={{ maxWidth: '600px' }}>
+        <Stack spacing={24} style={{ maxWidth: '500px' }}>
             <Image
                 className="mb-2 w-[140px] sm:w-[170px]"
                 src="/static/logos/black.png"
