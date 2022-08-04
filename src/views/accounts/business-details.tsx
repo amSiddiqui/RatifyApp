@@ -99,7 +99,7 @@ const BusinessDetails: React.FC<{
         return;
         setLeEditMode(false);
         setBfEditMode(false);
-        authHelper.updateOrganizationLegalEntities({legalEntity: legalEntities, businessFunction: businessFunctions}).then(() => {
+        authHelper.updateOrganizationLegalEntitiesAndBusinessFunction({legalEntity: legalEntities, businessFunction: businessFunctions}).then(() => {
             toast.success('Business details saved!');
         }).catch(err => {
             toast.error('Error saving business details!');

@@ -14,7 +14,7 @@ const AuthMessage: React.FC = () => {
             <p className='text-3xl'>Focus on growing your business.</p>
             <List spacing={20} icon={<GoPrimitiveDot className='relative' style={{ top: 6 }} />}>
                 <List.Item>
-                    <p className="text-lg rounded-md">
+                    <p className="text-lg">
                         Manual or via email approval &amp; signing of documents
                         takes ages to complete, Leading to poor document management,
                         as well as potentially damaging few trees in the process.

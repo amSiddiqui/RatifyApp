@@ -4,7 +4,7 @@ import { toast } from 'react-toastify';
 
 import AppLayout from '../../components/layout/AppLayout';
 
-const App = () => {
+const ViewApp = () => {
     const [searchParams, setSearchParam] = useSearchParams();
 
     React.useEffect(() => {
@@ -37,4 +37,4 @@ const App = () => {
     );
 };
 
-export default App;
+export default ViewApp;

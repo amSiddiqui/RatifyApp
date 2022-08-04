@@ -117,13 +117,30 @@ export class AuthHelper extends ApiHelper {
         );
     }
 
-    async updateOrganizationLegalEntities(data: {legalEntity: LegalEntity[], businessFunction: BusinessFunction[]}) {
+    async updateOrganizationLegalEntitiesAndBusinessFunction(data: {legalEntity: LegalEntity[], businessFunction: BusinessFunction[]}) {
         await axios.put(
             `/auth/user/organization/entity/`,
             data,
             { headers: { Authorization: `Bearer ${await this.getToken()}` } },
         );
     }
+
+    async updateOrganizationLegalEntities(data: {legalEntity: LegalEntity[], skip: boolean}) {
+        await axios.put(
+            `/auth/user/organization/legal-entities/`,
+            data,
+            { headers: { Authorization: `Bearer ${await this.getToken()}` } },
+        );
+    }
+
+    async updateOrganizationBusinessFunction(data: { businessFunction: BusinessFunction[], skip: boolean }) {
+        await axios.put(
+            `/auth/user/organization/business-function/`,
+            data,
+            { headers: { Authorization: `Bearer ${await this.getToken()}` } },
+        );
+    }
+    
     
     async getOrganizationName() {
         let response: AxiosResponse<OrganizationNameResponse> = await axios.get(

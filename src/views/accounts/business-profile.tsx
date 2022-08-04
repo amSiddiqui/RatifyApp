@@ -29,7 +29,7 @@ const BusinessProfile: React.FC = () => {
             if (meta.shouldUpdate) {
                 setBusinessProfile(org);
                 setLoading(false);
-                setStepperForm(org.stepsCompleted < 3);
+                setStepperForm(org.stepsCompleted < 4);
             }
         }).catch(err => {
             if (meta.shouldUpdate) {
