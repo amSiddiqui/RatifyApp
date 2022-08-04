@@ -605,7 +605,7 @@ const AgreementSign: React.FC = () => {
                     </Grid.Col>}
 
                 </Grid>}
-                {secondBreakPoint && <div className={classNames('w-full mt-8', { 'px-4': mdBP})}>
+                {secondBreakPoint && <div className={classNames('w-full mt-8', { 'px-8': mdBP})}>
                     <Divider className='my-4' />
                     <h3 className='bg-gray-50 py-4'>
                         Comments
