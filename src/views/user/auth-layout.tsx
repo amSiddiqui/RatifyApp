@@ -10,7 +10,7 @@ const AuthLayout:React.FC = ({children}) => {
                     {children}
                 </Card>
             </Center>
-            <Center className="h-screen bg-slate-200 px-8 md:px-8">
+            <Center className="h-screen bg-slate-100 px-8 md:px-8">
                 <AuthMessage />
             </Center>
         </SimpleGrid>
