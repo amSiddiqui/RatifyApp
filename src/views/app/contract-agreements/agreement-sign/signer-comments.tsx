@@ -76,7 +76,7 @@ const SignerComments:React.FC<Props> = ({ contractHelper, token, signerId, userI
     }, [contractHelper, token, type]);
 
     return (<>
-        <Textarea disabled={error || loading} autosize maxRows={12} onFocus={() => {
+        <Textarea icon={<i className='text-lg simple-icon-bubble' />} disabled={error || loading} autosize maxRows={12} onFocus={() => {
             setCommenting(true);
         }} value={comment} onChange={(e) => {
             setComment(e.currentTarget.value);
