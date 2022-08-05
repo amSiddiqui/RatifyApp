@@ -381,7 +381,6 @@ const AgreementSign: React.FC = () => {
                 return;
             }
         }
-        
     }, [rect]);
 
     const pgNavigation = <PageNavigation

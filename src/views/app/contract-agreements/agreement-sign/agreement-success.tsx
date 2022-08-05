@@ -11,7 +11,7 @@ import {
 import { Button } from 'reactstrap';
 import {  useNavigate, useSearchParams } from 'react-router-dom';
 import Confetti from 'react-confetti';
-import { useViewportSize } from '@mantine/hooks';
+import { useMediaQuery, useViewportSize } from '@mantine/hooks';
 import SignupForm from '../../../user/signup-form';
 import { useDispatch } from 'react-redux';
 import { ContractHelper } from '../../../../helpers/ContractHelper';
@@ -49,6 +49,8 @@ const AgreementSuccess: React.FC = () => {
     const [showDocumentCopy, setShowDocumentCopy] = React.useState(false);
     const [error, setError] = React.useState(false);
     const [respType, setRespType] = React.useState('');
+
+    const matches = useMediaQuery('(max-width: 800px)');
 
     React.useEffect(() => {
         const confetti = searchParams.get('confetti');
@@ -109,14 +111,14 @@ const AgreementSuccess: React.FC = () => {
     return (
         <>
         <div style={{ backgroundColor: '#F8F8F8' }}>
-            <SimpleGrid className='h-screen' cols={2} breakpoints={[{ maxWidth: 600, cols: 1 }]}>
-                <Center className="px-10 mb-36 h-100 mt-10 sm:mt-0">
-                    <Stack spacing='xl'>
+            <SimpleGrid className='h-screen' cols={2} breakpoints={[{ maxWidth: 800, cols: 1 }]}>
+                <Center style={{ height: matches ? '60vh' : '100%', marginTop: matches ? '20px' : '0px', marginBottom: matches ? '20px' : '0px'}}>
+                    <Stack spacing='xl' className='px-4'>
                         <Center>
                             <Image className='mb-4 w-[120px] sm:w-[150px] relative' style={{ right: 15 }} src='/static/logos/black.svg' alt='Ratify' />
                         </Center>
                         <div>
-                            <h4 className="text-2xl font-bold">
+                            <h4 className="text-2xl text-center font-bold">
                                 {signerType.length > 0 ? `You have successfully ${signerType === 'signer' ? 'signed and sent' : 'approved'} the document.` : 'You have completed the document.'}
                             </h4>
                             <p className="text-center text-muted">
@@ -138,8 +140,8 @@ const AgreementSuccess: React.FC = () => {
                         </Group>
                     </Stack>
                 </Center>
-                <Center className="w-full h-full p-3">
-                    <Card className="shadow-md w-full sm:w-[500px] p-6 md:p-12">
+                <Center className="w-full h-full">
+                    <Card className="shadow-md w-full mx-4 sm:w-[500px] p-6 md:p-12">
                         <SignupForm title='Try Ratify for free' buttonTitle='Register' />
                     </Card>
                 </Center>

@@ -63,7 +63,6 @@ export class AuthHelper extends ApiHelper {
             return response.data;
         } catch (err: any) {
             if (err.response && err.response.status === 401) {
-                this.dispatchFn(authActions.logout());
                 throw new NoTokenError('No token');
             }
             throw err;
