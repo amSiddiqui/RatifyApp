@@ -56,7 +56,7 @@ const BaseDocumentViewer = React.forwardRef<HTMLDivElement, Props>(
         );
 
         return (
-            <div style={ (scale !== undefined && topOffset !== undefined) ? { transform: `scale(${scale}) translate(0%, -${topOffset}%)` } : {}} className="flex" onMouseEnter={() => setHovered(true)} onMouseLeave={() => setHovered(false)}>
+            <div style={ (scale !== undefined && topOffset !== undefined) ? { transform: `scale(${scale})` } : {}} className="flex" onMouseEnter={() => setHovered(true)} onMouseLeave={() => setHovered(false)}>
                 {showPrevPage && <Center
                     onClick={onPrevPage}
                     className={classNames("cursor-pointer transition-all", {'opacity-0': !hovered , 'opacity-90': hovered})}

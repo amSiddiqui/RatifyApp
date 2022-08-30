@@ -96,6 +96,8 @@ const AgreementSign: React.FC = () => {
 
     const [pdf, setPdf] = React.useState('');
     const [pdfLoading, setPdfLoading] = React.useState(true);
+    const [pdfIpLoading, setPdfIpLoading] = React.useState(true);
+    const [pdfOIpLoading, setPdfOIpLoading] = React.useState(true);
     const [numPages, setNumPages] = React.useState<number>(0);
     const [pageNumber, setPageNumber] = React.useState(1);
     const canvasRef = React.useRef<HTMLDivElement>(null);
@@ -308,9 +310,13 @@ const AgreementSign: React.FC = () => {
                     setTotalFields(input_fields.length);
                     setCompletedFields(input_fields.filter(field => field.completed).length);
                     setInputElements(input_fields);
+                    setPdfIpLoading(false);
                 }
             }
         }).catch(err => {
+            if (shouldUpdate) {
+                setPdfIpLoading(false);
+            }
             console.log(err);
         });
 
@@ -320,9 +326,13 @@ const AgreementSign: React.FC = () => {
                     let input_fields = resp.data;
                     setOtherInputElements(input_fields);
                 }
+                setPdfOIpLoading(false);
             }
         }).catch(err => {
             console.log(err);
+            if (shouldUpdate) {
+                setPdfOIpLoading(false);
+            }
         });
 
     }, [token, tokenValid, contractHelper]);
@@ -518,12 +528,12 @@ const AgreementSign: React.FC = () => {
                     {firstBreakPoint && pgNavigation}
                     <Grid.Col span={GRID_CENTER + (firstBreakPoint ? GRID_SIDE : 0) + (secondBreakPoint ? GRID_SIDE : 0)}>
                         <Card style={{height: 1080 * (scale ? scale : 1) }}>
-                            <CardBody>
-                                <Center ref={containerRef}>
-                                    {pdfLoading && (
+                            <CardBody style={{height: 1080 * (scale ? scale : 1) }}>
+                                <Center style={{height: 1080 * (scale ? scale : 1) }} ref={containerRef}>
+                                    {pdfLoading && pdfIpLoading && pdfOIpLoading && (
                                         <Skeleton height={ scale ? 1024 * scale : 1024 } style={{zIndex: 0}} width={ scale ? 613 * scale : 613} />
                                     )}
-                                    {!pdfLoading && (
+                                    {!pdfLoading && !pdfIpLoading && !pdfOIpLoading && (
                                         <BaseDocumentViewer 
                                             ref={canvasRef} 
                                             onDocLoadSuccess={onDocumentLoadSuccess} 
