@@ -3,6 +3,7 @@ import {
     Autocomplete,
     Checkbox,
     Group,
+    Select,
     SimpleGrid,
     Stack,
     Textarea,
@@ -215,8 +216,10 @@ const BusinessDetailsForm: React.FC<{
 
                             <SimpleGrid cols={2}>
 
-                                <Autocomplete
+                                <Select
                                     data={Country}
+                                    nothingFound='No options'
+                                    searchable
                                     size={size}
                                     label='Country'
                                     required
@@ -225,7 +228,9 @@ const BusinessDetailsForm: React.FC<{
                                     value={bACountry}
 
                                     onChange={(value) => {
-                                        setValue('billingAddress.country', value);
+                                        if (value) {
+                                            setValue('billingAddress.country', value);
+                                        }
                                     }}
                                     onBlur={register('billingAddress.country').onBlur}
                                     name={register('billingAddress.country').name}
