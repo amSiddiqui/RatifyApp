@@ -147,6 +147,14 @@ input {
     font-weight: bold;
 }
 
+.delete-button-underlined {
+    @apply text-red-500 underline px-10 py-3 cursor-pointer;
+}
+
+.delete-button-underlined:hover {
+    @apply bg-rose-50;
+}
+
 @media (max-width: 1000px) {
     .client-logo-text {
         font-size: 18px;

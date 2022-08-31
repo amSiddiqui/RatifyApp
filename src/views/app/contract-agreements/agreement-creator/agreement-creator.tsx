@@ -894,7 +894,9 @@ const AgreementCreator: React.FC = () => {
                 <Grid.Col span={GRID_CENTER}>
                     <Group position='apart'>
                         <Group>
-                            <span onClick={deleteModalHandlers.open}><Button color='danger' className='agreement-button' >Delete</Button></span>
+                            <span onClick={deleteModalHandlers.open}>
+                                <p className='delete-button-underlined'>Delete</p>
+                            </span>
                             <span onClick={() => {toast.success('Draft saved!')}}><Button color='secondary' className='agreement-button' >Save Draft</Button></span>
                             <span><Button
                                 type='button'

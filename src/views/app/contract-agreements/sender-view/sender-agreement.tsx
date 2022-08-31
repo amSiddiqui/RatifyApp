@@ -525,7 +525,10 @@ const SenderAgreement: React.FC = () => {
                     {agreement?.status === 'sent' && <Group position='left'>
                         <span onClick={() => {
                             setShowConfirmWithdraw(true);
-                        }}><Button color='danger'>Withdraw Document</Button></span>
+                        }}>
+                            <p className='delete-button-underlined'>Withdraw Document</p>
+                            
+                        </span>
                     </Group>}
                 </Grid.Col>
                 <Grid.Col span={GRID_SIDE}></Grid.Col>

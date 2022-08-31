@@ -605,7 +605,9 @@ const AgreementSign: React.FC = () => {
                     
                     <Grid.Col span={GRID_CENTER + (firstBreakPoint ? GRID_SIDE : 0) + (secondBreakPoint ? GRID_SIDE : 0)}>
                         <Group position='apart' className={classNames({ 'px-4': mdBP})}>
-                            <span onClick={() => setShowDecline(true)}><Button color='danger' className='agreement-button' >Decline</Button></span>
+                            <span onClick={() => setShowDecline(true)}>
+                                <p className='delete-button-underlined'>Decline</p>
+                            </span>
                             <span onClick={onDocumentComplete}><Button className='items-center justify-center capitalize agreement-button' color='success'>{basicInfo ? getCompleteButtonLabel(basicInfo.signerType) : ''}</Button></span>
                         </Group>
                     </Grid.Col>
