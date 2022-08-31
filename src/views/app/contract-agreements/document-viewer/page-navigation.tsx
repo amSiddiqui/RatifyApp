@@ -124,10 +124,10 @@ const PageNavigation: React.FC<Props> = ({ token, doc_id, contractHelper, pageNu
         },
     );
     
-    if (hideBottomNavigation === true) {
-        return <></>;
-    }
     if (showBottomNavigation) {
+        if (hideBottomNavigation === true) {
+            return <></>;
+        }
         return (createPortal(
             <div className='transition-all' style={{ 
                 position: 'fixed', 
