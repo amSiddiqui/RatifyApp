@@ -56,16 +56,14 @@ const BaseDocumentViewer = React.forwardRef<HTMLDivElement, Props>(
         );
 
         return (
-            <div style={ (scale !== undefined && topOffset !== undefined) ? { transform: `scale(${scale})` } : {}} className="flex" onMouseEnter={() => setHovered(true)} onMouseLeave={() => setHovered(false)}>
+            <div className='relative' style={ (scale !== undefined && topOffset !== undefined) ? { transform: `scale(${scale})` } : {}} onMouseEnter={() => setHovered(true)} onMouseLeave={() => setHovered(false)}>
                 {showPrevPage && <Center
                     onClick={onPrevPage}
-                    className={classNames("cursor-pointer transition-all", {'opacity-0': !hovered , 'opacity-90': hovered})}
-                    style={{ width: 50, height: pageDim.height, backgroundImage: 'linear-gradient(270deg, rgba(255,255,255,1) 0%, rgba(226, 243, 255, 1) 100%)'}}>
+                    className={classNames("absolute left-0 top-0 cursor-pointer transition-all", {'opacity-0': !hovered || !touchDevice, 'opacity-90': hovered || touchDevice})}
+                    style={{ zIndex: 13, width: 50, height: pageDim.height, backgroundImage: 'linear-gradient(270deg, rgba(255,255,255,1) 0%, rgba(226, 243, 255, 1) 100%)'}}>
                         <HiChevronLeft style={{ fontSize: '4rem' }} />
                     </Center>}
-                {!showPrevPage && <div style={{ width: 50, height: pageDim.height }}>
-                    </div>}
-                    <div className='relative'>
+                    <div>
                         <div
                             ref={ref}
                             style={{
@@ -93,11 +91,10 @@ const BaseDocumentViewer = React.forwardRef<HTMLDivElement, Props>(
                             />
                         </Document>
                     </div>
-                {!showNextPage && <div style={{ width: 50, height: pageDim.height }}></div>}
                 {showNextPage && <Center
                     onClick={onNextPage}
-                    className={classNames("bg-black cursor-pointer transition-all", {'opacity-0': !hovered || !touchDevice, 'opacity-90': hovered || touchDevice})}
-                    style={{ width: 50, height: pageDim.height, backgroundImage: 'linear-gradient(90deg, rgba(255,255,255,1) 0%, rgba(226, 243, 255,1) 100%' }}>
+                    className={classNames("absolute right-0 top-0 cursor-pointer transition-all", {'opacity-0': !hovered || !touchDevice, 'opacity-90': hovered || touchDevice})}
+                    style={{ zIndex: 13, width: 50, height: pageDim.height, backgroundImage: 'linear-gradient(90deg, rgba(255,255,255,1) 0%, rgba(226, 243, 255,1) 100%' }}>
                         <HiChevronRight style={{ fontSize: '4rem' }} /> 
                     </Center>}
             </div>

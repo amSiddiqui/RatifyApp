@@ -27,13 +27,14 @@ type Props = {
     doc_id?: string;
     pageCompleted?: {hasFields: boolean, completed: boolean}[];
     showBottomNavigation?: boolean;
+    hideBottomNavigation?: boolean;
 };
 
-const PageNavigation: React.FC<Props> = ({ token, doc_id, contractHelper, pageNumber, numPages, showBottomNavigation, onNextPage, onPrevPage, onFirstPage, onLastPage, onGotoPage, pageCompleted, height }) => {
+const PageNavigation: React.FC<Props> = ({ token, doc_id, contractHelper, pageNumber, numPages, showBottomNavigation, onNextPage, onPrevPage, onFirstPage, onLastPage, onGotoPage, pageCompleted, height, hideBottomNavigation }) => {
     const [thumbnailsLoading, setThumbnailsLoading] = React.useState(true);
     const [pdfThumbnails, setThumbnails] = React.useState<{[id: string]: string}>({});
 
-    const [hideBottomNavigation, setHideBottomNavigation] = React.useState(false);
+    const [drawBottomNavigation, setDrawBottomNavigation] = React.useState(true);
     React.useEffect(() => {
         let shouldUpdate = true;
         if (token) {
@@ -122,12 +123,15 @@ const PageNavigation: React.FC<Props> = ({ token, doc_id, contractHelper, pageNu
             );
         },
     );
-
+    
+    if (hideBottomNavigation === true) {
+        return <></>;
+    }
     if (showBottomNavigation) {
         return (createPortal(
             <div className='transition-all' style={{ 
                 position: 'fixed', 
-                bottom: hideBottomNavigation ? -118 : 20, 
+                bottom: drawBottomNavigation ? 20 : -118, 
                 left: '50%', 
                 margin: '0 auto', 
                 transform: 'translate(-50%, 0)', 
@@ -135,10 +139,10 @@ const PageNavigation: React.FC<Props> = ({ token, doc_id, contractHelper, pageNu
                 zIndex: 12
             }}>
                 <Center className='absolute bg-rose-400 cursor-pointer shadow-lg' onClick={() => {
-                        setHideBottomNavigation(prev => !prev);
+                        setDrawBottomNavigation(prev => !prev);
                     }} style={{ width: 40, height: 30, right: 10, top: -30, borderTopLeftRadius: 200, borderTopRightRadius: 200 }}>
-                    {hideBottomNavigation && <MdKeyboardArrowUp className='text-xl relative text-white' style={{ top: 2 }}  />}
-                    {!hideBottomNavigation && <MdKeyboardArrowDown className='text-xl relative text-white' style={{ top: 2 }} />}
+                    {!drawBottomNavigation && <MdKeyboardArrowUp className='text-xl relative text-white' style={{ top: 2 }}  />}
+                    {drawBottomNavigation && <MdKeyboardArrowDown className='text-xl relative text-white' style={{ top: 2 }} />}
                 </Center>
                 <div className='shadow-lg rounded-md pt-2 px-2'>
                     <PerfectScrollbar style={{ width: '80vw', height: 110, maxWidth: 350 }} >

@@ -110,6 +110,7 @@ const AgreementSign: React.FC = () => {
     const [shouldUpdate, setShouldUpdate] = React.useState(false);
     const [showAuditTrail, setShowAuditTrail] = React.useState(false);
     const [showDecline, setShowDecline] = React.useState(false);
+    const [inputFocus, setInputFocus] = React.useState(false);
     const [declineMessage, setDeclineMessage] = React.useState('');
 
     const firstBreakPoint = useMediaQuery('(max-width: 1370px)');
@@ -392,6 +393,9 @@ const AgreementSign: React.FC = () => {
             }
         }
     }, [rect]);
+    React.useEffect(() => {
+        console.log({inputFocus});
+    }, [inputFocus]);
 
     const pgNavigation = <PageNavigation
         pageNumber={pageNumber}
@@ -406,6 +410,7 @@ const AgreementSign: React.FC = () => {
         pageCompleted={pageCompleted}
         height={600}
         showBottomNavigation={firstBreakPoint}
+        hideBottomNavigation={inputFocus}
     />;
     const comments = basicInfo ? <SignerComments type='signer' token={token} signerId={basicInfo.signerId} contractHelper={contractHelper} /> : null ;
 
@@ -528,9 +533,9 @@ const AgreementSign: React.FC = () => {
                     {firstBreakPoint && pgNavigation}
                     <Grid.Col span={GRID_CENTER + (firstBreakPoint ? GRID_SIDE : 0) + (secondBreakPoint ? GRID_SIDE : 0)}>
                         <Card style={{height: 1080 * (scale ? scale : 1) }}>
-                            <CardBody style={{height: 1080 * (scale ? scale : 1) }}>
+                            <CardBody style={{height: 1080 * (scale ? scale : 1), padding: !scale ? '1.25rem': 0}}>
                                 <Center style={{height: 1080 * (scale ? scale : 1) }} ref={containerRef}>
-                                    {pdfLoading && pdfIpLoading && pdfOIpLoading && (
+                                    {(pdfLoading || pdfIpLoading || pdfOIpLoading) && (
                                         <Skeleton height={ scale ? 1024 * scale : 1024 } style={{zIndex: 0}} width={ scale ? 613 * scale : 613} />
                                     )}
                                     {!pdfLoading && !pdfIpLoading && !pdfOIpLoading && (
@@ -561,7 +566,13 @@ const AgreementSign: React.FC = () => {
                                                                         x={element.x}
                                                                         y={element.y}
                                                                         color={element.color}
-                                                                        type={element.type} 
+                                                                        type={element.type}
+                                                                        onFocus={() => {
+                                                                            setInputFocus(true);
+                                                                        }}
+                                                                        onBlur={() => {
+                                                                            setInputFocus(false);
+                                                                        }}
                                                                     />
                                                                 )
                                                             }

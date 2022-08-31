@@ -20,9 +20,11 @@ interface Props  {
     onFilled: (value: string | Date | null, id: number) => void;
     initialValue: string;
     color: string;
+    onBlur?: () => void;
+    onFocus?: () => void;
 }
 
-const SignerInput:React.FC<Props> = ({id, x, y, type, placeholder, onFilled, initialValue, width, height, color}) => {
+const SignerInput:React.FC<Props> = ({id, x, y, type, placeholder, onFilled, initialValue, width, height, color, onBlur, onFocus}) => {
 
     const [initialHide, setInitialHide] = React.useState<boolean>(true);
     const [nameValue, setNameValue] = React.useState(initialValue);
@@ -72,6 +74,9 @@ const SignerInput:React.FC<Props> = ({id, x, y, type, placeholder, onFilled, ini
             }}
             onBlur={(e) => {
                 onFilled(e.currentTarget.value, id);
+                if (onBlur) {
+                    onBlur();
+                }
             }}
             className={classNames(
                 'pdf-input-element', getBgColorLight(color),
@@ -81,6 +86,11 @@ const SignerInput:React.FC<Props> = ({id, x, y, type, placeholder, onFilled, ini
                 getBorderColorBold(color),
                 'focus:outline-none focus:'+getBorderColorBold(color)+' focus:border-2'
             )}
+            onFocus={() => {
+                if (onFocus) {
+                    onFocus();
+                }
+            }}
         />}
         {type === 'date' && <DatePicker 
             variant='unstyled'
@@ -88,6 +98,16 @@ const SignerInput:React.FC<Props> = ({id, x, y, type, placeholder, onFilled, ini
             onChange={(date) => {
                 setDateValue(date);
                 onFilled(date, id);
+            }}
+            onFocus={() => {
+                if (onFocus) {
+                    onFocus();
+                }
+            }}
+            onBlur={() => {
+                if (onBlur) {
+                    onBlur();
+                }
             }}
             placeholder={placeholder}
             style={{height: height - INPUT_TOP_OFFSET, paddingLeft: 3}}
