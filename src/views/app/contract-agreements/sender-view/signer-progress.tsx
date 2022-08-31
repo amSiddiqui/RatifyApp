@@ -25,6 +25,9 @@ export const getSignerStatus = (signer:Signer, signerProgress: {total: number, c
             return 'Not viewed';
         }
     } else if (signer.type === 'approver') {
+        if (signer.status === 'wait') {
+            return 'In Progress';
+        }
         if (signer.approved) {
             return 'Approved';
         } 
@@ -34,6 +37,9 @@ export const getSignerStatus = (signer:Signer, signerProgress: {total: number, c
             return 'In progress';
         }
     }  else {
+        if (signer.status === 'wait') {
+            return 'In Progress';
+        }
         if (signer.declined) {
             return 'Declined';
         }
@@ -245,7 +251,7 @@ const SignerProgress: React.FC<Props> = ({ signer, contractHelper, onDocumentSen
                                     </Group>
                                     <p>{signer.email}</p>
                                 </div>
-                                {signer.job_title.trim() && <div>
+                                {signer.job_title && signer.job_title.trim() && <div>
                                     <p className='text-muted'>Job Title</p>
                                     <p className='capitalize'>{ signer.job_title }</p>
                                 </div>}

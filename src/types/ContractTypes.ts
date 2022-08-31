@@ -61,7 +61,7 @@ export interface Signer {
     last_seen: string | null;
     every_unit: string;
     deleted: boolean;
-    status: 'completed' | 'error' | 'sent';
+    status: 'completed' | 'error' | 'sent' | 'wait';
     agreement: number;
     decline_message: string;
     signed: boolean;

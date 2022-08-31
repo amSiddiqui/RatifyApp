@@ -101,7 +101,15 @@ const PrepareSend: React.FC<Props> = ({
                                                         <i className="simple-icon-check text-xl text-success"></i>
                                                         <span>Sent</span>
                                                     </Group>
-                                                ) : (
+                                                ) :
+                                                signerStatus[signer.id] ===
+                                                'wait' ? (
+                                                    <Group spacing={8}>
+                                                        <i className="simple-icon-check text-xl text-success"></i>
+                                                        <span>Queued</span>
+                                                    </Group>
+                                                ) :
+                                                (
                                                     <Tooltip label='Error sending email to signer. Please check the email.'>
                                                         <Group spacing={8}>
                                                             <i className='simple-icon-close text-xl text-danger'></i>
