@@ -66,6 +66,7 @@ export const enMessages = {
     'menu.manage-users': 'Manage Users',
     'menu.dashboard': 'Dashboard',
     'menu.notification-settings': 'Notification Settings',
+    'menu.users': 'Users',
 
     /* 04.Error Page */
     'pages.error-title': 'Ooops... looks like an error occurred!',
@@ -91,6 +92,9 @@ export const enMessages = {
     'account.business-profile': 'Business Profile',
     'account.settings.profile': 'My Account',
     'account.settings.ui': 'UI Settings',
+
+    // 07. Admin
+    'admin.user-management' : 'User Management',
 
     'profile-settings.last-name': 'Surname',
     'profile-settings.first-name': 'First Name',

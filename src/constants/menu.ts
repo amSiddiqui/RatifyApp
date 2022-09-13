@@ -1,4 +1,4 @@
-// import { UserRole } from "./defaultValues";
+import { UserRole } from "./defaultValues";
 
 const data = [
     {
@@ -37,25 +37,24 @@ const data = [
         label: 'menu.business-profile',
         to: `/business-profile`,
     },
-    // TODO: For future release
-    // {
-    //     id: 'administration',
-    //     icon: 'iconsminds-gear',
-    //     label: 'menu.administration',
-    //     roles: [UserRole.Admin],
-    //     to: `/administration`,
-    //     subs: [
-    //         {   
-    //             icon: 'iconsminds-mens',
-    //             label: 'menu.manage-users',
-    //             to: `/administration/users`,
-    //         },
-    //         {
-    //             icon: 'iconsminds-mail-settings',
-    //             label: 'menu.notification-settings',
-    //             to: `/administration/notification-settings`,
-    //         }
-    //     ]
-    // },
+    {
+        id: 'administration',
+        icon: 'iconsminds-gear',
+        label: 'menu.administration',
+        roles: [UserRole.Admin],
+        to: `/administration`,
+        subs: [
+            {   
+                icon: 'iconsminds-mens',
+                label: 'menu.manage-users',
+                to: `/administration/users`,
+            },
+            // {
+            //     icon: 'iconsminds-mail-settings',
+            //     label: 'menu.notification-settings',
+            //     to: `/administration/notification-settings`,
+            // }
+        ]
+    },
 ];
 export default data;

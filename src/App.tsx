@@ -77,8 +77,8 @@ const Billing = React.lazy(() =>
   import(/* webpackChunkName: "views-billing" */ './views/billing')
 );
 
-const Administration = React.lazy(() =>
-  import(/* webpackChunkName: "views-admin" */ './views/admin')
+const UserManagement = React.lazy(() =>
+  import(/* webpackChunkName: "views-user-management" */ './views/admin/user-management')
 );
 
 const AgreementSign = React.lazy(() =>
@@ -162,10 +162,10 @@ function App() {
                           <Route path='/' element={<ProtectedRoute {...defaultProtectedRouteProps} outlet={<ViewApp />} />}>
                               <Route index element={<AgreementDashboard />} />
                               <Route path='agreements' element={<><Outlet /></>}>
-                                  <Route index element={<ContractsAgreements></ContractsAgreements>} />
-                                  <Route path='dashboard' element={<AgreementDashboard />} />
-                                  <Route path='add-signers/:contractId' element={<AgreementCreator />} />
-                                  <Route path=':contractId' element={ <SenderAgreement /> } />
+                                <Route index element={<ContractsAgreements></ContractsAgreements>} />
+                                <Route path='dashboard' element={<AgreementDashboard />} />
+                                <Route path='add-signers/:contractId' element={<AgreementCreator />} />
+                                <Route path=':contractId' element={ <SenderAgreement /> } />
                               </Route>
                               <Route path='reports' element={<Reports></Reports>}></Route>
                               <Route path='profile-settings' element={<ProfileSettings />} />
@@ -173,23 +173,26 @@ function App() {
                               <Route path='business-profile' element={<BusinessProfile />} />
                               <Route path='blank' element={<BlankPage />} />
                               <Route path='billing' element={<Billing />}></Route>
-                              <Route path='administration' element={<Administration />}></Route>
+                              <Route path='administration' element={<><Outlet /></>}>
+                                <Route index element={<Navigate to='/administration/users' />} />
+                                <Route path='users' element={<UserManagement />} />
+                              </Route>
                           </Route>
                           <Route path='error' element={<ViewError></ViewError>} />
                           <Route path='unauthorized' element={<ViewUnauthorized></ViewUnauthorized>} />
                           <Route path='user' element={<ViewUser />} >
-                              <Route index element={<Navigate to='/user/login' />} />
-                              <Route path='login' element={<Login />} />
-                              <Route path='register' element={<Register />} />
-                              <Route path='verify-email' element={<VerifyEmail />} />
-                              <Route path='forgot-password' element={<ForgotPassword />} />
-                              <Route path='reset-password' element={<ResetPassword />} />
+                            <Route index element={<Navigate to='/user/login' />} />
+                            <Route path='login' element={<Login />} />
+                            <Route path='register' element={<Register />} />
+                            <Route path='verify-email' element={<VerifyEmail />} />
+                            <Route path='forgot-password' element={<ForgotPassword />} />
+                            <Route path='reset-password' element={<ResetPassword />} />
                           </Route>
                           <Route path='agreements' element={<><Outlet /></>}>
-                              <Route path='sign' element={<AgreementSign />} />
-                              <Route path='greeting' element={<AgreementGreetings />} />
-                              <Route path='success' element={<AgreementSuccess />} />
-                              <Route path='decline' element={<AgreementDecline />} />
+                            <Route path='sign' element={<AgreementSign />} />
+                            <Route path='greeting' element={<AgreementGreetings />} />
+                            <Route path='success' element={<AgreementSuccess />} />
+                            <Route path='decline' element={<AgreementDecline />} />
                           </Route>
                           <Route path="*" element={<ViewError />} />
                       </Routes>

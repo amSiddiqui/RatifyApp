@@ -11,6 +11,8 @@ import {
     LegalEntity,
     BusinessFunction,
     OrganizationNameResponse,
+    OrganizationUser,
+    NewUserData,
 } from '../types/AuthTypes';
 import { authActions } from '../redux/auth-slice';
 import { LoginDataType } from '../types/AuthTypes';
@@ -225,5 +227,22 @@ export class AuthHelper extends ApiHelper {
         );
 
         return response.data;
+    }
+
+    // Organization Users Helper
+    async getOrganizationUsers() {
+        let response: AxiosResponse<OrganizationUser[]> = await axios.get(
+            '/auth/users/',
+            { headers: { Authorization: `Bearer ${await this.getToken()}` } },
+        );
+        return response.data;
+    }
+
+    async postOrganizationUser(data: NewUserData) {
+        await axios.post(
+            '/auth/users/',
+            data,
+            { headers: { Authorization: `Bearer ${await this.getToken()}` } },
+        );
     }
 }

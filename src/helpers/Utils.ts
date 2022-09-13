@@ -344,3 +344,9 @@ export const documentViewerBreakpoint = [
     { bp: 291, scale: 0.45, topOffset: 60 },
     { bp: 0, scale: 0.4, topOffset: 70 },
 ];
+
+export const validateEmail = (email: string) => {
+    // check if email is a valid email
+    const re = /\S+@\S+\.\S+/;
+    return re.test(email);
+}

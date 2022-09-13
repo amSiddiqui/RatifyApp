@@ -281,7 +281,7 @@ const AgreementDashboard: React.FC = () => {
     }, [showColumns, navigate, onShowDetailClick]);
 
     React.useEffect(() => {
-        if (auth && auth.user) {
+        if (auth && auth.user && auth.user.email.length > 0) {
             let first_name = auth.user.first_name || '';
             setUserName({firstName: first_name, lastName: auth.user.last_name || ''});
             if (first_name.length === 0) {

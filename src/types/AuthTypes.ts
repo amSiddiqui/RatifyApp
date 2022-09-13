@@ -9,6 +9,27 @@ export type UserType = {
     email: string;
 };
 
+export type OrganizationUser = {
+    id: number;
+    email: string;
+    role: 0 | 99 | 1;
+    created_at: string;
+    first_name: string;
+    last_name: string;
+    job_title: string;
+    user_type: 0 | 1;
+}
+
+export type NewUserData = {
+    email: string;
+    name: string;
+    role: string;
+    userType: string;
+    jobTitle: string;
+    legalEntity: string;
+    businessFunction: string;
+}
+
 export interface UserSettingsFormType {
     email: string;
     firstName: string;
