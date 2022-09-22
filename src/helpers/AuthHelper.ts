@@ -13,6 +13,7 @@ import {
     OrganizationNameResponse,
     OrganizationUser,
     NewUserData,
+    OrganizationUserDataResponse,
 } from '../types/AuthTypes';
 import { authActions } from '../redux/auth-slice';
 import { LoginDataType } from '../types/AuthTypes';
@@ -244,5 +245,28 @@ export class AuthHelper extends ApiHelper {
             data,
             { headers: { Authorization: `Bearer ${await this.getToken()}` } },
         );
+    }
+
+    async getOrganizationUserImage(id: number) {
+        let response: AxiosResponse<string> = await axios.get(
+            `/auth/users/${id}/image/`,
+            { headers: { Authorization: `Bearer ${await this.getToken()}` } },
+        );
+        return response.data;
+    }
+
+    async validateUserActivationToken(token: string) {
+        let response: AxiosResponse<{ user: OrganizationUser }> = await axios.get(
+            `/auth/users/token-validate/?token=${token}`,
+            {}
+        );
+        return response.data.user;
+    }
+
+    async activateUser(token: string, data: OrganizationUserDataResponse) {
+        await axios.post(
+            `/auth/users/activate/?token=${token}`,
+            data
+        );        
     }
 }

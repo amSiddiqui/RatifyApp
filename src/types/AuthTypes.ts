@@ -18,6 +18,14 @@ export type OrganizationUser = {
     last_name: string;
     job_title: string;
     user_type: 0 | 1;
+    image: string;
+}
+
+export type OrganizationUserDataResponse = {
+    first_name: string;
+    last_name: string;
+    password: string;
+    confirm_password: string;
 }
 
 export type NewUserData = {

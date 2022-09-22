@@ -84,6 +84,7 @@ export const enMessages = {
     'auth.password.confirm': 'Please confirm your password.',
     'auth.email.required': 'Please enter your email.',
     'auth.email.invalid': 'Please enter a valid email.',
+    'auth.first_name.required': 'Please enter your first name.',
     'auth.login.notify': 'Invalid email or password.',
     'auth.login.error': 'Invalid email or password.',
 
