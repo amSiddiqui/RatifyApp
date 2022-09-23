@@ -183,7 +183,7 @@ const ActivateUser:React.FC = () => {
                     placeholder="*********"
                 />
                 <span className='w-full mt-4'>
-                    <Button size="lg" className='w-full' color='primary'>
+                    <Button disabled={error.length > 0} size="lg" className='w-full' color='primary'>
                         Submit
                     </Button>
                 </span>

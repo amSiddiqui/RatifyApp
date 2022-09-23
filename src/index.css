@@ -183,6 +183,10 @@ input {
 
 }
 
+#dashboard-main-table {
+    font-family: 'Nunito', sans-serif;
+}
+
 #dashboard-main-table .ag-paging-panel {
     display: none !important;
 }

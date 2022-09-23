@@ -62,7 +62,8 @@ const AddUserForm: React.FC<Props> = ({
         }
         setEmailError('');
         let data = {
-            name: (firstName.trim() + '  ' + lastName.trim()).trim(),
+            first_name: firstName,
+            last_name: lastName,
             email: email,
             role: selectedRole,
             userType: userType,

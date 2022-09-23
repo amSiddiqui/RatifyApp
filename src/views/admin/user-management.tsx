@@ -1,4 +1,4 @@
-import { Center, Grid, Group, Modal, Stack } from '@mantine/core';
+import { Group, Modal, Stack } from '@mantine/core';
 import React from 'react';
 import { MdAdd } from 'react-icons/md';
 import { useDispatch } from 'react-redux';
@@ -11,7 +11,7 @@ import { AuthHelper } from '../../helpers/AuthHelper';
 import { AppDispatch } from '../../redux';
 import { BusinessFunction, LegalEntity, OrganizationUser } from '../../types/AuthTypes';
 import AddUserForm from './add-user-form';
-import OrganizationUserCard from './organization-user-card';
+import UserManagementTable from './user-management-table';
 
 const UserManagement: React.FC = () => {
     const match = useLocation();
@@ -65,18 +65,8 @@ const UserManagement: React.FC = () => {
                     </Button>
                 </span>
                 
-                <Grid gutter={32}>
-                    <Grid.Col md={6}>
-                        <Stack>
-                            {users.map((user, index) => index % 2 === 0 ? (<OrganizationUserCard key={user.id} user={user} />) : null)}
-                        </Stack>
-                    </Grid.Col>
-                    <Grid.Col md={6}>
-                        <Stack>
-                            {users.map((user, index) => index % 2 === 0 ? null : (<OrganizationUserCard key={user.id} user={user} />))}
-                        </Stack>
-                    </Grid.Col>
-                </Grid>
+
+                <UserManagementTable users={users} /> 
             </Stack>
 
             <Modal

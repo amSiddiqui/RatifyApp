@@ -18,6 +18,7 @@ export type OrganizationUser = {
     last_name: string;
     job_title: string;
     user_type: 0 | 1;
+    status: boolean;
     image: string;
 }
 
@@ -30,7 +31,8 @@ export type OrganizationUserDataResponse = {
 
 export type NewUserData = {
     email: string;
-    name: string;
+    first_name: string;
+    last_name: string;
     role: string;
     userType: string;
     jobTitle: string;
