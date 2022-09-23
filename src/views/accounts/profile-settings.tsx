@@ -317,7 +317,7 @@ const ProfileSettings: React.FC = () => {
                                             className="object-cover w-24 h-24 rounded-full shadow"
                                             alt="Profile"
                                         />
-                                        <span>
+                                        {editMode && <span>
                                             <Menu className="relative top-10 right-4">
                                                 <Menu.Item
                                                     className="hover:bg-gray-100"
@@ -349,7 +349,7 @@ const ProfileSettings: React.FC = () => {
                                                     Remove
                                                 </Menu.Item>
                                             </Menu>
-                                        </span>
+                                        </span>}
 
                                         <input
                                             onChange={onImageUpload}

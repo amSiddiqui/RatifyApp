@@ -50,6 +50,7 @@ const ActivateUser:React.FC = () => {
         register,
         handleSubmit,
         formState: { errors },
+        setValue,
     } = useForm<OrganizationUserDataResponse>({
         resolver: yupResolver(schema),
         defaultValues: {
@@ -94,6 +95,8 @@ const ActivateUser:React.FC = () => {
             if (shouldUpdate) {
                 setUser(user);
                 setLoading(false);
+                setValue('first_name', user.first_name);
+                setValue('last_name', user.last_name);
             }
         }).catch(err => {
             if (err.response) {
@@ -106,7 +109,7 @@ const ActivateUser:React.FC = () => {
 
         return () => { shouldUpdate = false; }
 
-    }, [searchParams, navigate, authHelper]);
+    }, [searchParams, navigate, authHelper, setValue]);
 
     
     return <AuthLayout>
