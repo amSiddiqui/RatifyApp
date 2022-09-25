@@ -408,6 +408,7 @@ const ProfileSettings: React.FC = () => {
                                     {editMode &&  <TextInput
                                         required={true}
                                         {...register('email')}
+                                        disabled={true}
                                         error={
                                             errors.email
                                                 ? errors.email.message
