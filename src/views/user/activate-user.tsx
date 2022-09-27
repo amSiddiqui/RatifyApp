@@ -12,6 +12,7 @@ import { useIntl } from 'react-intl';
 import { passwordValidation } from '../../helpers/Utils';
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
+import UneditableInput from '../../components/common/UneditableInput';
 
 const ActivateUser:React.FC = () => {
     const [searchParams] = useSearchParams();
@@ -129,14 +130,7 @@ const ActivateUser:React.FC = () => {
                         Something went wrong! Please contact the sender to resend the activation link.
                     </Alert>
                 )}
-                <TextInput 
-                    size="md" 
-                    icon={<i className='simple-icon-envelope' />}
-                    label='Email'
-                    placeholder='Email'
-                    value={user?.email}
-                    disabled
-                />
+                {user && <UneditableInput label='Email' value={user.email} icon={ <i className='simple-icon-envelope' /> } />}
                 <Grid>
                     <Grid.Col md={6}>
                         <TextInput

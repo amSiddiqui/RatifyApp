@@ -35,12 +35,12 @@ const AddUserForm: React.FC<Props> = ({
         React.useState('');
     const [selectedRole, setSelectedRole] = React.useState('1');
     const [userType, setUserType] = React.useState('0');
+    const [userIdReference, setUserIdReference] = React.useState('');
     const [jobTitle, setJobTitle] = React.useState('');
     const [firstName, setFirstName] = React.useState('');
     const [lastName, setLastName] = React.useState('');
     const [email, setEmail] = React.useState('');
     const [emailError, setEmailError] = React.useState('');
-
     
     const resetForm = () => {
         setAdditionalSettings(false);
@@ -52,6 +52,7 @@ const AddUserForm: React.FC<Props> = ({
         setFirstName('');
         setLastName('');
         setEmail('');
+        setUserIdReference('');
         setEmailError('');
     }
 
@@ -66,6 +67,7 @@ const AddUserForm: React.FC<Props> = ({
             last_name: lastName,
             email: email,
             role: selectedRole,
+            userIdReference: userIdReference,
             userType: userType,
             jobTitle: jobTitle,
             legalEntity: selectedLegalEntity,
@@ -174,9 +176,14 @@ const AddUserForm: React.FC<Props> = ({
                 {additionalSettings && <i className="simple-icon-arrow-down" />}
                 <p>Optional Settings</p>
             </Group>
-
             <Collapse in={additionalSettings}>
                 <Stack>
+                    <TextInput
+                        value={userIdReference}
+                        onChange={(e) => setUserIdReference(e.target.value)}
+                        placeholder="User ID Reference"
+                        label="User ID Reference"
+                    />
                     <TextInput
                         value={jobTitle}
                         onChange={(e) => setJobTitle(e.target.value)}

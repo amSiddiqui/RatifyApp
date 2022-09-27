@@ -85,7 +85,6 @@ const UserManagement: React.FC = () => {
 
                 <UserManagementTable users={users} />
             </Stack>
-
             <Modal
                 centered
                 opened={userModal}

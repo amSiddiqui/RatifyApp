@@ -30,6 +30,7 @@ import {
 } from '../../types/AuthTypes';
 import { authActions } from '../../redux/auth-slice';
 import { DateTime } from 'luxon';
+import UneditableInput from '../../components/common/UneditableInput';
 
 const WAIT_BEFORE_RESENT_EMAIL_IN_SECONDS = 60 * 10;
 
@@ -405,19 +406,9 @@ const ProfileSettings: React.FC = () => {
                                             </Stack>}
                                         </Grid.Col>
                                     </Grid>
-                                    {editMode &&  <TextInput
-                                        required={true}
-                                        {...register('email')}
-                                        disabled={true}
-                                        error={
-                                            errors.email
-                                                ? errors.email.message
-                                                : ''
-                                        }
+                                    {editMode && <UneditableInput
                                         icon={<i className='simple-icon-envelope' />}
-                                        placeholder={intl.formatMessage({
-                                            id: 'profile-settings.email',
-                                        })}
+                                        value={auth.user ? auth.user.email : ''}
                                         label={intl.formatMessage({
                                             id: 'profile-settings.email',
                                         })}

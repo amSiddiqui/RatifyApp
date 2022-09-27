@@ -18,6 +18,7 @@ export type OrganizationUser = {
     last_name: string;
     job_title: string;
     user_type: 0 | 1;
+    userIdReference: string;
     status: boolean;
     image: string;
 }
@@ -34,6 +35,7 @@ export type NewUserData = {
     first_name: string;
     last_name: string;
     role: string;
+    userIdReference: string;
     userType: string;
     jobTitle: string;
     legalEntity: string;

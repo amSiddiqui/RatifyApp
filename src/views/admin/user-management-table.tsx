@@ -24,7 +24,7 @@ const UserManagementTable: React.FC<{ users: OrganizationUser[] }> = ({
     const gridRef = React.useRef<AgGridReact>(null);
 
     const columnDefs: (ColDef | ColGroupDef)[] = [
-        { headerName: '', field: 'image', filter: false,  sortable: false, width: 50, cellRenderer: (params: ICellRendererParams) => {
+        { headerName: '', field: 'image', resizable: false, suppressMovable: true, filter: false,  sortable: false, width: 50, cellRenderer: (params: ICellRendererParams) => {
             return <Center className='w-full h-full'><Avatar size='sm' radius={'xl'} src={'data:image/jpeg;base64,' + params.value} alt="Avatar" /></Center>
         }},
         { headerName: 'First Name', field: 'first_name' },
