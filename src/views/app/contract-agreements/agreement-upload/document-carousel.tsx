@@ -7,7 +7,6 @@ import {
     Menu,
     Modal,
     ScrollArea,
-    Skeleton,
     Stack,
     Textarea,
     TextInput,
@@ -20,6 +19,7 @@ import { toast } from 'react-toastify';
 import { ContractHelper } from '../../../../helpers/ContractHelper';
 import { BsBook, BsTrash } from 'react-icons/bs';
 import { MdAdd, MdEdit } from 'react-icons/md';
+import DocumentCarouselLoading from './document-carousel-loading';
 
 type TemplateImageType = {
     doc_id: number;
@@ -152,14 +152,8 @@ const DocumentCarousel: React.FC<Props> = ({
             <ScrollArea offsetScrollbars>
                 <div className="flex flex-row items-center mb-4">
                     {loading &&
-                        templateImages.map((t) => {
-                            return (
-                                <Stack className="mr-5" key={t.id}>
-                                    <Skeleton width={163} height={200} />
-                                    <Skeleton width={163} height={10} />
-                                </Stack>
-                            );
-                        })}
+                        <DocumentCarouselLoading />
+                    }
                     {!loading &&
                         templateImages.length > 0 &&
                         templateImages.map((image, index) => {

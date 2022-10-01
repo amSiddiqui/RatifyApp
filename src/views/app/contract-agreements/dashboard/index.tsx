@@ -39,7 +39,7 @@ const AllColumns = [
 const columnBuilder = (columns: boolean[], navigate: NavigateFunction, onMoreDetailsClicked: (id: number) => void):(ColDef | ColGroupDef)[] => {
     const columnDefs:(ColDef | ColGroupDef)[] = [];
     if (columns.length > 0 && columns[0]) {
-        columnDefs.push({ headerName: 'ID', field: 'index', width: 150, onCellClicked: (e) => {
+        columnDefs.push({ headerName: 'ID', field: 'index', width: 120, onCellClicked: (e) => {
             navigate( `/agreements/${e.data.id}`);
         }, cellClass: 'dashboard-title-cell', colId: 'agreement-id-col' });
     }
@@ -52,7 +52,7 @@ const columnBuilder = (columns: boolean[], navigate: NavigateFunction, onMoreDet
 
     if (columns.length > 2 && columns[2]) {
         columnDefs.push(
-            { headerName: 'Sent On', field: 'sent_on', width: 180, cellRenderer: (params: ICellRendererParams) => {
+            { headerName: 'Sent On', field: 'sent_on', width: 200, cellRenderer: (params: ICellRendererParams) => {
                 return getFormatDateFromIso(params.value);
             }}
         );

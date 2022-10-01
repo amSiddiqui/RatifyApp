@@ -28,6 +28,7 @@ import { settingsActions } from '../../redux/settings-slice';
 import { menuActions } from '../../redux/menu-slice';
 import { authActions } from '../../redux/auth-slice';
 import { AuthHelper } from '../../helpers/AuthHelper';
+import { toast } from 'react-toastify';
 
 const TopNav = ({ intl }) => {
     const [isInFullScreen, setIsInFullScreen] = useState(false);
@@ -199,9 +200,9 @@ const TopNav = ({ intl }) => {
 
     React.useEffect(() => {
         authHelper.checkIfAuthExists(auth).catch(err => {
-            console.log(err);
             dispatch(authActions.logout()); 
             navigate('/');
+            toast.error('Session expired. Please login again.');
         });
     }, [auth, authHelper, dispatch, navigate]);
 

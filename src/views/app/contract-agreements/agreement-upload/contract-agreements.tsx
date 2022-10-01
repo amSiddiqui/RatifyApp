@@ -19,6 +19,7 @@ import { MdClose } from 'react-icons/md';
 import { OrganizationNameResponse } from '../../../../types/AuthTypes';
 import { AuthHelper } from '../../../../helpers/AuthHelper';
 import PdfViewer from './pdf-viewer';
+import DocumentCarouselLoading from './document-carousel-loading';
 
 const ContractAgreements: React.FC = () => {
     const match = useLocation();
@@ -46,6 +47,7 @@ const ContractAgreements: React.FC = () => {
     const [selectedTemplate, setSelectedTemplate] = React.useState<AgreementTemplate | null>(null);
     const [openTemplateConfirm, templateConfirmHandlers] = useDisclosure(false);
     const [searchTerm, setSearchTerm] = React.useState('');
+    const [loading, setLoading] = React.useState(true);
     const auth = useSelector((root: RootState) => root.auth);
     const [organization, setOrganization] = React.useState<OrganizationNameResponse>();
     const [showUnverifiedModal, setShowUnverifiedModal] = React.useState(false);
@@ -143,12 +145,14 @@ const ContractAgreements: React.FC = () => {
                     setTemplates(data);
                     const categories = new Set(data.map(t => t.category));
                     setTemplateCategories(Array.from(categories));
+                    setLoading(false);
                 }
             })
             .catch(err => {
                 if (shouldUpdate) {
                     console.log(err);
                     toast.error('Cannot fetch templates. Try Again Later!');
+                    setLoading(false);
                 }
             });
         return () => { shouldUpdate = false; }
@@ -238,7 +242,7 @@ const ContractAgreements: React.FC = () => {
                         { value: '', label: 'All' },
                         ...templateCategories.map(c => ({ value: c, label: c }))
                         ]} value={selectedCategory} onChange={val => setSelectedCategory(val ? val : '')} />
-                    <DocumentCarousel 
+                    {!loading && <DocumentCarousel 
                     onTemplateDelete={(id) => {
                         setTemplates(prev => {
                             const newTemplates = prev.filter(t => t.id !== id);
@@ -269,7 +273,13 @@ const ContractAgreements: React.FC = () => {
                             templateConfirmHandlers.open();
                         }
                     }}
-                    />
+                    />}
+                    {loading && <>
+                        <div className="flex flex-row items-center mb-4">
+                            <DocumentCarouselLoading />
+                        </div>
+    
+                    </>}
                 </Stack>
             </Stack>
             
