@@ -35,6 +35,7 @@ export type OrganizationUserDataResponse = {
 }
 
 export type NewUserData = {
+    id: string;
     email: string;
     first_name: string;
     last_name: string;
@@ -42,8 +43,8 @@ export type NewUserData = {
     user_id_reference: string;
     userType: string;
     job_title: string;
-    legalEntity: string;
-    businessFunction: string;
+    legalEntity: number;
+    businessFunction: number;
 }
 
 export interface UserSettingsFormType {

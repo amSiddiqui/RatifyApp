@@ -275,6 +275,14 @@ export class AuthHelper extends ApiHelper {
         );
     }
 
+    async putOrganizationUser(data: NewUserData) {
+        await axios.put(
+            '/auth/users/',
+            data,
+            { headers: { Authorization: `Bearer ${await this.getToken()}` } },
+        );
+    }
+
     async getOrganizationUserImage(id: number) {
         let response: AxiosResponse<string> = await axios.get(
             `/auth/users/${id}/image/`,

@@ -32,6 +32,26 @@ const UserManagement: React.FC = () => {
     );
     const [users, setUsers] = React.useState<OrganizationUser[]>([]);
 
+    const fetchOrganizationUsers = React.useCallback(() => {
+        authHelper
+        .getOrganizationUsers()
+        .then(async (res) => {
+            for (var i = 0; i < res.length; i++) {
+                try {
+                    res[i].image =
+                        await authHelper.getOrganizationUserImage(
+                            res[i].id,
+                        );
+                } catch (err) {}
+            }
+            setUsers(res);
+        })
+        .catch((err) => {
+            console.log(err);
+            toast.error('Error fetching users');
+        });
+    }, [authHelper]);
+
     React.useEffect(() => {
         authHelper
             .getOrganizationLegalEntities()
@@ -43,24 +63,8 @@ const UserManagement: React.FC = () => {
                 console.log(err);
             });
 
-        authHelper
-            .getOrganizationUsers()
-            .then(async (res) => {
-                for (var i = 0; i < res.length; i++) {
-                    try {
-                        res[i].image =
-                            await authHelper.getOrganizationUserImage(
-                                res[i].id,
-                            );
-                    } catch (err) {}
-                }
-                setUsers(res);
-            })
-            .catch((err) => {
-                console.log(err);
-                toast.error('Error fetching users');
-            });
-    }, [authHelper]);
+        fetchOrganizationUsers();
+    }, [authHelper, fetchOrganizationUsers]);
 
     return (
         <>
@@ -83,7 +87,9 @@ const UserManagement: React.FC = () => {
                     </Group>
                 </Button>
 
-                <UserManagementTable users={users} />
+                <UserManagementTable onEditSuccess={() => {
+                    fetchOrganizationUsers();
+                }} users={users} legalEntities={legalEntities} businessFunctions={businessFunctions} authHelper={authHelper} />
             </Stack>
             <Modal
                 centered
@@ -92,6 +98,9 @@ const UserManagement: React.FC = () => {
                 <AddUserForm
                     onClose={() => {
                         setUserModal(false);
+                    }}
+                    onSuccess={() => {
+                        fetchOrganizationUsers();
                     }}
                     authHelper={authHelper}
                     legalEntities={legalEntities}

@@ -2,7 +2,7 @@ import React from 'react';
 import { AgGridReact } from 'ag-grid-react';
 import 'ag-grid-community/styles/ag-grid.css';
 import 'ag-grid-community/styles/ag-theme-material.css';
-import { OrganizationUser } from '../../types/AuthTypes';
+import { BusinessFunction, LegalEntity, OrganizationUser } from '../../types/AuthTypes';
 import {
     AgGridEvent,
     ColDef,
@@ -11,16 +11,20 @@ import {
     ICellRendererParams,
     ValueGetterParams,
 } from 'ag-grid-community';
-import { Avatar, Center, Group } from '@mantine/core';
+import { Avatar, Center, Group, Modal } from '@mantine/core';
 import { MdOutlineAdminPanelSettings, MdPersonOutline } from 'react-icons/md';
 import { useResizeObserver } from '@mantine/hooks';
+import AddUserForm from './add-user-form';
+import { AuthHelper } from '../../helpers/AuthHelper';
 
-const UserManagementTable: React.FC<{ users: OrganizationUser[] }> = ({
-    users,
+const UserManagementTable: React.FC<{ users: OrganizationUser[], authHelper: AuthHelper, legalEntities: LegalEntity[], businessFunctions: BusinessFunction[], onEditSuccess: () => void }> = ({
+    users, authHelper, legalEntities, businessFunctions, onEditSuccess
 }) => {
 
     const [cardRef, rect] = useResizeObserver();
-    
+    const [editUserModal, setEditUserModal] = React.useState(false);
+    const [selectedUser, setSelectedUser] = React.useState<OrganizationUser>();
+
     const gridRef = React.useRef<AgGridReact>(null);
 
     const columnDefs: (ColDef | ColGroupDef)[] = [
@@ -67,6 +71,33 @@ const UserManagementTable: React.FC<{ users: OrganizationUser[] }> = ({
                 );
             },
         },
+        {
+            headerName: 'Actions',
+            field: 'id',
+            width: 90,
+            suppressMovable: true,
+            filter: false,
+            sortable: false,
+            cellRenderer: (params: ICellRendererParams) => {
+                const user = users.find((user) => user.id === params.value);
+                if (user && user.role === 1) {
+                    return (
+                        <Center className="h-full w-full">
+                            <Group spacing={4} position='left'>
+                                <button className='text-primary hover:scale-120' onClick={() => {
+                                    setSelectedUser(user);
+                                    setEditUserModal(true);
+                                }}>
+                                    <i className='simple-icon-pencil' />
+                                </button>
+                            </Group>
+                        </Center>
+                    );
+                } else {
+                    return <span></span>;
+                }
+            }
+        }
     ];
 
     const gridOptions = React.useMemo<GridOptions>(() => {
@@ -98,23 +129,41 @@ const UserManagementTable: React.FC<{ users: OrganizationUser[] }> = ({
 
 
     return (
-        <div
-            ref={cardRef}
-            id="dashboard-main-table"
-            className="ag-theme-material w-full h-full mt-4">
-            <AgGridReact
-                animateRows={true}
-                columnDefs={columnDefs}
-                onGridReady={onGridReady}
-                ref={gridRef}
-                rowData={users}
-                defaultColDef={defaultColDef}
-                gridOptions={gridOptions}
-                overlayNoRowsTemplate={
-                    "Currently you do not have any Users. Please click on 'Add User' button to proceed."
-                }
-            />
-        </div>
+        <>
+            <div
+                ref={cardRef}
+                id="dashboard-main-table"
+                className="ag-theme-material w-full h-full mt-4">
+                <AgGridReact
+                    animateRows={true}
+                    columnDefs={columnDefs}
+                    onGridReady={onGridReady}
+                    ref={gridRef}
+                    rowData={users}
+                    defaultColDef={defaultColDef}
+                    gridOptions={gridOptions}
+                    overlayNoRowsTemplate={
+                        "Currently you do not have any Users. Please click on 'Add User' button to proceed."
+                    }
+                />
+            </div>
+            <Modal
+                centered
+                opened={editUserModal}
+                onClose={() => setEditUserModal(false)}
+            >
+                <AddUserForm
+                    onSuccess={onEditSuccess}
+                    onClose={() => setEditUserModal(false)}
+                    authHelper={authHelper}
+                    legalEntities={legalEntities}
+                    businessFunctions={businessFunctions}
+                    editMode={true}
+                    user={selectedUser}
+                />
+
+            </Modal>
+        </>
     );
 };
 

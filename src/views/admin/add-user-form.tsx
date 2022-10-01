@@ -9,18 +9,22 @@ import {
     Collapse,
     Select,
 } from '@mantine/core';
-import { MdSend } from 'react-icons/md';
+import { MdSave, MdSend } from 'react-icons/md';
 import { Button } from 'reactstrap';
-import { BusinessFunction, LegalEntity, NewUserData } from '../../types/AuthTypes';
+import { BusinessFunction, LegalEntity, NewUserData, OrganizationUser } from '../../types/AuthTypes';
 import { AuthHelper } from '../../helpers/AuthHelper';
 import { validateEmail } from '../../helpers/Utils';
 import { toast } from 'react-toastify';
+import UneditableInput from '../../components/common/UneditableInput';
 
 type Props = {
     legalEntities: LegalEntity[];
     businessFunctions: BusinessFunction[];
     authHelper: AuthHelper;
     onClose: () => void;
+    onSuccess: () => void;
+    editMode?: boolean;
+    user?: OrganizationUser;
 };
 
 const AddUserForm: React.FC<Props> = ({
@@ -28,24 +32,27 @@ const AddUserForm: React.FC<Props> = ({
     businessFunctions,
     authHelper,
     onClose,
+    onSuccess,
+    editMode,
+    user
 }) => {
     const [additionalSettings, setAdditionalSettings] = React.useState(false);
-    const [selectedLegalEntity, setSelectedLegalEntity] = React.useState('');
+    const [selectedLegalEntity, setSelectedLegalEntity] = React.useState<{ id: number, label: string }>();
     const [selectedBusinessFunction, setSelectedBusinessFunction] =
-        React.useState('');
-    const [selectedRole, setSelectedRole] = React.useState('1');
-    const [userType, setUserType] = React.useState('0');
-    const [userIdReference, setUserIdReference] = React.useState('');
-    const [jobTitle, setJobTitle] = React.useState('');
-    const [firstName, setFirstName] = React.useState('');
-    const [lastName, setLastName] = React.useState('');
-    const [email, setEmail] = React.useState('');
+        React.useState(0);
+    const [selectedRole, setSelectedRole] = React.useState( user ? user.role.toString() : '1');
+    const [userType, setUserType] = React.useState(user ? user.user_type.toString() : '0');
+    const [userIdReference, setUserIdReference] = React.useState(user ? user.user_id_reference ?? '' : '');
+    const [jobTitle, setJobTitle] = React.useState(user ? user.job_title : '');
+    const [firstName, setFirstName] = React.useState(user ? user.first_name : '');
+    const [lastName, setLastName] = React.useState(user ? user.last_name : '');
+    const [email, setEmail] = React.useState(user ? user.email : '');
     const [emailError, setEmailError] = React.useState('');
     
     const resetForm = () => {
         setAdditionalSettings(false);
-        setSelectedLegalEntity('');
-        setSelectedBusinessFunction('');
+        setSelectedLegalEntity({ id: 0, label: '' });
+        setSelectedBusinessFunction(0);
         setSelectedRole('1');
         setUserType('0');
         setJobTitle('');
@@ -63,6 +70,7 @@ const AddUserForm: React.FC<Props> = ({
         }
         setEmailError('');
         let data = {
+            id: user ? user.id.toString() : '',
             first_name: firstName,
             last_name: lastName,
             email: email,
@@ -70,52 +78,85 @@ const AddUserForm: React.FC<Props> = ({
             user_id_reference: userIdReference,
             userType: userType,
             job_title: jobTitle,
-            legalEntity: selectedLegalEntity,
+            legalEntity: selectedLegalEntity ? selectedLegalEntity.id : 0,
             businessFunction: selectedBusinessFunction,
         } as NewUserData;
-
-        authHelper.postOrganizationUser(data).then(res => {
-            toast.success('Invitation sent successfully');
-            resetForm();
-            onClose();
-        }).catch(err => {
-            // handle all the errors
-            // check if 401 error
-            if (err.response) {
-                if (err.response.status === 401 || err.response.status === 404) {
-                    onClose();
-                    resetForm();
-                    toast.error('Your session has expired. Please login again.');
-                }
-                else {
-                    if (err.response && err.response.data) {
-                        toast.error(err.response.data.message);
+        
+        if (!editMode) {
+            authHelper.postOrganizationUser(data).then(res => {
+                toast.success('Invitation sent successfully');
+                resetForm();
+                onClose();
+                onSuccess();
+            }).catch(err => {
+                // handle all the errors
+                // check if 401 error
+                if (err.response) {
+                    if (err.response.status === 401 || err.response.status === 404) {
+                        onClose();
+                        resetForm();
+                        toast.error('Your session has expired. Please login again.');
                     }
+                    else {
+                        if (err.response && err.response.data) {
+                            toast.error(err.response.data.message);
+                        }
+                    }
+                } else {
+                    toast.error('Something went wrong. Try again Later!');
                 }
-            } else {
-                toast.error('Something went wrong. Try again Later!');
-            }
-        });
+            });
+        } else {
+            authHelper.putOrganizationUser(data).then(res => {
+                toast.success('User updated successfully');
+                resetForm();
+                onClose();
+                onSuccess();
+            }).catch(err => {
+                // handle all the errors
+                // check if 401 error
+                if (err.response) {
+                    if (err.response.status === 401 || err.response.status === 404) {
+                        onClose();
+                        resetForm();
+                        toast.error('Your session has expired. Please login again.');
+                    }
+                    else {
+                        if (err.response && err.response.data) {
+                            toast.error(err.response.data.message);
+                        }
+                    }
+                } else {
+                    toast.error('Something went wrong. Try again Later!');
+                }
+            });
+        }
     };
 
     return (
         <Stack>
             <div>
-                <h3>Add New User</h3>
-                <p className="text-sm">
+                {editMode && <h3>Edit User</h3>}
+                {!editMode && <h3>Add New User</h3>}
+                {!editMode && <p className="text-sm">
                     An invite will be sent to the user to complete their
                     profile. Once they have completed their profile this user
                     will be added to your organization.
-                </p>
+                </p>}
             </div>
-            <TextInput
+            {!editMode && <TextInput
                 error={emailError}
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="Email"
                 label="Email"
                 required
-            />
+            />}
+            {editMode && <UneditableInput
+                value={email}
+                label='Email'
+                icon={<i className='simple-icon-envelope' />}
+            />}
 
             <Grid>
                 <Grid.Col sm={6}>
@@ -201,9 +242,9 @@ const AddUserForm: React.FC<Props> = ({
                                             );
                                             if (filter.length > 0) {
                                                 setSelectedLegalEntity(
-                                                    filter[0].name,
+                                                    {id: filter[0].id, label: filter[0].name}
                                                 );
-                                                setSelectedBusinessFunction('');
+                                                setSelectedBusinessFunction(0);
                                             }
                                         }
                                     }}
@@ -217,23 +258,23 @@ const AddUserForm: React.FC<Props> = ({
                             </Grid.Col>
                         )}
                         {businessFunctions.filter(
-                            (bf) => bf.entity === selectedLegalEntity,
+                            (bf) => bf.entity === selectedLegalEntity?.label,
                         ).length > 0 && (
                             <Grid.Col sm={6}>
                                 <Select
                                     data={businessFunctions
                                         .filter(
                                             (bf) =>
-                                                bf.entity === selectedLegalEntity,
+                                                bf.entity === selectedLegalEntity?.label,
                                         )
                                         .map((le) => ({
                                             label: le.label,
                                             value: le.id.toString(),
                                         }))}
-                                    value={selectedBusinessFunction}
-                                    onChange={(e) => {
-                                        if (e) {
-                                            setSelectedBusinessFunction(e);
+                                    value={selectedBusinessFunction.toString()}
+                                    onChange={(val) => {
+                                        if (val) {
+                                            setSelectedBusinessFunction(isNaN(parseInt(val)) ? 0: parseInt(val));
                                         }
                                     }}
                                     placeholder="Business Function"
@@ -258,8 +299,10 @@ const AddUserForm: React.FC<Props> = ({
                     }}>
                     <Button color="success">
                         <Group spacing={8}>
-                            <MdSend />
-                            <span>Send Invite</span>
+                            {!editMode && <MdSend />}
+                            {!editMode && <span>Send Invite</span>}
+                            {editMode && <MdSave />}
+                            {editMode && <span>Save</span>}
                         </Group>
                     </Button>
                 </span>
