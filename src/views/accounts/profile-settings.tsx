@@ -48,7 +48,6 @@ const ProfileSettings: React.FC = () => {
     const match = useLocation();
     const intl = useIntl();
     const auth = useSelector((root: RootState) => root.auth);
-    console.log('auth', auth);
     const [image, setImage] = React.useState(() => {
         if (auth.user && auth.user.img) {
             return 'data:image/jpeg;base64,' + auth.user.img;

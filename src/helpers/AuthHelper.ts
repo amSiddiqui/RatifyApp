@@ -14,6 +14,7 @@ import {
     OrganizationUser,
     NewUserData,
     OrganizationUserDataResponse,
+    AuthInitialStateType,
 } from '../types/AuthTypes';
 import { authActions } from '../redux/auth-slice';
 import { LoginDataType } from '../types/AuthTypes';
@@ -50,6 +51,33 @@ export class AuthHelper extends ApiHelper {
             this.dispatchFn(authActions.setError('Wrong email or password.'));
             throw err;
         }
+    }
+
+    async checkIfAuthExists(auth: AuthInitialStateType) {
+        // check if auth user exists
+        if (auth && auth.user && auth.user.email) {
+            return;
+        }
+        
+        let retries = 3;
+        let token = await this.getToken();
+        if (token === null) {
+            throw new NoTokenError('No token');
+        }
+        while (retries > 0) {
+            // wait for 500ms
+            await new Promise((resolve) => setTimeout(resolve, 500));
+            try {
+                await this.getUser();
+                return;
+            } catch(err) {
+                if (err instanceof NoTokenError) {
+                    throw err;
+                }
+            }
+            retries--;
+        }
+        throw new Error('Could not get user');
     }
 
     async getUser(): Promise<UserType> {

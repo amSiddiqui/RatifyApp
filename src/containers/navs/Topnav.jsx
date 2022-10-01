@@ -27,6 +27,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { settingsActions } from '../../redux/settings-slice';
 import { menuActions } from '../../redux/menu-slice';
 import { authActions } from '../../redux/auth-slice';
+import { AuthHelper } from '../../helpers/AuthHelper';
 
 const TopNav = ({ intl }) => {
     const [isInFullScreen, setIsInFullScreen] = useState(false);
@@ -35,6 +36,10 @@ const TopNav = ({ intl }) => {
     const dispatch = useDispatch();
     const { menu, settings, auth } = useSelector((root) => root);
     const selectedMenuHasSubItems = menu.selectedMenuHasSubItems;
+    const authHelper = React.useMemo(
+        () => new AuthHelper(dispatch),
+        [dispatch],
+    );
 
     const search = () => {
         navigate(`${searchPath}?key=${searchKeyword}`);
@@ -191,6 +196,15 @@ const TopNav = ({ intl }) => {
     };
 
     const { messages } = intl;
+
+    React.useEffect(() => {
+        authHelper.checkIfAuthExists(auth).catch(err => {
+            console.log(err);
+            dispatch(authActions.logout()); 
+            navigate('/');
+        });
+    }, [auth, authHelper, dispatch, navigate]);
+
     return (
         <nav className="navbar fixed-top">
             <div className="d-flex align-items-center navbar-left">
