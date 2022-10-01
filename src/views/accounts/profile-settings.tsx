@@ -48,6 +48,7 @@ const ProfileSettings: React.FC = () => {
     const match = useLocation();
     const intl = useIntl();
     const auth = useSelector((root: RootState) => root.auth);
+    console.log('auth', auth);
     const [image, setImage] = React.useState(() => {
         if (auth.user && auth.user.img) {
             return 'data:image/jpeg;base64,' + auth.user.img;
@@ -129,6 +130,8 @@ const ProfileSettings: React.FC = () => {
             email: auth.user ? auth.user.email : '',
             firstName: auth.user ? auth.user.first_name : '',
             lastName: auth.user ? auth.user.last_name : '',
+            job_title: auth.user ? auth.user.job_title : '',
+            user_id_reference: auth.user ? auth.user.user_id_reference : '',
             oldPassword: '',
             newPassword: '',
             confirmPassword: '',
@@ -416,6 +419,44 @@ const ProfileSettings: React.FC = () => {
                                     {!editMode && <Stack style={{ minWidth: 220, width: '100%' }} spacing={'sm'}>
                                         <p className='font-bold'>Email</p>    
                                         <Group className='border-b-2 border-gray-200 pb-1 mr-3'><i className='simple-icon-envelope relative' style={{ top: -2 }} /><p>{auth.user?.email}</p></Group>
+                                    </Stack>}
+                                    
+                                    {editMode && <TextInput
+                                        {...register('job_title')}
+                                        error={
+                                            errors.job_title
+                                                ? errors.job_title
+                                                        .message
+                                                : ''
+                                        }
+                                        icon={<i className='simple-icon-briefcase' />}
+                                        placeholder={'Job Title'}
+                                        label={'Job Title'}
+                                    />}
+                                    {!editMode && <Stack style={{ minWidth: 220, width: '100%' }} spacing={'sm'}>
+                                        <p className='font-bold'>Job Title</p>    
+                                        <Group className='border-b-2 border-gray-200 pb-1 mr-3'><i className='simple-icon-briefcase relative' style={{ top: -2 }} />
+                                            <p>{auth.user?.job_title}</p>
+                                        </Group>
+                                    </Stack>}
+
+                                    {editMode && <TextInput
+                                        {...register('user_id_reference')}
+                                        error={
+                                            errors.user_id_reference
+                                                ? errors.user_id_reference
+                                                        .message
+                                                : ''
+                                        }
+                                        icon={<i className='simple-icon-tag' />}
+                                        placeholder={'User Id Reference'}
+                                        label={'User Id Reference'}
+                                    />}
+                                    {!editMode && <Stack style={{ minWidth: 220, width: '100%' }} spacing={'sm'}>
+                                        <p className='font-bold'>User Id Reference</p>    
+                                        <Group className='border-b-2 border-gray-200 pb-1 mr-3'><i className='simple-icon-tag relative' style={{ top: -2 }} />
+                                            <p>{auth.user?.user_id_reference}</p>
+                                        </Group>
                                     </Stack>}
 
                                     {editMode && <p

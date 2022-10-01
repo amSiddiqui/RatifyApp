@@ -5,7 +5,11 @@ export type UserType = {
     verified: boolean;
     img: string;
     last_seen: string;
-    role: number;
+    role: 0 | 99 | 1;
+    job_title: string;
+    user_type: 0 | 1;
+    user_id_reference: string;
+    status: boolean;
     email: string;
 };
 
@@ -18,7 +22,7 @@ export type OrganizationUser = {
     last_name: string;
     job_title: string;
     user_type: 0 | 1;
-    userIdReference: string;
+    user_id_reference: string;
     status: boolean;
     image: string;
 }
@@ -35,9 +39,9 @@ export type NewUserData = {
     first_name: string;
     last_name: string;
     role: string;
-    userIdReference: string;
+    user_id_reference: string;
     userType: string;
-    jobTitle: string;
+    job_title: string;
     legalEntity: string;
     businessFunction: string;
 }
@@ -47,6 +51,8 @@ export interface UserSettingsFormType {
     firstName: string;
     changePassword: boolean;
     lastName?: string;
+    job_title?: string;
+    user_id_reference?: string;
     oldPassword?: string;
     newPassword?: string;
     confirmPassword?: string;

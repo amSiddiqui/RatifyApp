@@ -67,9 +67,9 @@ const AddUserForm: React.FC<Props> = ({
             last_name: lastName,
             email: email,
             role: selectedRole,
-            userIdReference: userIdReference,
+            user_id_reference: userIdReference,
             userType: userType,
-            jobTitle: jobTitle,
+            job_title: jobTitle,
             legalEntity: selectedLegalEntity,
             businessFunction: selectedBusinessFunction,
         } as NewUserData;
