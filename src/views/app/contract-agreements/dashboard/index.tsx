@@ -333,7 +333,8 @@ const AgreementDashboard: React.FC = () => {
                                                 <span><i style={{ fontSize: 42 }} className={classNames('iconsminds-folder-edit text-primary transition-all')} /></span>
                                                 <p style={{ padding: '12px 22px' }} 
                                                     className={classNames('text-5xl transition-all rounded-full border-2 border-gray-300', 
-                                                    {'text-primary': !tile1Hovered, 'text-white bg-primary': tile1Hovered })}>{agreements.filter(a => a.status === 'draft').length}</p>
+                                                    {'text-primary': renderTileFilter !== 1 && !tile1Hovered, 
+                                                    'text-white bg-primary': renderTileFilter === 1 || tile1Hovered })}>{agreements.filter(a => a.status === 'draft').length}</p>
                                             </Group>
                                             <div style={{ height: 37 }}>
                                                 <p style={{ marginLeft: 8 }}>Draft</p>
@@ -357,7 +358,8 @@ const AgreementDashboard: React.FC = () => {
                                                 <span><i style={{ fontSize: 42 }} className={classNames('iconsminds-box-with-folders text-primary transition-all')} /></span>
                                                 <p style={{ padding: '12px 22px' }} 
                                                     className={classNames('text-5xl transition-all rounded-full border-2 border-gray-300', 
-                                                    {'text-primary': !tile2Hovered, 'text-white bg-primary': tile2Hovered })}>{agreements.filter(a => a.status === 'complete').length}</p>
+                                                    {'text-primary': renderTileFilter !== 2 && !tile2Hovered, 
+                                                    'text-white bg-primary': renderTileFilter === 2 || tile2Hovered })}>{agreements.filter(a => a.status === 'complete').length}</p>
                                             </Group>
                                             <div style={{ height: 37 }}>
                                                 <p style={{ marginLeft: 8 }}>Completed</p>
@@ -382,7 +384,8 @@ const AgreementDashboard: React.FC = () => {
                                                 <span><i style={{ fontSize: 42 }} className={classNames('iconsminds-bird-delivering-letter text-primary transition-all')} /></span>
                                                 <p style={{ padding: '12px 22px' }} 
                                                     className={classNames('text-5xl transition-all rounded-full border-2 border-gray-300', 
-                                                    {'text-primary': !tile3Hovered, 'text-white bg-primary': tile3Hovered })}>{agreements.filter(a => a.status === 'sent').length}</p>
+                                                    {'text-primary': renderTileFilter !== 3 && !tile3Hovered, 
+                                                    'text-white bg-primary': renderTileFilter === 3 || tile3Hovered })}>{agreements.filter(a => a.status === 'sent').length}</p>
                                             </Group>
                                             <div style={{ height: 37 }}>
                                                 <p style={{ marginLeft: 8 }}>In Progress</p>

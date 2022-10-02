@@ -134,7 +134,7 @@ const AddUserForm: React.FC<Props> = ({
     };
 
     return (
-        <Stack>
+        <Stack spacing={'lg'}>
             <div>
                 {editMode && <h3>Edit User</h3>}
                 {!editMode && <h3>Add New User</h3>}
@@ -180,31 +180,25 @@ const AddUserForm: React.FC<Props> = ({
                     />
                 </Grid.Col>
             </Grid>
-            <Grid>
-                <Grid.Col lg={6}>
-                    <RadioGroup
-                        value={selectedRole}
-                        label="Select User Role"
-                        onChange={(e) => {
-                            setSelectedRole(e);
-                        }}>
-                        <Radio value="1" label="User" />
-                        <Radio value="99" label="Admin" />
-                    </RadioGroup>
-                </Grid.Col>
-                <Grid.Col lg={6}>
-                    <RadioGroup
-                        value={userType}
-                        onChange={(e) => {
-                            setUserType(e);
-                        }}
-                        label="Select User Type"
-                        defaultValue="0">
-                        <Radio value="0" label="Internal " />
-                        <Radio value="1" label="External" />
-                    </RadioGroup>
-                </Grid.Col>
-            </Grid>
+            <RadioGroup
+                value={selectedRole}
+                label="Select User Role"
+                onChange={(e) => {
+                    setSelectedRole(e);
+                }}>
+                <Radio value="1" label="Normal User" />
+                <Radio value="99" label="Administrator" />
+            </RadioGroup>
+            <RadioGroup
+                value={userType}
+                onChange={(e) => {
+                    setUserType(e);
+                }}
+                label="Select User Type"
+                defaultValue="0">
+                <Radio value="0" label="Internal User" />
+                <Radio value="1" label="External User" />
+            </RadioGroup>
             <Group
                 spacing={12}
                 className="cursor-pointer"

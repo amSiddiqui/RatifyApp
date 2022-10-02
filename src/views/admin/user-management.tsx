@@ -94,6 +94,7 @@ const UserManagement: React.FC = () => {
             <Modal
                 centered
                 opened={userModal}
+                size='md'
                 onClose={() => setUserModal(false)}>
                 <AddUserForm
                     onClose={() => {

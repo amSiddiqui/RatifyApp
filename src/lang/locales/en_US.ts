@@ -63,7 +63,7 @@ export const enMessages = {
     'menu.blank': 'Blank Page',
     'menu.billing': 'Billing',
     'menu.administration': 'Administration',
-    'menu.manage-users': 'Manage Users',
+    'menu.manage-users': 'User Management',
     'menu.dashboard': 'Dashboard',
     'menu.notification-settings': 'Notification Settings',
     'menu.users': 'Users',

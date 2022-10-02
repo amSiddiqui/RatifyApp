@@ -29,6 +29,7 @@ const data = [
         id: 'billing',
         icon: 'iconsminds-billing',
         label: 'menu.billing',
+        roles: [UserRole.Admin],
         to: `/billing`,
     },
     {
@@ -38,23 +39,11 @@ const data = [
         to: `/business-profile`,
     },
     {
-        id: 'administration',
-        icon: 'iconsminds-gear',
-        label: 'menu.administration',
+        id: 'user-management',
+        icon: 'iconsminds-mens',
+        label: 'menu.manage-users',
         roles: [UserRole.Admin],
-        to: `/administration`,
-        subs: [
-            {   
-                icon: 'iconsminds-mens',
-                label: 'menu.manage-users',
-                to: `/administration/users`,
-            },
-            // {
-            //     icon: 'iconsminds-mail-settings',
-            //     label: 'menu.notification-settings',
-            //     to: `/administration/notification-settings`,
-            // }
-        ]
+        to: `/administration/users`,
     },
 ];
 export default data;
