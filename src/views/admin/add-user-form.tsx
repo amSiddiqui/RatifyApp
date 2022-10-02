@@ -133,6 +133,28 @@ const AddUserForm: React.FC<Props> = ({
         }
     };
 
+    React.useEffect(() => {
+        let shouldUpdate = true;
+        if (editMode) {
+            if (user && user.id) {
+                authHelper.getOrganizationUserBusinessFunction(user.id).then(data => {                    
+                    if (shouldUpdate) {
+                        if (data.businessFunction) {
+                            setSelectedBusinessFunction(data.businessFunction.id);
+                        }
+                        if (data.legalEntity) {
+                            setSelectedLegalEntity({ id: data.legalEntity.id, label: data.legalEntity.name });
+                        }
+                    }
+                }).catch(err => {
+
+                });
+            }
+        }
+
+        return () => { shouldUpdate = false; }
+    }, [editMode, user, authHelper]);
+
     return (
         <Stack spacing={'lg'}>
             <div>
@@ -246,6 +268,7 @@ const AddUserForm: React.FC<Props> = ({
                                         label: le.name,
                                         value: le.id.toString(),
                                     }))}
+                                    value={selectedLegalEntity ? selectedLegalEntity.id.toString() : null}
                                     placeholder="Legal Entity"
                                     label="Legal Entity"
                                 />

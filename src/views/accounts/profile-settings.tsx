@@ -23,6 +23,8 @@ import { passwordValidation } from '../../helpers/Utils';
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import {
+    BusinessFunction,
+    LegalEntity,
     OrganizationNameResponse,
     UserSettingsFormType,
     UserSettingsWithImage,
@@ -73,6 +75,10 @@ const ProfileSettings: React.FC = () => {
 
     const [organization, setOrganization] = React.useState<OrganizationNameResponse>();
     const [editMode, setEditMode] = React.useState(false);
+    const [userBusinessFunction, setUserBusinessFunction] = React.useState<{
+        businessFunction: BusinessFunction | null,
+        legalEntity: LegalEntity | null,
+    }>({ businessFunction: null, legalEntity: null });
 
     const schema = Yup.object().shape({
         changePassword: Yup.boolean(),
@@ -225,6 +231,23 @@ const ProfileSettings: React.FC = () => {
         
             return () => { shouldUpdate = false; }
     }, [authHelper]);
+
+    React.useEffect(() => {
+        let shouldUpdate = true;
+        if (auth && auth.user && auth.user.id) {
+            authHelper.getOrganizationUserBusinessFunction(auth.user.id)
+            .then(data => {
+                if (shouldUpdate) {
+                    setUserBusinessFunction(data);
+                    console.log('User business function: ', data);
+                }
+            }).catch(err => {
+                console.log('User business function: ', err);
+            });
+        }
+
+        return () =>  { shouldUpdate = false; }
+    }, [authHelper, auth]);
 
     return (
         <>
@@ -457,6 +480,25 @@ const ProfileSettings: React.FC = () => {
                                             <p>{auth.user?.user_id_reference}</p>
                                         </Group>
                                     </Stack>}
+                                    
+                                    <Grid>
+                                        {userBusinessFunction.legalEntity && <Grid.Col span={6}>
+                                            <Stack style={{ minWidth: 220, width: '100%' }} spacing={'sm'}>
+                                                <p className='font-bold'>Legal Entity</p>    
+                                                <Group className='border-b-2 border-gray-200 pb-1 mr-3'><i className='simple-icon-briefcase relative' style={{ top: -2 }} />
+                                                    <p>{userBusinessFunction.legalEntity.name}</p>
+                                                </Group>
+                                            </Stack>
+                                        </Grid.Col>}
+                                        {userBusinessFunction.businessFunction && <Grid.Col span={6}>
+                                            <Stack style={{ minWidth: 220, width: '100%' }} spacing={'sm'}>
+                                                <p className='font-bold'>Business Function</p>    
+                                                <Group className='border-b-2 border-gray-200 pb-1 mr-3'><i className='simple-icon-briefcase relative' style={{ top: -2 }} />
+                                                    <p>{userBusinessFunction.businessFunction.label}</p>
+                                                </Group>
+                                            </Stack>
+                                        </Grid.Col>}
+                                    </Grid>
 
                                     {editMode && <p
                                         className="cursor-pointer"

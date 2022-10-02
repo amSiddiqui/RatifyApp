@@ -283,6 +283,17 @@ export class AuthHelper extends ApiHelper {
         );
     }
 
+    async getOrganizationUserBusinessFunction(id: number) {
+        let response: AxiosResponse<{
+            businessFunction: BusinessFunction | null,
+            legalEntity: LegalEntity | null,
+        }> = await axios.get(
+            `/auth/users/entity/?id=${id}`,
+            { headers: { Authorization: `Bearer ${await this.getToken()}` } },            
+        );
+        return response.data;
+    }
+
     async getOrganizationUserImage(id: number) {
         let response: AxiosResponse<string> = await axios.get(
             `/auth/users/${id}/image/`,
