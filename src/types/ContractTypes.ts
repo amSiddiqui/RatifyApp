@@ -208,6 +208,16 @@ export type AgreementProgressType = {
 };
 
 
+export type SignerMetaData = {
+    id: number;
+    signer: string;
+    signerId: number;
+    meta_json: string;
+    meta_hash: string;
+    created_at: string;
+    updated_at: string;
+}
+
 export type BrowserData = {
     browserName: string | null;
     browserVersion: string | null;
@@ -219,5 +229,6 @@ export type BrowserData = {
     resolution: string | null;
     language: string | null;
     localTime: string | null;
-    logicalCores: number | null,
+    logicalCores: number | null;
+    ip_address: string | null;
 }

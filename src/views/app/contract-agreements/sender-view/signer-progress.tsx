@@ -2,7 +2,7 @@ import { Center, Collapse, Group, Indicator, Loader, Modal, Popover, Progress, S
 import classNames from 'classnames';
 import React from 'react';
 import { getFormatDateFromIso } from '../../../../helpers/Utils';
-import { Signer } from '../../../../types/ContractTypes';
+import { BrowserData, Signer, SignerMetaData } from '../../../../types/ContractTypes';
 import { getBgColorLight } from '../types';
 import { Button } from 'reactstrap';
 import { useDisclosure } from '@mantine/hooks';
@@ -13,6 +13,10 @@ import { ContractHelper } from '../../../../helpers/ContractHelper';
 import { toast } from 'react-toastify';
 import SignerPopover from '../form-elements/signer-popover';
 import { MdCheck, MdClear, MdError, MdSearch } from 'react-icons/md';
+
+const regionNames = new Intl.DisplayNames(
+    ['en'], {type: 'language'}
+);
 
 export const getSignerStatus = (signer:Signer, signerProgress: {total: number, completed: number} | null) => {
     if (signer.status === 'error') {
@@ -137,6 +141,9 @@ const SignerProgress: React.FC<Props> = ({ signer, contractHelper, onDocumentSen
     const [reminderSending, setReminderSending] = React.useState(false);
     const [lastReminder, setLastReminder] = React.useState('');
     const [lastReminderError, setLastReminderError] = React.useState(true);
+    const [showSignerMeta, setShowSignerMeta] = React.useState(false);
+    const [signerMeta, setSignerMeta] = React.useState<SignerMetaData>();
+    const [browserData, setBrowserData] = React.useState<BrowserData>();
 
     const { register, handleSubmit, formState: { errors } } = useForm({
         resolver: yupResolver(sendAgainSchema),
@@ -208,6 +215,28 @@ const SignerProgress: React.FC<Props> = ({ signer, contractHelper, onDocumentSen
         fetchReminder(meta);
         return () => { meta.shouldUpdate = false; }
     }, [fetchReminder]);
+
+
+    React.useEffect(() => {
+        let shouldUpdate = true;        
+        if (signer.id) {
+            contractHelper.getSignerMetaData(signer.id).then(res => {
+                if (shouldUpdate) {
+                    const meta_json = res.meta_data.meta_json;
+                    if (meta_json) {
+                        // parse the meta json
+                        const meta = JSON.parse(meta_json) as BrowserData;
+                        setBrowserData(meta);
+                    }
+                    setSignerMeta(res.meta_data);
+                }
+            }).catch(err => {
+
+            });
+        }
+
+        return () => { shouldUpdate = false; }
+    }, [contractHelper, signer]);
 
     return (
         <>
@@ -284,6 +313,11 @@ const SignerProgress: React.FC<Props> = ({ signer, contractHelper, onDocumentSen
                                         </Popover>
                                     </div>}
                                 </Group>
+                                {!!signerMeta && <div>
+                                    <Button onClick={() => {
+                                        setShowSignerMeta(true);
+                                    }} size='xs' color='primary'>Show Meta</Button>
+                                </div>}
                                 {signerProgress && !signer.declined && <div className='w-full'>
                                     <Progress className='w-full h-2' value={signerProgress.total === 0 ? 100 : signerProgress.completed * 100 / signerProgress.total} />
                                     <Group position='apart' className='text-gray-600'>
@@ -363,6 +397,80 @@ const SignerProgress: React.FC<Props> = ({ signer, contractHelper, onDocumentSen
                         </span>
                     </Group>
                 </Stack>
+            </Modal>
+
+            <Modal
+                centered
+                opened={showSignerMeta}
+                onClose={() => setShowSignerMeta(false)}
+                title={<p className='font-bold text-2xl'>Signer Meta Information</p>}
+                withCloseButton
+                size='lg'
+            >
+                {signerMeta && browserData && <Stack className='p-4'>
+                    <Group>
+                        <p className='font-bold'>Hash: </p>
+                        <p className='flex-wrap'>{ signerMeta.meta_hash }</p>
+                    </Group>
+                    {browserData.ip_address && <Group>
+                        <p className='font-bold'>IP Address: </p>
+                        <p>{ browserData.ip_address }</p>    
+                    </Group>}
+                    {browserData.browserName && <Group>
+                        <p className='font-bold'>Browser Name: </p>
+                        <p>{ browserData.browserName }</p>    
+                    </Group>}
+                    {browserData.browserVersion && <Group>
+                        <p className='font-bold'>Browser Version: </p>
+                        <p>{ browserData.browserVersion }</p>
+                    </Group>}
+                    {browserData.os && <Group>
+                        <p className='font-bold'>Operating System: </p>
+                        <p>{ browserData.os }</p>
+                    </Group>}
+                    {browserData.osVersion && <Group>
+                        <p className='font-bold'>OS Version: </p>
+                        <p>{ browserData.osVersion }</p>
+                    </Group>}
+                    {browserData.language && <Group>
+                        <p className='font-bold'>Device Language: </p>
+                        <p>{ regionNames.of(browserData.language) }</p>
+                    </Group>}
+                    {browserData.localTime && <Group>
+                        <p className='font-bold'>Local Time: </p>
+                        <p>{ browserData.localTime }</p>
+                    </Group>}
+
+                    {browserData.resolution && <Group>
+                        <p className='font-bold'>Screen Resolution: </p>
+                        <p>{ browserData.resolution }</p>
+                    </Group>}
+
+                    {browserData.userAgent && <Group>
+                        <p className='font-bold'>User Agent: </p>
+                        <p>{ browserData.userAgent }</p>
+                    </Group>}
+                    
+                    {browserData.platformType && <Group>
+                        <p className='font-bold'>Platform Type: </p>
+                        <p>{ browserData.platformType }</p>
+                    </Group>}
+
+                    {browserData.platformVendor && <Group>
+                        <p className='font-bold'>Platform Vendor: </p>
+                        <p>{ browserData.platformVendor }</p>
+                    </Group>}
+
+                    {browserData.logicalCores && <Group>
+                        <p className='font-bold'>CPU Cores: </p>
+                        <p>{ browserData.logicalCores } cores</p>
+                    </Group>}
+                </Stack>}
+
+                {(!signerMeta || !browserData) && <Stack className='p-4'>
+                    {/* print data not available */}
+                    <p>Signer Meta Information not available for this signer</p>
+                </Stack>}
             </Modal>
         </>
     );

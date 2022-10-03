@@ -17,6 +17,7 @@ import {
     SignerComment,
     SignerErrorTypes,
     SignerInputElements,
+    SignerMetaData,
     SignerPdfResponse,
     SignerPdfThumbnails,
     SignerReminder,
@@ -567,6 +568,22 @@ export class ContractHelper extends ApiHelper {
         const response:AxiosResponse<{ 'reminder': SignerReminder | null }> = await axios.get(
             `contracts/signer/reminder/?agreement_id=${agreement_id}&signer_id=${signer_id}`,
             {headers: {Authorization: `Bearer ${await this.getToken()}`}}
+        );
+        return response.data;
+    }
+
+    async getSignerMetaData(signer_id:number) {
+        const response:AxiosResponse<{ meta_data: SignerMetaData }> = await axios.get(
+            `contracts/signer/${signer_id}/meta/`,
+            {headers: {Authorization: `Bearer ${await this.getToken()}`}}
+        );
+        return response.data;
+    }
+
+    async getSignerSelfMetaData(token: string) {
+        const response:AxiosResponse<{ status: string, valid: boolean, meta_data: SignerMetaData }> = await axios.get(
+            `contracts/signer/self-meta/?token=${token}`,
+            {}
         );
         return response.data;
     }
