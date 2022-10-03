@@ -350,3 +350,19 @@ export const validateEmail = (email: string) => {
     const re = /\S+@\S+\.\S+/;
     return re.test(email);
 }
+
+export const getWebRTCIp = () => {
+    // get WebRTC leak IP
+    return new Promise((resolve, reject) => {
+        const xhr = new XMLHttpRequest();
+        xhr.open('GET', 'https://api.ipify.org?format=json');
+        xhr.send();
+        xhr.onload = () => {
+            if (xhr.status === 200) {
+                resolve(JSON.parse(xhr.responseText).ip);
+            } else {
+                reject();
+            }
+        };
+    });
+}

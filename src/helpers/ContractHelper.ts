@@ -8,6 +8,7 @@ import {
     AgreementRowData,
     AgreementTemplate,
     AuditTrailData,
+    BrowserData,
     ContractCreateResponseType,
     DocumentsResponseType,
     GetAgreementResponse,
@@ -387,10 +388,10 @@ export class ContractHelper extends ApiHelper {
         return response.data;
     }
 
-    async completeSigningProcess(token: string) {
+    async completeSigningProcess(token: string, browserData: BrowserData) {
         await axios.post(
             `contracts/signer/complete/?token=${token}`,
-            {},
+            {browserData},
         );
     }
 

@@ -207,3 +207,17 @@ export type AgreementProgressType = {
     sections: AgreementProgressSectionType[];
 };
 
+
+export type BrowserData = {
+    browserName: string | null;
+    browserVersion: string | null;
+    os: string | null;
+    osVersion: string | null;
+    platformType: string | null;
+    platformVendor: string | null;
+    userAgent: string | null;
+    resolution: string | null;
+    language: string | null;
+    localTime: string | null;
+    logicalCores: number | null,
+}

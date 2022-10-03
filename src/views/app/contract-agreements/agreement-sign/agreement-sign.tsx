@@ -6,7 +6,7 @@ import { ContractHelper } from '../../../../helpers/ContractHelper';
 import { AppDispatch } from '../../../../redux';
 import { useDisclosure, useMediaQuery, useResizeObserver } from '@mantine/hooks';
 import { Button, Card, CardBody } from 'reactstrap';
-import { Agreement, InputField, SignerErrorTypes } from '../../../../types/ContractTypes';
+import { Agreement, BrowserData, InputField, SignerErrorTypes } from '../../../../types/ContractTypes';
 import { toast } from 'react-toastify';
 import { DateTime } from 'luxon';
 import SignerInput from '../form-elements/signer-input';
@@ -21,6 +21,47 @@ import AgreementProgressBar from '../sender-view/agreement-progress-bar';
 import BaseDocumentViewer from '../document-viewer/base-document-viewer';
 import PageNavigation from '../document-viewer/page-navigation';
 import classNames from 'classnames';
+import * as bowser from 'bowser';
+
+const browser = bowser.getParser(window.navigator.userAgent);
+const browserName = browser.getBrowserName();
+const browserVersion = browser.getBrowserVersion();
+const os = browser.getOSName();
+const osVersion = browser.getOSVersion();
+const platformType = browser.getPlatformType();
+const platformVendor = browser.getResult().platform.vendor;
+
+// get user agent
+const userAgent = window.navigator.userAgent;
+
+// get screen resolution
+const screenWidth = window.screen.width;
+const screenHeight = window.screen.height;
+const resolution = `${screenWidth}x${screenHeight}`;
+
+// get system language
+const language = window.navigator.language;
+
+// get local time
+const localTime = new Date().toLocaleString();
+
+// get number of logical cores
+const logicalCores = window.navigator.hardwareConcurrency;
+
+const browserData = {
+    browserName,
+    browserVersion,
+    os,
+    osVersion,
+    platformType,
+    platformVendor,
+    userAgent,
+    resolution,
+    language,
+    localTime,
+    logicalCores,
+} as BrowserData;
+
 
 const GRID_TOTAL = 16;
 const GRID_SIDE = 3;
@@ -183,7 +224,7 @@ const AgreementSign: React.FC = () => {
     }
 
     const onDocumentSubmit = () => {
-        contractHelper.completeSigningProcess(token).then(() => {
+        contractHelper.completeSigningProcess(token, browserData).then(() => {
             confirmationModalHandlers.close();
             navigate(`/agreements/success?token=${token}&confetti=true`);
         }).catch(err => {
@@ -393,9 +434,6 @@ const AgreementSign: React.FC = () => {
             }
         }
     }, [rect]);
-    React.useEffect(() => {
-        console.log({inputFocus});
-    }, [inputFocus]);
 
     const pgNavigation = <PageNavigation
         pageNumber={pageNumber}
