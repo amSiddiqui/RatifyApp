@@ -9,12 +9,14 @@ import {
     Modal
 } from '@mantine/core';
 import { Button } from 'reactstrap';
-import {  useNavigate, useSearchParams } from 'react-router-dom';
+import { useSearchParams } from 'react-router-dom';
 import Confetti from 'react-confetti';
 import { useMediaQuery, useViewportSize } from '@mantine/hooks';
 import SignupForm from '../../../user/signup-form';
 import { useDispatch } from 'react-redux';
 import { ContractHelper } from '../../../../helpers/ContractHelper';
+import { BrowserData, SignerMetaData } from '../../../../types/ContractTypes';
+import ShowBrowserData from '../show-browser-data';
 
 const typeToMessage = (type: string) => {
     if (type === 'many') {
@@ -33,7 +35,6 @@ const typeToMessage = (type: string) => {
 };
 
 const AgreementSuccess: React.FC = () => {
-    const navigate = useNavigate();
     const dispatchFn = useDispatch();
     const contractHelper = React.useMemo(
         () => new ContractHelper(dispatchFn),
@@ -49,6 +50,10 @@ const AgreementSuccess: React.FC = () => {
     const [showDocumentCopy, setShowDocumentCopy] = React.useState(false);
     const [error, setError] = React.useState(false);
     const [respType, setRespType] = React.useState('');
+    const [showSignerMeta, setShowSignerMeta] = React.useState(false);
+    const [signerMeta, setSignerMeta] = React.useState<SignerMetaData>();
+    const [browserData, setBrowserData] = React.useState<BrowserData>();
+
 
     const matches = useMediaQuery('(max-width: 800px)');
 
@@ -83,6 +88,22 @@ const AgreementSuccess: React.FC = () => {
                 }
             }).catch(err => {
                 console.log(err);
+            });
+
+
+            contractHelper.getSignerSelfMetaData(token).then(res => {
+                if (shouldUpdate) {
+                    if (res.valid) {
+                        const meta_json = res.meta_data.meta_json;
+                        if (meta_json) {
+                            const meta = JSON.parse(meta_json) as BrowserData;
+                            setBrowserData(meta);
+                        }
+                        setSignerMeta(res.meta_data);
+                    }
+                }
+            }).catch(err => {
+
             });
         }
 
@@ -133,9 +154,9 @@ const AgreementSuccess: React.FC = () => {
                                 </Button>
                             </span>
                             <span onClick={() => {
-                                navigate(`/`);
+                                setShowSignerMeta(true);
                             }}>
-                                <Button color="primary">Try Ratify</Button>
+                                <Button color="primary">Show Meta Data</Button>
                             </span>
                         </Group>
                     </Stack>
@@ -174,6 +195,19 @@ const AgreementSuccess: React.FC = () => {
                     </Group>
                 </div>
             </Center>
+        </Modal>
+        <Modal
+            centered
+            opened={showSignerMeta}
+            onClose={() => setShowSignerMeta(false)}
+            title={<p className='font-bold'>Meta Information</p>}
+            withCloseButton
+            size='lg'
+        >
+            <ShowBrowserData
+                signerMeta={signerMeta}
+                browserData={browserData}
+            />
         </Modal>
         </>
     );
