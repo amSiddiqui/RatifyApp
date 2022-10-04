@@ -540,10 +540,10 @@ export class ContractHelper extends ApiHelper {
         return response.data;
     }
 
-    async signerDecline(token: string, declineMessage: string) {
+    async signerDecline(token: string, declineMessage: string, browserData: BrowserData) {
         await axios.post(
             `contracts/signer/decline/?token=${token}`,
-            { message: declineMessage },
+            { message: declineMessage, browserData },
         );
     }
 

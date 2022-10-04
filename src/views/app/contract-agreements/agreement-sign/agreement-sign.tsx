@@ -475,7 +475,7 @@ const AgreementSign: React.FC = () => {
         </Tooltip>
         <p>Download Document</p>
         </Group>}
-    </Group>;
+    </Group>
     
     const signerInfo = basicInfo && basicInfo.signerType === 'signer' ?  
     <Group position={thirdBreakPoint ? 'left' : 'right'}>
@@ -793,7 +793,7 @@ const AgreementSign: React.FC = () => {
                         <span onClick={() => setShowDecline(false)}><Button color='light'>Close</Button></span>
                         <span onClick={() => {
                             setShowDecline(false);
-                            contractHelper.signerDecline(token, declineMessage).then(() => {
+                            contractHelper.signerDecline(token, declineMessage, browserData).then(() => {
                                 navigate('/agreements/decline?token='+token);
                             }).catch(err => {
                                 console.log(err);
