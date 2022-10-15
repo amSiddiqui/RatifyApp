@@ -20,6 +20,7 @@ import { OrganizationNameResponse } from '../../../../types/AuthTypes';
 import { AuthHelper } from '../../../../helpers/AuthHelper';
 import PdfViewer from './pdf-viewer';
 import DocumentCarouselLoading from './document-carousel-loading';
+import VerifyEmailMessage from './verify-email-message';
 
 const ContractAgreements: React.FC = () => {
     const match = useLocation();
@@ -50,6 +51,7 @@ const ContractAgreements: React.FC = () => {
     const [loading, setLoading] = React.useState(true);
     const auth = useSelector((root: RootState) => root.auth);
     const [organization, setOrganization] = React.useState<OrganizationNameResponse>();
+    const [organizationLoading, setOrganizationLoading] = React.useState(true);
     const [showUnverifiedModal, setShowUnverifiedModal] = React.useState(false);
     const [selectedCategory, setSelectedCategory] = React.useState('');
     const [showPdfView, setShowPdfView] = React.useState(false);
@@ -98,6 +100,16 @@ const ContractAgreements: React.FC = () => {
                         });
                 })
                 .catch((err) => {
+                    // check if 400 error and check if 'billing' in error response
+                    if (err.response && err.response.status === 400 && err.response.data && err.response.data.billing) {
+                        var err_type = err.response.data.billing;
+                        if (err_type === 'expired') {
+                            toast.error('Your billing plan has expired');
+                            setUploadError('Your billing plan has expired');
+                            return;
+                        }
+                    }
+
                     toast.error('Error uploading document');
                     setUploadError('Error uploading document');
                 })
@@ -164,6 +176,7 @@ const ContractAgreements: React.FC = () => {
             .getOrganizationName().then(resp => {
                 if (shouldUpdate) {
                     setOrganization(resp);
+                    setOrganizationLoading(false);
                 }
             }).catch(err => {
                 console.log(err);
@@ -192,7 +205,7 @@ const ContractAgreements: React.FC = () => {
                     <Separator className="mb-14" />
                 </Colxx>
             </Row>
-            <CATopBar onUploadButtonClick={onUploadButtonClick} intl={intl} onDocSelect={onDocSelect} />
+            <CATopBar organizationLoading={organizationLoading} organization={organization} navigate={navigate} auth={auth} onUploadButtonClick={onUploadButtonClick} intl={intl} onDocSelect={onDocSelect} />
             <Divider
                 className="mb-10 mt-10"
                 label={<p className="text-2xl">OR</p>}
@@ -386,17 +399,7 @@ const ContractAgreements: React.FC = () => {
                 onClose={() => setShowUnverifiedModal(false)}
                 centered
             >
-                {(auth.user && organization) && 
-                <>
-                    {!auth.user.verified && <Stack className='text-center'>
-                        <h5>Please verify your email first before creating a document.</h5>
-                        <span onClick={() => {navigate(`/profile-settings`)}}><Button color='primary'>Profile Settings</Button></span>
-                    </Stack>}
-                    {auth.user.verified && organization.stepsCompleted < 3 && <Stack className='text-center'>
-                        <h5>Please complete the business profile before continuing!</h5>
-                        <span onClick={() => {navigate(`/business-profile`)}}><Button color='primary'>Business Profile</Button></span>
-                    </Stack>}
-                </>}
+                <VerifyEmailMessage navigate={navigate} auth={auth} organization={organization}  />
             </Modal>
             <Modal
                 opened={showPdfView}

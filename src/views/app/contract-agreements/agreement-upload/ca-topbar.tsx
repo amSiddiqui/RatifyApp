@@ -4,13 +4,19 @@ import { Colxx } from '../../../../components/common/CustomBootstrap';
 import { IntlShape } from 'react-intl';
 import { Dropzone, PDF_MIME_TYPE } from '@mantine/dropzone';
 import { MdFileUpload } from 'react-icons/md';
-import { Center, Grid } from '@mantine/core';
+import { Center, Grid, Loader, Stack } from '@mantine/core';
+import { AuthInitialStateType, OrganizationNameResponse } from '../../../../types/AuthTypes';
+import { NavigateFunction } from 'react-router-dom';
 
 const CATopBar: React.FC<{
     intl: IntlShape;
     onDocSelect: (files: File[]) => void;
     onUploadButtonClick: (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void;
-}> = ({ intl, onDocSelect, onUploadButtonClick }) => {
+    organization?: OrganizationNameResponse;
+    auth: AuthInitialStateType;
+    organizationLoading: boolean;
+    navigate: NavigateFunction;
+}> = ({ intl, onDocSelect, onUploadButtonClick, organization, auth, organizationLoading, navigate }) => {
 
     return (
         <Row>
@@ -18,7 +24,16 @@ const CATopBar: React.FC<{
                 <Grid columns={12}>
                     <Grid.Col span={2}></Grid.Col>
                     <Grid.Col span={8}>
-                        <Dropzone
+                        {!(auth && organization && !organizationLoading && !auth.loading) && <Center>
+                            <Center style={{ height: 180, width: '100%', maxWidth: '842px', border: '2px dashed #ced4da' }} className='rounded-sm bg-white '>
+                                {(organizationLoading || auth.loading) && <Loader size='lg' variant='bars'></Loader>}
+                                {!(organizationLoading || auth.loading) && (!auth || !organization) && <Stack className='text-center'>
+                                    <h5 className='text-rose-500'>Please complete the business profile before continuing!</h5>
+                                    <span onClick={() => {navigate(`/business-profile`)}}><Button color='primary'>Business Profile</Button></span>
+                                </Stack>}
+                            </Center>
+                        </Center>}
+                        {auth && organization && !organizationLoading && !auth.loading && <Dropzone
                             className="w-full h-full"
                             onDrop={onDocSelect}
                             onReject={(files) =>
@@ -44,7 +59,7 @@ const CATopBar: React.FC<{
                                     </div>
                                 </Center>
                             )}
-                        </Dropzone>
+                        </Dropzone>}
                     </Grid.Col>
                     <Grid.Col span={2}>
                         {/* TODO: Add document creator */}

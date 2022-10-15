@@ -25,6 +25,8 @@ import AuditTrail from '../audit-trail';
 import { getSignerStatusAndIcon } from '../sender-view/signer-progress';
 import AgreementProgressBar from '../sender-view/agreement-progress-bar';
 import { AuthHelper } from '../../../../helpers/AuthHelper';
+import { OrganizationNameResponse } from '../../../../types/AuthTypes';
+import VerifyEmailMessage from '../agreement-upload/verify-email-message';
 
 const AllColumns = [
     'ID',
@@ -147,6 +149,8 @@ const AgreementDashboard: React.FC = () => {
     const [pageSize, setPageSize] = useLocalStorage<number>({key: 'agreement-dashboard-page-size', defaultValue: 10});
     const [page, setPage] = React.useState(1);
     const [totalPages, setTotalPages] = React.useState(1);
+    const [organization, setOrganization] = React.useState<OrganizationNameResponse>();
+    const [showUnverifiedModal, setShowUnverifiedModal] = React.useState(false);
 
     const { hovered: tile1Hovered, ref: tile1Ref } = useHover();
     const { hovered: tile2Hovered, ref: tile2Ref } = useHover();
@@ -216,8 +220,16 @@ const AgreementDashboard: React.FC = () => {
     }), []);
 
     const onCreateNewClick = React.useCallback(() => {
+        if (!organization || !auth.user) {
+            toast.error('Something went wrong! Please try again later.');
+            return;
+        }
+        if (!auth.user.verified || organization.stepsCompleted < 3) {
+            setShowUnverifiedModal(true);
+            return;
+        }
         navigate('/agreements');
-    }, [navigate]);
+    }, [navigate, auth, organization]);
 
     const onSubmitProfileSettings = () => {
         setShowNameErrors(false);
@@ -268,6 +280,20 @@ const AgreementDashboard: React.FC = () => {
         });
         return () => { shouldUpdate = false; }
     }, [contractHelper]);
+
+    
+    React.useEffect(() => {
+        let shouldUpdate = true;
+        authHelper
+            .getOrganizationName().then(resp => {
+                if (shouldUpdate) {
+                    setOrganization(resp);
+                }
+            }).catch(err => {
+                console.log(err);
+            });
+        return () => { shouldUpdate = false; } 
+    }, [authHelper]);
 
     React.useEffect(() => {
         const totalAgreements = agreements.length;
@@ -702,6 +728,15 @@ const AgreementDashboard: React.FC = () => {
                     </Group>
                 </Stack>
             </Modal>
+            
+            <Modal
+                opened={showUnverifiedModal}
+                onClose={() => setShowUnverifiedModal(false)}
+                centered
+            >
+                <VerifyEmailMessage navigate={navigate} auth={auth} organization={organization}  />
+            </Modal>
+
         </>
     );
 };
