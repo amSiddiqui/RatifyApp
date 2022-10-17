@@ -1,7 +1,7 @@
 import React from 'react';
 import { useIntl } from 'react-intl';
 import { useDispatch, useSelector } from 'react-redux';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { AuthHelper } from '../../helpers/AuthHelper';
 import { SignUpDataType } from '../../types/AuthTypes';
 import * as Yup from 'yup';
@@ -28,6 +28,7 @@ type Props = {
 
 const SignupForm: React.FC<Props> = ( {title, buttonTitle} ) => {
     const loading = useSelector((root: RootState) => root.auth.loading);
+    const [searchParams] = useSearchParams();
 
     const intl = useIntl();
     const dispatchFn = useDispatch();
@@ -63,6 +64,7 @@ const SignupForm: React.FC<Props> = ( {title, buttonTitle} ) => {
         register,
         handleSubmit,
         formState: { errors },
+        setValue,
     } = useForm<SignUpDataType>({
         resolver: yupResolver(schema),
         defaultValues: {
@@ -92,6 +94,13 @@ const SignupForm: React.FC<Props> = ( {title, buttonTitle} ) => {
                 setSending(false);
             });
     };
+
+    React.useEffect(() => {
+        const email = searchParams.get('email');
+        if (email) {
+            setValue('email', email);
+        }
+    }, [searchParams, setValue]);
 
     return (
         <form onSubmit={handleSubmit(onUserRegister)} className="w-full">
