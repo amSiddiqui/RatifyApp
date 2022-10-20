@@ -89,13 +89,22 @@ const columnBuilder = (columns: boolean[], navigate: NavigateFunction, onMoreDet
             return <Center>
                     <Group position='apart' style={{ marginTop: 12, width: 130 }} className='mt-[12px]'>
                         <Center style={{ width: 20 }}>
-                            {params.data.signed_before && params.data.status === 'sent' && <Tooltip
-                                label={'Complete Before: ' + getFormatDateFromIso(params.data.signed_before)}
-                            >
-                                <Center>
-                                    <i className='iconsminds-stopwatch text-xl' />
-                                </Center>
-                            </Tooltip>}
+                            <Group spacing={8}>
+                                {params.data.signed_before && params.data.status === 'sent' && <Tooltip
+                                    label={'Complete Before: ' + getFormatDateFromIso(params.data.signed_before)}
+                                >
+                                    <Center>
+                                        <i className='simple-icon-hourglass text-xl' />
+                                    </Center>
+                                </Tooltip>}
+                                {params.data.end_date && params.data.status === 'sent' && <Tooltip
+                                    label={'End Date: ' + getFormatDateFromIso(params.data.end_date)}
+                                >
+                                    <Center>
+                                        <i className='iconsminds-stopwatch text-xl' />
+                                    </Center>
+                                </Tooltip>}
+                            </Group>
                         </Center>
                         <Center>{params.data.status === 'sent' && <div className={classNames('flex relative font-bold flex-col rounded-full justify-center items-center', { 
                             'text-success': lessThanADay || diff.days <= 7,
