@@ -60,6 +60,15 @@ const ContractAgreements: React.FC = () => {
         setProgress(progressEvent.loaded / progressEvent.total);
     }, []);
 
+    const onCreateDocumentClick = (id:number) => {
+        const ts = templates.filter(t => t.id === id);
+        if (ts.length > 0) {
+            const tp = ts[0];
+            setSelectedTemplate(tp);
+            templateConfirmHandlers.open();
+        }
+    }
+
     const onUploadButtonClick = React.useCallback((event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
         if (!organization || !auth.user) {
             event.stopPropagation();
@@ -278,14 +287,7 @@ const ContractAgreements: React.FC = () => {
                             setShowPdfView(true);
                         }
                     }}
-                    onCreateClick={(id) => {
-                        const ts = templates.filter(t => t.id === id);
-                        if (ts.length > 0) {
-                            const tp = ts[0];
-                            setSelectedTemplate(tp);
-                            templateConfirmHandlers.open();
-                        }
-                    }}
+                    onCreateClick={onCreateDocumentClick}
                     />}
                     {loading && <>
                         <div className="flex flex-row items-center mb-4">
@@ -408,14 +410,22 @@ const ContractAgreements: React.FC = () => {
                 overflow='inside'
                 id='contract-agreements-pdf-viewer-modal'
                 title={<Stack spacing={2}>
-                    <Group>
-                        <p><span>Document: </span><span className='font-bold'>{selectedTemplate && (selectedTemplate.name.length > 40 ? selectedTemplate.name.substring(0, 40) + '...' : selectedTemplate.name)}</span></p>
-                        <p><span>Category: </span><span className='font-bold'>{selectedTemplate?.category}</span></p>
+                    <Group className='w-full' position='apart'>
+                        <Group>
+                            <p><span>Document: </span><span className='font-bold'>{selectedTemplate && (selectedTemplate.name.length > 40 ? selectedTemplate.name.substring(0, 40) + '...' : selectedTemplate.name)}</span></p>
+                            <p><span>Category: </span><span className='font-bold'>{selectedTemplate?.category}</span></p>
+                        </Group>
+                        <span onClick={() => {
+                            if (selectedTemplate) {
+                                setShowPdfView(false);
+                                onCreateDocumentClick(selectedTemplate.id);
+                            }
+                        }}><Button size='sm'>Use Template</Button></span>
                     </Group>
                     {selectedTemplate && selectedTemplate.description && <p><span>Description: </span><span>{selectedTemplate && (selectedTemplate.description.length > 100) ? selectedTemplate.description.substring(0, 100) + '...' : selectedTemplate?.description}</span></p>}
                 </Stack>}
             >
-                {selectedTemplate && <PdfViewer contractHelper={contractHelper} documentId={selectedTemplate.documents[0].toString()} />}
+                {selectedTemplate && <PdfViewer docTitle={selectedTemplate.name} contractHelper={contractHelper} documentId={selectedTemplate.documents[0].toString()} />}
             </Modal>
         </>
     );
