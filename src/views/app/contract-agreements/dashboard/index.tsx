@@ -539,7 +539,7 @@ const AgreementDashboard: React.FC = () => {
                                             if (gridRef.current && gridRef.current.api) {
                                                 if (page > 1) {
                                                     setPage(page - 1);
-                                                    gridRef.current.api.paginationGoToPage(page - 1);
+                                                    gridRef.current.api.paginationGoToPage(page - 2);
                                                 }
                                             }
                                         }}>
@@ -559,7 +559,7 @@ const AgreementDashboard: React.FC = () => {
                                                 <PaginationLink onClick={() => {
                                                     if (gridRef.current && gridRef.current.api) {
                                                         setPage(p);
-                                                        gridRef.current.api.paginationGoToPage(p);
+                                                        gridRef.current.api.paginationGoToPage(p - 1);
                                                     }
                                                 }}>
                                                     {p}
@@ -572,7 +572,7 @@ const AgreementDashboard: React.FC = () => {
                                             if (gridRef.current && gridRef.current.api) {
                                                 if (page < totalPages) {
                                                     setPage(page + 1);
-                                                    gridRef.current.api.paginationGoToPage(page + 1);
+                                                    gridRef.current.api.paginationGoToPage(page);
                                                 }
                                             }
                                         }}>
