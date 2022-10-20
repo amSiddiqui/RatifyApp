@@ -1,5 +1,6 @@
-import { Menu } from '@mantine/core';
+import { Menu, ThemeIcon } from '@mantine/core';
 import React from 'react';
+import { BsThreeDots } from 'react-icons/bs';
 import { toast } from 'react-toastify';
 import { AuthHelper } from '../../helpers/AuthHelper';
 
@@ -55,7 +56,7 @@ const BusinessLogo: React.FC<{authHelper: AuthHelper}> = ( {authHelper} ) => {
                     alt="Logo"
                 />
                 <span>
-                    <Menu className="relative top-11 right-4">
+                    <Menu control={<ThemeIcon radius={'xl'} size='sm'><BsThreeDots></BsThreeDots></ThemeIcon>} className="relative top-11 right-4">
                         <Menu.Item
                             className="hover:bg-gray-100"
                             onClick={() => {

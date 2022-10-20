@@ -14,7 +14,6 @@ import { MdAdd } from 'react-icons/md';
 import { BusinessFunction, LegalEntity } from '../../types/AuthTypes';
 import { AuthHelper } from '../../helpers/AuthHelper';
 import { BsTrash } from 'react-icons/bs';
-import { useMediaQuery } from '@mantine/hooks';
 import { toast } from 'react-toastify';
 
 export const AutoCompleteFunctionalData = [
@@ -42,7 +41,6 @@ const BusinessFunctionForm: React.FC<Props> = ({
         BusinessFunction[]
     >([]);
     const [showError, setShowError] = React.useState(false);
-    const matches = useMediaQuery('(max-width:800px)');
 
     const onSubmit = (skip: boolean) => {
         setShowError(true);
@@ -149,7 +147,7 @@ const BusinessFunctionForm: React.FC<Props> = ({
                         </List.Item>
                     ))}
                 </List>
-                <Group position={matches ? 'left' : 'right'}>
+                <Group position={'left'}>
                     <span
                         onClick={() => {
                             const newBusinessFunction = {

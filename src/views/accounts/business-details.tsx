@@ -109,7 +109,9 @@ const BusinessDetails: React.FC<{
     return (
         <Stack className="w-full" spacing={'xl'}>
             <Grid columns={12}>
-                <Grid.Col xs={2}></Grid.Col>
+                <Grid.Col xs={2}>
+                    <BusinessLogo authHelper={authHelper} />
+                </Grid.Col>
                 <Grid.Col xs={8}>
                     <Center className="h-full relative">
                         <Stack
@@ -206,7 +208,7 @@ const BusinessDetails: React.FC<{
                     </Center>
                 </Grid.Col>
                 <Grid.Col xs={2}>
-                    <BusinessLogo authHelper={authHelper} />
+                    
                 </Grid.Col>
             </Grid>
             <Card shadow={'md'} className="p-4 w-full h-full">

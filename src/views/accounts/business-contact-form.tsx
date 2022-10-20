@@ -3,6 +3,7 @@ import { Checkbox, Collapse, Group, SimpleGrid, Space, Stack, TextInput } from '
 import classNames from 'classnames';
 import React from 'react';
 import { useForm } from 'react-hook-form';
+import { MdAdd, MdRemove } from 'react-icons/md';
 import { toast } from 'react-toastify';
 import { Button } from 'reactstrap';
 import * as Yup from 'yup';
@@ -131,10 +132,14 @@ const BusinessContactForm:React.FC<{
                         </SimpleGrid>
                     </Stack>
                     <Stack spacing='lg' className='p-4'>
-                        <Group>
-                            <Checkbox size={size} defaultChecked={showSecondaryContact} onChange={(event) => {
-                                setValue('showSecondaryContact', event.target.checked);
-                            }} />
+                        <Group spacing={8}>
+                            {!showSecondaryContact && <MdAdd className='text-xl cursor-pointer' onClick={() => {
+                                setValue('showSecondaryContact', true);
+                            }} />}
+                            {showSecondaryContact && <MdRemove className='text-xl cursor-pointer' onClick={() => {
+                                setValue('showSecondaryContact', false);
+                            }} />}
+                            
                             <h4 className={classNames('font-bold', {'text-lg': size==='xs', 'text-xl': size === 'md' })}>
                                 {showSecondaryContact ? 'Secondary Contact' : 'Add Secondary Contact'}
                             </h4>

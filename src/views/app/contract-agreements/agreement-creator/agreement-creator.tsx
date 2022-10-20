@@ -769,7 +769,6 @@ const AgreementCreator: React.FC = () => {
                                             value={startDate.toJSDate()}
                                             inputFormat="DD/MM/YYYY"
                                             defaultValue={startDate.toJSDate()}
-                                            excludeDate={(dt) => dt < today.minus({ days: 1 }).toJSDate() }
                                             icon={<MdCalendarToday />}
                                             style={{ width: 150 }}
                                             placeholder="Select Date"
@@ -852,7 +851,6 @@ const AgreementCreator: React.FC = () => {
                                                 value={endDate.toJSDate()}
                                                 inputFormat="DD/MM/YYYY"
                                                 defaultValue={endDate.toJSDate()}
-                                                excludeDate={(dt) => dt < today.minus({ days: 1 }).toJSDate() }
                                                 icon={<MdCalendarToday />}
                                                 style={{ width: 150 }}
                                                 placeholder="Select Date"
