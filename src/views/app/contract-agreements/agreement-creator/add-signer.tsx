@@ -108,7 +108,16 @@ const SignerRow:React.FC<SignerRowProps> = ({ index, color, step, onDragEnd, onD
                         }} onMouseUp={() => {
                             setDragging(false);
                             onDragEnd();
-                        }} className='dragger cursor-pointer' style={{width: '70%'}}>
+                        }} 
+                        onTouchStart={() => {
+                            onDragStart();
+                            setDragging(true);
+                        }}
+                        onTouchEnd={() => {
+                            setDragging(false);
+                            onDragEnd();
+                        }}
+                        className='dragger cursor-pointer' style={{width: '70%'}}>
                             <Stack spacing={2}>
                                 <p className='mb-0 text-center'>Step {step}</p>
                                 <Center className='text-2xl'>

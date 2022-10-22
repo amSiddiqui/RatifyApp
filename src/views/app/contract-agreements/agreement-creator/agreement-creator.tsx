@@ -443,18 +443,26 @@ const AgreementCreator: React.FC = () => {
             setIsDragging(false);
         };
 
-        const onmousemove = (event: MouseEvent) => {
+        const onmousemove = (event: MouseEvent | TouchEvent) => {
             if (isDragging) {
-                setMousePosition({ x: event.clientX, y: event.clientY });
+                if (event instanceof MouseEvent) {
+                    setMousePosition({x: event.clientX, y: event.clientY});
+                } else {
+                    setMousePosition({x: event.touches[0].clientX, y: event.touches[0].clientY});
+                }
             }
         };
 
         window.addEventListener('mouseup', onmouseup);
+        window.addEventListener('touchend', onmouseup);
         window.addEventListener('mousemove', onmousemove);
+        window.addEventListener('touchmove', onmousemove);
 
         return () => {
             window.removeEventListener('mouseup', onmouseup);
+            window.removeEventListener('touchend', onmouseup);
             window.removeEventListener('mousemove', onmousemove);
+            window.removeEventListener('touchmove', onmousemove);
         };
     }, [isDragging]);
 
@@ -556,6 +564,15 @@ const AgreementCreator: React.FC = () => {
                                                                 });
                                                                 setIsDragging(true);
                                                             }}
+                                                            onTouchStart={() => {
+                                                                setDragInputProps({
+                                                                    dragInputColor: signer.color,
+                                                                    dragInputId: signer.id,
+                                                                    dragInputText: 'Full Name',
+                                                                    dragInputType: 'name'
+                                                                });
+                                                                setIsDragging(true);
+                                                            }}
                                                             position="apart"
                                                             className="border-2 cursor-pointer border-slate-300 rounded-sm bg-white p-2 text-slate-400"
                                                             spacing='xs'
@@ -567,6 +584,15 @@ const AgreementCreator: React.FC = () => {
                                                         </Group>
                                                         <Group
                                                             onMouseDown={() => {
+                                                                setDragInputProps({
+                                                                    dragInputColor: signer.color,
+                                                                    dragInputId: signer.id,
+                                                                    dragInputText: 'Signature',
+                                                                    dragInputType: 'signature'
+                                                                });
+                                                                setIsDragging(true);
+                                                            }}
+                                                            onTouchStart={() => {
                                                                 setDragInputProps({
                                                                     dragInputColor: signer.color,
                                                                     dragInputId: signer.id,
@@ -593,6 +619,15 @@ const AgreementCreator: React.FC = () => {
                                                                 });
                                                                 setIsDragging(true);
                                                             }}
+                                                            onTouchStart={() => {
+                                                                setDragInputProps({
+                                                                    dragInputColor: signer.color,
+                                                                    dragInputId: signer.id,
+                                                                    dragInputText: 'Date',
+                                                                    dragInputType: 'date',
+                                                                });
+                                                                setIsDragging(true);
+                                                            }}
                                                             position="apart"
                                                             className="border-2 cursor-pointer border-slate-300 rounded-sm bg-white p-2 text-slate-400"
                                                         >
@@ -603,6 +638,15 @@ const AgreementCreator: React.FC = () => {
                                                         </Group>
                                                         {signer.text_field && <Group
                                                             onMouseDown={() => {
+                                                                setDragInputProps({
+                                                                    dragInputColor: signer.color,
+                                                                    dragInputId: signer.id,
+                                                                    dragInputText: 'Extra Field',
+                                                                    dragInputType: 'text'
+                                                                });
+                                                                setIsDragging(true);
+                                                            }}
+                                                            onTouchStart={() => {
                                                                 setDragInputProps({
                                                                     dragInputColor: signer.color,
                                                                     dragInputId: signer.id,
