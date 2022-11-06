@@ -10,13 +10,13 @@ import {
 } from '@mantine/core';
 import { Button } from 'reactstrap';
 import { useSearchParams } from 'react-router-dom';
-import Confetti from 'react-confetti';
-import { useMediaQuery, useViewportSize } from '@mantine/hooks';
+import { useMediaQuery } from '@mantine/hooks';
 import SignupForm from '../../../user/signup-form';
 import { useDispatch } from 'react-redux';
 import { ContractHelper } from '../../../../helpers/ContractHelper';
 import { BrowserData, SignerMetaData } from '../../../../types/ContractTypes';
 import ShowBrowserData from '../show-browser-data';
+import confetti from 'canvas-confetti';
 
 const typeToMessage = (type: string) => {
     if (type === 'many') {
@@ -40,8 +40,6 @@ const AgreementSuccess: React.FC = () => {
         () => new ContractHelper(dispatchFn),
         [dispatchFn],
     );
-    const { height, width } = useViewportSize();
-    const [showConfetti, setShowConfetti] = React.useState(false);
     const [searchParams] = useSearchParams();
     const [token, setToken] = React.useState('');
     const [signerType, setSignerType] = React.useState('');
@@ -57,25 +55,33 @@ const AgreementSuccess: React.FC = () => {
 
     const matches = useMediaQuery('(max-width: 800px)');
 
+    
+    const fire = React.useCallback(() => {
+        confetti({
+            particleCount: 200,
+            angle: 60,
+            spread: 60,
+            origin: { x: 0, y: 0.8 }
+          });
+        // and launch a few from the right edge
+        confetti({
+            particleCount: 200,
+            angle: 120,
+            spread: 60,
+            origin: { x: 1, y: 0.8 }
+        });
+    }, []);
+
     React.useEffect(() => {
         const confetti = searchParams.get('confetti');
         const tokenStr = searchParams.get('token');
-        let timeout: NodeJS.Timeout | null = null; 
         if (confetti) {
-            setShowConfetti(true);
-            timeout = setTimeout(() => {
-                setShowConfetti(false);
-            }, 1400);
+            fire();
         }
         if (tokenStr) {
             setToken(tokenStr);
         }
-        return () => {
-            if (timeout) {
-                clearTimeout(timeout);
-            }
-        }
-    }, [searchParams]);
+    }, [searchParams, fire]);
 
     React.useEffect(() => {
         let shouldUpdate = true;
@@ -89,7 +95,6 @@ const AgreementSuccess: React.FC = () => {
             }).catch(err => {
                 console.log(err);
             });
-
 
             contractHelper.getSignerSelfMetaData(token).then(res => {
                 if (shouldUpdate) {
@@ -168,7 +173,6 @@ const AgreementSuccess: React.FC = () => {
                 </Center>
             </SimpleGrid>
         </div>
-        <Confetti gravity={0.1} width={width} numberOfPieces={showConfetti ? 200 : 0} height={height} />
         <Modal
             opened={showDocumentCopy}
             onClose={() => setShowDocumentCopy(false)}

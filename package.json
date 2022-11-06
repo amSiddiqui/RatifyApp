@@ -32,6 +32,7 @@
     "axios": "^0.26.1",
     "babel-eslint": "^10.1.0",
     "bowser": "^2.11.0",
+    "canvas-confetti": "^1.6.0",
     "chart.js": "^2.9.4",
     "classnames": "^2.3.1",
     "dayjs": "^1.11.1",
@@ -95,6 +96,7 @@
     ]
   },
   "devDependencies": {
+    "@types/canvas-confetti": "^1.4.3",
     "autoprefixer": "^10.4.4",
     "husky": "^7.0.4",
     "lint-staged": "^12.3.8",
