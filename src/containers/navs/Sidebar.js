@@ -338,8 +338,11 @@ class Sidebar extends Component {
       return menuItems.filter(
         (x) => (x.roles && x.roles.includes(currentUser.role)) || !x.roles
       );
+    } else {
+      return menuItems.filter(
+        (x) => !x.loggedIn
+      );
     }
-    return menuItems;
   };
 
   render() {
