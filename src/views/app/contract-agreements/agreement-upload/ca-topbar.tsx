@@ -24,7 +24,7 @@ const CATopBar: React.FC<{
                 <Grid columns={12}>
                     <Grid.Col span={2}></Grid.Col>
                     <Grid.Col span={8}>
-                        {!(auth && organization && !organizationLoading && !auth.loading) && <Center>
+                        {(!auth || !organization) && <Center>
                             <Center style={{ height: 180, width: '100%', maxWidth: '842px', border: '2px dashed #ced4da' }} className='rounded-sm bg-white '>
                                 {(organizationLoading || auth.loading) && <Loader size='lg' variant='bars'></Loader>}
                                 {!(organizationLoading || auth.loading) && (!auth || !organization) && <Stack className='text-center'>

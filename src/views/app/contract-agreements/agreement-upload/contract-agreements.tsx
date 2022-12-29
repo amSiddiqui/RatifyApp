@@ -189,6 +189,7 @@ const ContractAgreements: React.FC = () => {
                 }
             }).catch(err => {
                 console.log(err);
+                setOrganizationLoading(false);
             });
         return () => { shouldUpdate = false; } 
     }, [authHelper]);
