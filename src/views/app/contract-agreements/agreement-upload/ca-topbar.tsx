@@ -27,9 +27,13 @@ const CATopBar: React.FC<{
                         {(!auth || !organization) && <Center>
                             <Center style={{ height: 180, width: '100%', maxWidth: '842px', border: '2px dashed #ced4da' }} className='rounded-sm bg-white '>
                                 {(organizationLoading || auth.loading) && <Loader size='lg' variant='bars'></Loader>}
-                                {!(organizationLoading || auth.loading) && (!auth || !organization) && <Stack className='text-center'>
+                                {!(organizationLoading || auth.loading) && (auth && !organization) && <Stack className='text-center'>
                                     <h5 className='text-rose-500'>Please complete the business profile before continuing!</h5>
                                     <span onClick={() => {navigate(`/business-profile`)}}><Button color='primary'>Business Profile</Button></span>
+                                </Stack>}
+                                {!(organizationLoading || auth.loading) && (!auth.user) && <Stack className='text-center'>
+                                    <h5 className='text-rose-500'>Please verify your email address before continuing!</h5>
+                                    <span onClick={() => {navigate(`/profile-settings`)}}><Button color='primary'>My Account</Button></span>
                                 </Stack>}
                             </Center>
                         </Center>}
