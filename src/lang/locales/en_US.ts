@@ -63,7 +63,7 @@ export const enMessages = {
     'menu.blank': 'Blank Page',
     'menu.billing': 'Billing',
     'menu.administration': 'Administration',
-    'menu.manage-users': 'User Management',
+    'menu.manage-users': 'Manage Users',
     'menu.dashboard': 'Dashboard',
     'menu.notification-settings': 'Notification Settings',
     'menu.users': 'Users',
@@ -95,7 +95,7 @@ export const enMessages = {
     'account.settings.ui': 'UI Settings',
 
     // 07. Admin
-    'admin.user-management' : 'User Management',
+    'admin.user-management' : 'Manage Users',
 
     'profile-settings.last-name': 'Surname',
     'profile-settings.first-name': 'First Name',
