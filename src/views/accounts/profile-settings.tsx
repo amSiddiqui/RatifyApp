@@ -180,9 +180,10 @@ const ProfileSettings: React.FC = () => {
                     first_name: userData.firstName,
                     last_name: userData.lastName,
                     email: userData.email,
+                    job_title: userData.job_title,
+                    user_id_reference: userData.user_id_reference,
                     img: newImg,
                 } as UserType;
-                console.log('Setting user: ', { newUser });
                 dispatchFn(authActions.setUser(newUser));
                 toast.success('User updated successfully');
                 setEditMode(false);
