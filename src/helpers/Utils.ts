@@ -167,7 +167,7 @@ export const getLastSeenFromDate = (lastSeen: string) => {
 
 export const getFormatDateFromIso = (isoDate: string | null) => {
     if (!isoDate) return '';
-    return DateTime.fromISO(isoDate).toLocaleString(DateTime.DATE_FULL);
+    return DateTime.fromISO(isoDate).toLocaleString(DateTime.DATE_MED);
 }
 
 export const passwordValidation = (value:string | undefined) => {
