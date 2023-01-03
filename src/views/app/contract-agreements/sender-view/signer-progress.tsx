@@ -119,10 +119,11 @@ type Props = {
     onDocumentSent: (id: number) => void;
     signerProgress: {total: number, completed: number} | null;
     label: string;
+    agreementStatus: string;
     agreementId?: string;
 };
 
-const SignerProgress: React.FC<Props> = ({ signer, contractHelper, onDocumentSent, signerProgress, label, agreementId }) => {
+const SignerProgress: React.FC<Props> = ({ signer, contractHelper, onDocumentSent, signerProgress, label, agreementId, agreementStatus }) => {
     const [sendAgainModal, sendAgainHandlers] = useDisclosure(false);
     const [sending, setSending] = React.useState(false);
 
@@ -343,7 +344,7 @@ const SignerProgress: React.FC<Props> = ({ signer, contractHelper, onDocumentSen
                                 ><Button size='xs' color='primary'>
                                     Send Reminder    
                                 </Button></span>}
-                                {signer.status === 'error' && <span onClick={() => {
+                                {signer.status === 'error' && (agreementStatus === 'sent' || agreementStatus === 'error') && <span onClick={() => {
                                     sendAgainHandlers.open();
                                 }}>
                                     <Button disabled={sending}>Send Again</Button>    

@@ -10,6 +10,7 @@ import {
     Stack,
     Textarea,
     TextInput,
+    Tooltip,
 } from '@mantine/core';
 import React from 'react';
 import { IntlShape } from 'react-intl';
@@ -170,34 +171,38 @@ const DocumentCarousel: React.FC<Props> = ({
                                                     width: 116,
                                                 }}>
                                                 {(image.error || image.image.trim().length === 0) && (
-                                                    <Center
-                                                        style={{
-                                                            height: 150,
-                                                            width: 116,
-                                                        }}
-                                                        onClick={() => {
-                                                            onViewClick(image.id);
-                                                        }}
-                                                        className="shadow-md cursor-pointer">
-                                                        <div className="text-3xl">
-                                                            <i className="simple-icon-doc"></i>
-                                                        </div>
-                                                    </Center>
+                                                    <Tooltip label={image.name}>
+                                                        <Center
+                                                            style={{
+                                                                height: 150,
+                                                                width: 116,
+                                                            }}
+                                                            onClick={() => {
+                                                                onViewClick(image.id);
+                                                            }}
+                                                            className="shadow-md cursor-pointer">
+                                                            <div className="text-3xl">
+                                                                <i className="simple-icon-doc"></i>
+                                                            </div>
+                                                        </Center>
+                                                    </Tooltip>
                                                 )}
                                                 {!(image.error || image.image.trim().length === 0) && (
-                                                    <Image
-                                                        className="shadow-md cursor-pointer"
-                                                        onClick={() => {
-                                                            onViewClick(image.id,);
-                                                        }}
-                                                        src={
-                                                            'data:image/jpeg;base64,' +
-                                                            image.image
-                                                        }
-                                                        alt={image.name}
-                                                        height={150}
-                                                        fit="contain"
-                                                    />
+                                                    <Tooltip label={image.name}>
+                                                        <Image
+                                                            className="shadow-md cursor-pointer"
+                                                            onClick={() => {
+                                                                onViewClick(image.id,);
+                                                            }}
+                                                            src={
+                                                                'data:image/jpeg;base64,' +
+                                                                image.image
+                                                            }
+                                                            alt={image.name}
+                                                            height={150}
+                                                            fit="contain"
+                                                        />
+                                                    </Tooltip>
                                                 )}
                                             </div>
                                         </div>

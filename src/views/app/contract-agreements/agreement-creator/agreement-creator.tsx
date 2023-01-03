@@ -149,6 +149,20 @@ const AgreementCreator: React.FC = () => {
         setShowSignerModal(false);
     }, [contractId, contractHelper]);
 
+    const canDocumentBeSended = React.useCallback(() => {
+        if (agreementName.trim().length === 0)
+            return false;
+        if (signers.length === 0)
+            return false;
+        
+        for (let s of signers) {
+            if (s.type === 'signer' && inputElements.length === 0)
+                return false; 
+        }
+        
+        return true;
+    }, [signers, agreementName, inputElements]);
+
     const onSetSignerSequence = React.useCallback((signSequence: boolean) => {
         setSignSequence(signSequence);
     }, []);
@@ -952,7 +966,7 @@ const AgreementCreator: React.FC = () => {
                             </Button></span>
                         </Group>
                         <Group position='right'>
-                            <span onClick={() => {onPrepareSend()}}><Button color='success' className='agreement-button' >Review &amp; Send</Button></span>
+                            <span onClick={() => {canDocumentBeSended() && onPrepareSend()}}><Button color='success' disabled={!canDocumentBeSended()} className='agreement-button' >Review &amp; Send</Button></span>
                         </Group>
                     </Group>
                 </Grid.Col>

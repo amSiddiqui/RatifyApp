@@ -425,6 +425,7 @@ const SenderAgreement: React.FC = () => {
                                                     onDocumentSent={setSignerDocumentSuccess}
                                                     contractHelper={contractHelper}
                                                     key={signer.id}
+                                                    agreementStatus={agreement === null ? '' : agreement.status}
                                                     signer={signer}
                                                 />
                                             );
