@@ -162,7 +162,6 @@ const Login: React.FC = () => {
                                 ? errors.password.message
                                 : ''
                         }
-                        type="password"
                         size={'md'}
                         icon={<i className="simple-icon-lock" />}
                         label="Password"

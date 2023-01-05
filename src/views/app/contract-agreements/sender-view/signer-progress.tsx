@@ -339,7 +339,7 @@ const SignerProgress: React.FC<Props> = ({ signer, contractHelper, onDocumentSen
                                         {lastReminder === '' ? 'Not sent' : getFormatDateFromIso(lastReminder)}    
                                     </p>}
                                 </div>
-                                {!signer.declined && (signer.type === 'viewer' ? !signer.last_seen : signer.status === 'sent') &&<span
+                                {agreementStatus === 'sent' && !signer.declined && (signer.type === 'viewer' ? !signer.last_seen : signer.status === 'sent') &&<span
                                     onClick={() => setShowConfirmReminder(true)}
                                 ><Button size='xs' color='primary'>
                                     Send Reminder    
