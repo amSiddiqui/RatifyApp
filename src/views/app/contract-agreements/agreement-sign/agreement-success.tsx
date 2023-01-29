@@ -46,8 +46,8 @@ const AgreementSuccess: React.FC = () => {
     const [senderName, setSenderName] = React.useState('');
     const [organizationName, setOrganizationName] = React.useState('');
     const [showDocumentCopy, setShowDocumentCopy] = React.useState(false);
-    const [error, setError] = React.useState(false);
-    const [respType, setRespType] = React.useState('');
+    const [error] = React.useState(false);
+    const [respType] = React.useState('');
     const [showSignerMeta, setShowSignerMeta] = React.useState(false);
     const [signerMeta, setSignerMeta] = React.useState<SignerMetaData>();
     const [browserData, setBrowserData] = React.useState<BrowserData>();
@@ -115,24 +115,9 @@ const AgreementSuccess: React.FC = () => {
         return () => { shouldUpdate = false; }
     }, [token, contractHelper]);
 
-    const requestDocumentCopy = React.useCallback(() => {
-        if (token) {
-            setError(false);
-            contractHelper.requestFinalDocument(token).then(resp => {
-                setRespType(resp.type);
-                setShowDocumentCopy(true);
-            }).catch(err => {
-                setError(true);
-                console.log(err.response);
-                if (err && err.response && err.response.data) {
-                    setRespType(err.response.data.type);
-                } else {
-                    setRespType('error');
-                }
-                setShowDocumentCopy(true);
-            });
-        }
-    }, [contractHelper, token]);
+    const requestDocumentCopy = () => {
+        window.open('/api/v1/contracts/signer/download-document/?token='+token, '_blank')
+    }
 
     return (
         <>
