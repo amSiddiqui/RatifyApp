@@ -38,6 +38,8 @@ const AllColumns = [
     'Actions'
 ]
 
+const showActionButtonForStatus = ['sent', 'completed']
+
 const columnBuilder = (columns: boolean[], navigate: NavigateFunction, onMoreDetailsClicked: (id: number) => void):(ColDef | ColGroupDef)[] => {
     const columnDefs:(ColDef | ColGroupDef)[] = [];
     if (columns.length > 0 && columns[0]) {
@@ -90,14 +92,14 @@ const columnBuilder = (columns: boolean[], navigate: NavigateFunction, onMoreDet
                     <Group position='apart' style={{ marginTop: 12, width: 130 }} className='mt-[12px]'>
                         <Center style={{ width: 20 }}>
                             <Group spacing={8}>
-                                {params.data.signed_before && params.data.status === 'sent' && <Tooltip
+                                {params.data.signed_before && showActionButtonForStatus.includes(params.data.status) && <Tooltip
                                     label={'Complete Before: ' + getFormatDateFromIso(params.data.signed_before)}
                                 >
                                     <Center>
                                         <i className='simple-icon-hourglass text-xl' />
                                     </Center>
                                 </Tooltip>}
-                                {params.data.end_date && params.data.status === 'sent' && <Tooltip
+                                {params.data.end_date && showActionButtonForStatus.includes(params.data.status) && <Tooltip
                                     label={'End Date: ' + getFormatDateFromIso(params.data.end_date)}
                                 >
                                     <Center>
