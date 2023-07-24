@@ -14,23 +14,10 @@ const data = [
         to: `/agreements`,
     },
     {
-        id: 'reports',
-        icon: 'iconsminds-monitor-analytics',
-        label: 'menu.reports',
-        to: `/reports`,
-    },
-    {
         id: 'account',
         icon: 'iconsminds-profile',
         label: 'menu.account',
         to: `/profile-settings`,
-    },
-    {
-        id: 'billing',
-        icon: 'iconsminds-billing',
-        label: 'menu.billing',
-        roles: [UserRole.Admin],
-        to: `/billing`,
     },
     {
         id: 'business',
